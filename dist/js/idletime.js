@@ -24,13 +24,13 @@ const timerIncrement = () => {
     //     default:
     // }
     
-    // switch (url_path) {
-    //     case "/zaihai/shop/applicator_list.php":
-    //         // Applicator List Interval
-    //         clearInterval(realtime_get_);
-    //         break;
-    //     default:
-    // }
+    switch (url_path) {
+        case "/zaihai/shop/applicator_list.php":
+            // Applicator List Interval
+            clearInterval(realtime_get_recent_applicator_list);
+            break;
+        default:
+    }
 
     window.location.href = '../process/logout.php';
   }

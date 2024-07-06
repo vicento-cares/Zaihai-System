@@ -39,10 +39,7 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-2">
-                <div class="col-sm-4">
-                  <span id="day_view"></span>
-                </div>
-                <div class="col-sm-2 offset-sm-6">
+                <div class="col-sm-2">
                   <span id="count_view"></span>
                 </div>
               </div>
