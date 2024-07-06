@@ -24,13 +24,21 @@ const timerIncrement = () => {
     //     default:
     // }
     
-    // switch (url_path) {
-    //     case "/zaihai/shop/applicator_list.php":
-    //         // Applicator List Interval
-    //         clearInterval(realtime_get_);
-    //         break;
-    //     default:
-    // }
+    switch (url_path) {
+        case "/zaihai/shop/applicator_list.php":
+            // Applicator List Interval
+            clearInterval(realtime_get_recent_applicator_list);
+            break;
+        case "/zaihai/shop/applicator_out.php":
+            // Applicator Out Interval
+            clearInterval(realtime_get_recent_applicator_out);
+            break;
+        case "/zaihai/shop/applicator_in.php":
+            // Applicator In Interval
+            clearInterval(realtime_get_recent_applicator_in);
+            break;
+        default:
+    }
 
     window.location.href = '../process/logout.php';
   }
