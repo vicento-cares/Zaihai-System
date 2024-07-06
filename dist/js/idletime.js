@@ -29,6 +29,10 @@ const timerIncrement = () => {
             // Applicator List Interval
             clearInterval(realtime_get_recent_applicator_list);
             break;
+        case "/zaihai/shop/applicator_out.php":
+            // Applicator List Interval
+            clearInterval(realtime_get_recent_applicator_out);
+            break;
         default:
     }
 

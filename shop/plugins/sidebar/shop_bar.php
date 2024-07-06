@@ -34,6 +34,30 @@
             </p>
           </a>
         </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/applicator_out.php") { ?>
+          <a href="applicator_out.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_out.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-cart-plus"></i>
+            <p>
+              Applicator Out
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/applicator_in.php") { ?>
+          <a href="applicator_in.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_in.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-th-large"></i>
+            <p>
+              Applicator In
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>
