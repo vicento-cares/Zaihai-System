@@ -9,6 +9,7 @@
 //MODALS
 include '../modals/logout_modal.php';
 include '../modals/applicator_checksheet.php';
+include '../modals/applicator_checksheet_view.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>
