@@ -1,5 +1,15 @@
 <?php
 
+function get_shift($server_time) {
+	if ($server_time >= '06:00:00' && $server_time < '18:00:00') {
+		return 'DS';
+	} else if ($server_time >= '18:00:00' && $server_time <= '23:59:59') {
+		return 'NS';
+	} else if ($server_time >= '00:00:00' && $server_time < '06:00:00') {
+		return 'NS';
+	}
+}
+
 function is_valid_applicator_no($applicator_no) {
     $pos = strpos($applicator_no, "/");
 

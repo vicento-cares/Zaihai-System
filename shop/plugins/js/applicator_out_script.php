@@ -10,8 +10,8 @@
 
     const get_recent_applicator_out = () => {
 		$.ajax({
-			type: "POST",
-			url: "../process/shop/applicator_in_out/aio_p.php",
+			type: "GET",
+			url: "../process/shop/applicator_in_out/aio_g_p.php",
 			cache: false,
 			data: {
 				method: "get_recent_applicator_out"
@@ -63,7 +63,7 @@
 					document.getElementById("out_applicator_result").innerHTML = 'Applicator Out Succesfully!!!';
 					setTimeout(() => {
 						document.getElementById("out_applicator_result").innerHTML = '';
-					}, 1000);
+					}, 3000);
 					get_recent_applicator_out();
 				} else {
 					document.getElementById("out_applicator_result").innerHTML = 'Error: ' + response;

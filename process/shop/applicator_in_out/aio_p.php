@@ -64,36 +64,33 @@ if ($method == 'out_applicator') {
     }
 }
 
-if ($method == 'get_recent_applicator_out') {
-    $c = 0;
-
-    $sql = "SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out
-            FROM t_applicator_in_out
-            WHERE zaihai_stock_address IS NULL AND date_time_in IS NULL
-            ORDER BY id DESC";
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
-            echo '<tr>';
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['serial_no'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['terminal_name'].'</td>';
-            echo '<td>'.$row['trd_no'].'</td>';
-            echo '<td>'.$row['operator_out'].'</td>';
-            echo '<td>'.$row['date_time_out'].'</td>';
-            echo '</tr>';
-        }
-    }
-}
-
 if ($method == 'in_applicator') {
     $location = $_POST['location'];
     $applicator_no = $_POST['applicator_no'];
     $terminal_name = $_POST['terminal_name'];
     $operator_in = $_SESSION['emp_no'];
+
+    $serial_no = $_POST['serial_no'];
+    $equipment_no = $_POST['equipment_no'];
+    $inspection_date_time = $_POST['inspection_date_time'];
+    $inspection_shift = $_POST['inspection_shift'];
+
+    $adjustment_content = $_POST['adjustment_content'];
+    $cross_section_result = $_POST['cross_section_result'];
+    $inspected_by = $_POST['inspected_by'];
+    $inspected_by_no = $_POST['inspected_by_no'];
+    $checked_by = $_POST['checked_by'];
+    
+    $ac1 = $_POST['ac1'];
+    $ac2 = $_POST['ac2'];
+    $ac3 = $_POST['ac3'];
+    $ac4 = $_POST['ac4'];
+    $ac5 = $_POST['ac5'];
+    $ac6 = $_POST['ac6'];
+    $ac7 = $_POST['ac7'];
+    $ac8 = $_POST['ac8'];
+    $ac9 = $_POST['ac9'];
+    $ac10 = $_POST['ac10'];
 
     if (is_valid_applicator_no($applicator_no) == false) {
         echo 'Invalid Applicator No.';
@@ -120,6 +117,16 @@ if ($method == 'in_applicator') {
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
             if ($row) {
+                $sql = "INSERT INTO t_applicator_c 
+                        (serial_no, equipment_no, machine_no, terminal_name, inspection_date_time, inspection_shift, 
+                        adjustment_content, cross_section_result, inspected_by, inspected_by_no, checked_by, 
+                        ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) 
+                        VALUES ('$serial_no', '$equipment_no', '$applicator_no', '$terminal_name', '$inspection_date_time', '$inspection_shift', 
+                        '$adjustment_content', '$cross_section_result', '$inspected_by', '$inspected_by_no', '$checked_by', 
+                        '$ac1', '$ac2', '$ac3', '$ac4', '$ac5', '$ac6', '$ac7', '$ac8', '$ac9', '$ac10')";
+                $stmt = $conn -> prepare($sql);
+                $stmt -> execute();
+
                 $sql = "UPDATE t_applicator_in_out 
                         SET zaihai_stock_address = '$location', operator_in = '$operator_in', date_time_in = '$server_date_time'
                         WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
@@ -139,45 +146,6 @@ if ($method == 'in_applicator') {
             }
         } else {
             echo 'Applicator Not Found';
-        }
-    }
-}
-
-if ($method == 'get_recent_applicator_in') {
-    $c = 0;
-
-    $sql = "SELECT t1.serial_no, t1.applicator_no, t1.terminal_name, 
-                t1.trd_no, t1.operator_out, t1.date_time_out, 
-                t1.zaihai_stock_address, t1.operator_in, t1.date_time_in 
-            FROM t_applicator_in_out t1
-            JOIN (
-                SELECT applicator_no, terminal_name, MAX(date_time_in) AS max_date_time_in
-                FROM t_applicator_in_out
-                WHERE zaihai_stock_address IS NOT NULL AND date_time_in IS NOT NULL
-                GROUP BY applicator_no, terminal_name
-            ) t2
-            ON t1.applicator_no = t2.applicator_no
-            AND t1.terminal_name = t2.terminal_name
-            AND t1.date_time_in = t2.max_date_time_in
-            WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL
-            ORDER BY t1.date_time_in DESC";
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
-            echo '<tr>';
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['serial_no'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['terminal_name'].'</td>';
-            echo '<td>'.$row['trd_no'].'</td>';
-            echo '<td>'.$row['operator_out'].'</td>';
-            echo '<td>'.$row['date_time_out'].'</td>';
-            echo '<td>'.$row['zaihai_stock_address'].'</td>';
-            echo '<td>'.$row['operator_in'].'</td>';
-            echo '<td>'.$row['date_time_in'].'</td>';
-            echo '</tr>';
         }
     }
 }

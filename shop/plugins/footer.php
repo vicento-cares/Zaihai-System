@@ -8,6 +8,7 @@
 <?php
 //MODALS
 include '../modals/logout_modal.php';
+include '../modals/applicator_checksheet.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>
