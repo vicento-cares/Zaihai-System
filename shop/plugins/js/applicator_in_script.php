@@ -100,6 +100,13 @@
 		document.getElementById('ac10_acv').innerHTML = convert_num_to_desc_symbol(ac10);
     }
 
+	document.getElementById("ai_location_before").addEventListener("change", e => {
+		e.preventDefault();
+		document.getElementById("ai_location_before").disabled = true;
+		document.getElementById("ai_location").disabled = false;
+		document.getElementById("ai_location").focus();
+	});
+
 	document.getElementById("ai_location").addEventListener("change", e => {
 		e.preventDefault();
 		document.getElementById("ai_location").disabled = true;
@@ -120,9 +127,36 @@
 		get_single_recent_applicator_out();
 	});
 
+	const reset_applicator_in_fields = () => {
+		document.getElementById("ai_location_before").value = '';
+		document.getElementById("ai_location").value = '';
+		document.getElementById("ai_applicator_no").value = '';
+		document.getElementById("ai_terminal_name").value = '';
+		document.getElementById("ai_location_before").disabled = false;
+		document.getElementById("ai_location_before").focus();
+	}
+
+	const display_applicator_in_out_result = (id, type, message) => {
+		var duration = 0;
+		var error_message = 'Error: ';
+		if (type == 'error') {
+			duration = 2000;
+			message = error_message + message;
+			document.getElementById(id).classList.add('text-red');
+		} else {
+			duration = 3000;
+		}
+		document.getElementById(id).innerHTML = message;
+		setTimeout(() => {
+			document.getElementById(id).innerHTML = '';
+			document.getElementById(id).classList.remove('text-red');
+		}, duration);
+	}
+
 	const get_single_recent_applicator_out = () => {
 		let applicator_no = document.getElementById("ai_applicator_no").value;
 		let terminal_name = document.getElementById("ai_terminal_name").value;
+		let location_before = document.getElementById("ai_location_before").value;
 		$.ajax({
 			type: "GET",
 			url: "../process/shop/applicator_in_out/aio_g_p.php",
@@ -130,7 +164,8 @@
 			data: {
 				method: "get_single_recent_applicator_out",
 				applicator_no: applicator_no,
-				terminal_name: terminal_name
+				terminal_name: terminal_name,
+				location_before: location_before
 			},
 			success: (response) => {
 				try {
@@ -147,28 +182,12 @@
 						document.getElementById('inspected_by_no_ac_i').value = response_array.inspected_by_no;
 						$('#applicator_checksheet').modal("show");
                     } else {
-						document.getElementById("in_applicator_result").innerHTML = 'Error: ' + response_array.message;
-						document.getElementById("in_applicator_result").classList.add('text-red');
-						setTimeout(() => {
-							document.getElementById("in_applicator_result").innerHTML = '';
-							document.getElementById("in_applicator_result").classList.remove('text-red');
-						}, 2000);
-
-						document.getElementById("ai_location").value = '';
-						document.getElementById("ai_applicator_no").value = '';
-						document.getElementById("ai_terminal_name").value = '';
-						document.getElementById("ai_location").disabled = false;
-						document.getElementById("ai_location").focus();
-
+						display_applicator_in_out_result('in_applicator_result', 'error', response_array.message);
+						reset_applicator_in_fields();
                         console.log(response);
                     }
                 } catch (e) {
-					document.getElementById("ai_location").value = '';
-					document.getElementById("ai_applicator_no").value = '';
-					document.getElementById("ai_terminal_name").value = '';
-					document.getElementById("ai_location").disabled = false;
-					document.getElementById("ai_location").focus();
-
+					reset_applicator_in_fields();
                     console.log(response);
                 }
 			}
@@ -214,11 +233,7 @@
 		clear_checked_radio_button("cross_section_result_ac_i");
         document.getElementById('checked_by_ac_i').value = '';
 
-		document.getElementById("ai_location").value = '';
-		document.getElementById("ai_applicator_no").value = '';
-		document.getElementById("ai_terminal_name").value = '';
-		document.getElementById("ai_location").disabled = false;
-		document.getElementById("ai_location").focus();
+		reset_applicator_in_fields();
     });
 
     document.getElementById('applicator_checksheet_form').addEventListener('submit', e => {
@@ -296,17 +311,8 @@
 				if (response == 'success') {
 					$('#applicator_checksheet').modal("hide");
 					get_recent_applicator_in();
-
-					document.getElementById("in_applicator_result").innerHTML = 'Applicator In Succesfully!!!';
-					setTimeout(() => {
-						document.getElementById("in_applicator_result").innerHTML = '';
-					}, 3000);
-
-					document.getElementById("ai_location").value = '';
-					document.getElementById("ai_applicator_no").value = '';
-					document.getElementById("ai_terminal_name").value = '';
-					document.getElementById("ai_location").disabled = false;
-					document.getElementById("ai_location").focus();
+					display_applicator_in_out_result('in_applicator_result', '', 'Applicator In Succesfully!!!');
+					reset_applicator_in_fields();
 				} else {
 					Swal.fire({
                         icon: 'error',

@@ -40,7 +40,12 @@
             <div class="card-body">
               <div class="row mb-2">
                 <div class="col-sm-12">
-                  <input type="text" class="form-control" id="ai_location" placeholder="Location" autocomplete="off" maxlength="255">
+                  <input type="text" class="form-control" id="ai_location_before" placeholder="TRD / Cart Location" autocomplete="off" maxlength="255">
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-12">
+                  <input type="text" class="form-control" id="ai_location" placeholder="Zaihai Location" autocomplete="off" maxlength="255" disabled>
                 </div>
               </div>
               <div class="row mb-2">

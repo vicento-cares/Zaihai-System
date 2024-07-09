@@ -65,6 +65,7 @@ if ($method == 'out_applicator') {
 }
 
 if ($method == 'in_applicator') {
+    $location_before = $_GET['location_before'];
     $location = $_POST['location'];
     $applicator_no = $_POST['applicator_no'];
     $terminal_name = $_POST['terminal_name'];
@@ -117,30 +118,34 @@ if ($method == 'in_applicator') {
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
             if ($row) {
-                $sql = "INSERT INTO t_applicator_c 
-                        (serial_no, equipment_no, machine_no, terminal_name, inspection_date_time, inspection_shift, 
-                        adjustment_content, cross_section_result, inspected_by, inspected_by_no, checked_by, 
-                        ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) 
-                        VALUES ('$serial_no', '$equipment_no', '$applicator_no', '$terminal_name', '$inspection_date_time', '$inspection_shift', 
-                        '$adjustment_content', '$cross_section_result', '$inspected_by', '$inspected_by_no', '$checked_by', 
-                        '$ac1', '$ac2', '$ac3', '$ac4', '$ac5', '$ac6', '$ac7', '$ac8', '$ac9', '$ac10')";
-                $stmt = $conn -> prepare($sql);
-                $stmt -> execute();
+                if ($location_before == $row['trd_no']) {
+                    $sql = "INSERT INTO t_applicator_c 
+                            (serial_no, equipment_no, machine_no, terminal_name, inspection_date_time, inspection_shift, 
+                            adjustment_content, cross_section_result, inspected_by, inspected_by_no, checked_by, 
+                            ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10) 
+                            VALUES ('$serial_no', '$equipment_no', '$applicator_no', '$terminal_name', '$inspection_date_time', '$inspection_shift', 
+                            '$adjustment_content', '$cross_section_result', '$inspected_by', '$inspected_by_no', '$checked_by', 
+                            '$ac1', '$ac2', '$ac3', '$ac4', '$ac5', '$ac6', '$ac7', '$ac8', '$ac9', '$ac10')";
+                    $stmt = $conn -> prepare($sql);
+                    $stmt -> execute();
 
-                $sql = "UPDATE t_applicator_in_out 
-                        SET zaihai_stock_address = '$location', operator_in = '$operator_in', date_time_in = '$server_date_time'
-                        WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
-                        AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
-                $stmt = $conn -> prepare($sql);
-                $stmt -> execute();
+                    $sql = "UPDATE t_applicator_in_out 
+                            SET zaihai_stock_address = '$location', operator_in = '$operator_in', date_time_in = '$server_date_time'
+                            WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
+                            AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
+                    $stmt = $conn -> prepare($sql);
+                    $stmt -> execute();
 
-                $sql = "UPDATE t_applicator_list 
-                        SET location = '$location', date_updated = '$server_date_time'
-                        WHERE applicator_no = '$applicator_no'";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute();
-                
-                echo 'success';
+                    $sql = "UPDATE t_applicator_list 
+                            SET location = '$location', date_updated = '$server_date_time'
+                            WHERE applicator_no = '$applicator_no'";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute();
+                    
+                    echo 'success';
+                } else {
+                    echo 'Unmatched TRD / Cart Location';
+                }
             } else {
                 echo 'Applicator Already In';
             }

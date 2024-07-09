@@ -44,6 +44,23 @@
 		out_applicator();
 	});
 
+	const display_applicator_in_out_result = (id, type, message) => {
+		var duration = 0;
+		var error_message = 'Error: ';
+		if (type == 'error') {
+			duration = 2000;
+			message = error_message + message;
+			document.getElementById(id).classList.add('text-red');
+		} else {
+			duration = 3000;
+		}
+		document.getElementById(id).innerHTML = message;
+		setTimeout(() => {
+			document.getElementById(id).innerHTML = '';
+			document.getElementById(id).classList.remove('text-red');
+		}, duration);
+	}
+
 	const out_applicator = () => {
 		let location = document.getElementById("ao_location").value;
 		let applicator_no = document.getElementById("ao_applicator_no").value;
@@ -60,18 +77,10 @@
 			},
 			success: (response) => {
 				if (response == 'success') {
-					document.getElementById("out_applicator_result").innerHTML = 'Applicator Out Succesfully!!!';
-					setTimeout(() => {
-						document.getElementById("out_applicator_result").innerHTML = '';
-					}, 3000);
+					display_applicator_in_out_result('out_applicator_result', '', 'Applicator Out Succesfully!!!');
 					get_recent_applicator_out();
 				} else {
-					document.getElementById("out_applicator_result").innerHTML = 'Error: ' + response;
-					document.getElementById("out_applicator_result").classList.add('text-red');
-					setTimeout(() => {
-						document.getElementById("out_applicator_result").innerHTML = '';
-						document.getElementById("out_applicator_result").classList.remove('text-red');
-					}, 2000);
+					display_applicator_in_out_result('out_applicator_result', 'error', response);
 				}
 				document.getElementById("ao_location").value = '';
 				document.getElementById("ao_applicator_no").value = '';

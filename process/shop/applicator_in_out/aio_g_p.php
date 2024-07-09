@@ -34,6 +34,7 @@ if ($method == 'get_recent_applicator_out') {
 }
 
 if ($method == 'get_single_recent_applicator_out') {
+    $location_before = $_GET['location_before'];
     $applicator_no = $_GET['applicator_no'];
     $terminal_name = $_GET['terminal_name'];
 
@@ -70,21 +71,26 @@ if ($method == 'get_single_recent_applicator_out') {
                 $row = $stmt -> fetch(PDO::FETCH_ASSOC);
     
                 if ($row) {
-                    $applicator_out_data_arr = array(
-                        "serial_no" => $row['serial_no'],
-                        "applicator_no" => $row['applicator_no'],
-                        "terminal_name" => $row['terminal_name'],
-                        "trd_no" => $row['trd_no'],
-                        "operator_out" => $row['operator_out'],
-                        "date_time_out" => $row['date_time_out'],
-                        "inspection_date_time" => $server_date_time,
-                        "inspection_date" => $server_date_only,
-                        "inspection_time" => $server_time,
-                        "inspection_shift" => get_shift($server_time),
-                        "inspected_by" => $operator_in_name,
-                        "inspected_by_no" => $operator_in
-                    );
-                    $message = 'success';
+                    if ($location_before == $row['trd_no']) {
+                        $applicator_out_data_arr = array(
+                            "serial_no" => $row['serial_no'],
+                            "applicator_no" => $row['applicator_no'],
+                            "terminal_name" => $row['terminal_name'],
+                            "trd_no" => $row['trd_no'],
+                            "operator_out" => $row['operator_out'],
+                            "date_time_out" => $row['date_time_out'],
+                            "inspection_date_time" => $server_date_time,
+                            "inspection_date" => $server_date_only,
+                            "inspection_time" => $server_time,
+                            "inspection_shift" => get_shift($server_time),
+                            "inspected_by" => $operator_in_name,
+                            "inspected_by_no" => $operator_in
+                        );
+
+                        $message = 'success';
+                    } else {
+                        $message = 'Unmatched TRD / Cart Location';
+                    }
                 } else {
                     $message = 'Applicator Already In';
                 }
