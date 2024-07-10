@@ -8,8 +8,7 @@
 <?php
 //MODALS
 include '../modals/logout_modal.php';
-include '../modals/applicator_out.php';
-include '../modals/applicator_in.php';
+include '../modals/applicator_checksheet.php';
 include '../modals/applicator_checksheet_view.php';
 ?>
 <!-- jQuery -->
@@ -30,7 +29,7 @@ include '../modals/applicator_checksheet_view.php';
 <script src="../dist/js/adminlte.js"></script>
 
 <!-- Idletime Script -->
-<script src="../dist/js/idletime.js"></script>
+<!-- <script src="../dist/js/idletime.js"></script> -->
 
 </body>
 </html>

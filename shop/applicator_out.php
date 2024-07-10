@@ -22,6 +22,11 @@
   <!-- Main content -->
   <section class="content">
     <div class="container-fluid">
+      <div class="row mb-4">
+        <div class="col-sm-2">
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#applicator_out"><i class="fas fa-minus-circle"></i> Out Applicator</button>
+        </div>
+      </div>
       <div class="row">
         <div class="col-sm-12">
           <div class="card card-gray-dark card-outline">
@@ -38,26 +43,6 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <div class="row mb-2">
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" id="ao_location" placeholder="Location" autocomplete="off" maxlength="255">
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" id="ao_applicator_no" placeholder="Applicator No." autocomplete="off" maxlength="255" disabled>
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-12">
-                  <input type="text" class="form-control" id="ao_terminal_name" placeholder="Terminal Name" autocomplete="off" maxlength="255" disabled>
-                </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-12">
-                  <span class="text-bold" id="out_applicator_result"></span>
-                </div>
-              </div>
               <div class="row mb-2">
                 <div class="col-sm-2">
                   <span id="count_view"></span>

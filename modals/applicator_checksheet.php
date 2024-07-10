@@ -10,6 +10,11 @@
       </div>
       <form id="applicator_checksheet_form">
         <div class="modal-body">
+          <div class="row mb-4">
+            <div class="col-sm-12">
+              <input type="text" class="form-control" id="ai_location" placeholder="Zaihai Location" autocomplete="off" maxlength="255" required>
+            </div>
+          </div>
           <div class="row">
             <div class="col-sm-5">
               <div class="form-group">
@@ -127,6 +132,18 @@
               </div>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_1s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 1 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_1r_ac_i" placeholder="Replace Details 1 X" autocomplete="off" maxlength="255" disabled>
+            </div>
+          </div>
           <div class="row">
             <div class="col-lg-8 col-sm-12">
               <div class="form-group mb-0">
@@ -158,6 +175,18 @@
                 <input type="radio" id="cont_2_na_ac_i" name="cont_2_ac_i" value="4">
                 <label class="h5" for="cont_2_na_ac_i">N/A</label>
               </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_2s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 2 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_2r_ac_i" placeholder="Replace Details 2 X" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -193,6 +222,18 @@
               </div>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_3s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 3 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_3r_ac_i" placeholder="Replace Details 3 X" autocomplete="off" maxlength="255" disabled>
+            </div>
+          </div>
           <div class="row">
             <div class="col-lg-8 col-sm-12">
               <div class="form-group mb-0">
@@ -224,6 +265,18 @@
                 <input type="radio" id="cont_4_na_ac_i" name="cont_4_ac_i" value="4">
                 <label class="h5" for="cont_4_na_ac_i">N/A</label>
               </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_4s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 4 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_4r_ac_i" placeholder="Replace Details 4 X" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -259,6 +312,18 @@
               </div>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_5s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 5 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_5r_ac_i" placeholder="Replace Details 5 X" autocomplete="off" maxlength="255" disabled>
+            </div>
+          </div>
           <div class="row">
             <div class="col-lg-8 col-sm-12">
               <div class="form-group mb-0">
@@ -290,6 +355,18 @@
                 <input type="radio" id="cont_6_na_ac_i" name="cont_6_ac_i" value="4">
                 <label class="h5" for="cont_6_na_ac_i">N/A</label>
               </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_6s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 6 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_6r_ac_i" placeholder="Replace Details 6 X" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -325,6 +402,18 @@
               </div>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_7s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 7 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_7r_ac_i" placeholder="Replace Details 7 X" autocomplete="off" maxlength="255" disabled>
+            </div>
+          </div>
           <div class="row">
             <div class="col-lg-8 col-sm-12">
               <div class="form-group mb-0">
@@ -356,6 +445,18 @@
                 <input type="radio" id="cont_8_na_ac_i" name="cont_8_ac_i" value="4">
                 <label class="h5" for="cont_8_na_ac_i">N/A</label>
               </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_8s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 8 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_8r_ac_i" placeholder="Replace Details 8 X" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -391,6 +492,18 @@
               </div>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_9s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 9 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_9r_ac_i" placeholder="Replace Details 9 X" autocomplete="off" maxlength="255" disabled>
+            </div>
+          </div>
           <div class="row">
             <div class="col-lg-8 col-sm-12">
               <div class="form-group mb-0">
@@ -422,6 +535,18 @@
                 <input type="radio" id="cont_10_na_ac_i" name="cont_10_ac_i" value="4">
                 <label class="h5" for="cont_10_na_ac_i">N/A</label>
               </div>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-lg-4 col-sm-12">
+              <select class="form-control" id="cont_10s_ac_i" style="width: 100%;" disabled>
+                <option selected value="">Select Option For 10 △</option>
+                <option value="Repair/Adjust">Repair/Adjust</option>
+                <option value="Clean">Clean</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <input type="text" class="form-control" id="cont_10r_ac_i" placeholder="Replace Details 10 X" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -466,20 +591,10 @@
           </div>
           <div class="row">
             <input type="hidden" id="inspected_by_no_ac_i" name="inspected_by_no_ac_i" value="">
-            <div class="col-sm-6">
+            <div class="col-sm-12">
               <div class="form-group mt-1 mb-0">
                 <label>Inspected By : </label>
                 <span id="inspected_by_ac_i" class="ml-2"></span>
-              </div>
-            </div>
-            <div class="col-sm-2">
-              <div class="form-group mt-1 mb-0">
-                <label>Checked By : </label>
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="form-group mt-1 mb-0">
-                <input type="text" class="form-control" id="checked_by_ac_i" name="checked_by_ac_i" placeholder="Checked By" autocomplete="off" maxlength="255" required>
               </div>
             </div>
           </div>
