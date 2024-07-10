@@ -1,7 +1,11 @@
 <?php require '../process/login.php';
 
 if (isset($_SESSION['emp_no'])) {
-  header('location: applicator_list.php');
+  if ($_SESSION['role'] == 'Shop') {
+    header('location:/zaihai/shop/applicator_list.php');
+  } else if ($_SESSION['role'] == 'Inspector') {
+    header('location:/zaihai/inspector/applicator_checksheet.php');
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -10,7 +14,7 @@ if (isset($_SESSION['emp_no'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Zaihai System - Shop</title>
+  <title>Zaihai System</title>
 
   <link rel="icon" href="../dist/img/logo.ico" type="image/x-icon" />
   <!-- Google Font: Source Sans Pro -->
@@ -25,7 +29,7 @@ if (isset($_SESSION['emp_no'])) {
   <div class="login-box">
     <div class="login-logo">
       <img src="../dist/img/logo.webp" style="height:100px;">
-      <h2>Zaihai System - Shop</h2>
+      <h2>Zaihai System</h2>
     </div>
     <!-- /.login-logo -->
     <div class="card">

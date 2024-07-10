@@ -1,5 +1,5 @@
 <?php include 'plugins/navbar.php';?>
-<?php include 'plugins/sidebar/shop_bar.php';?>
+<?php include 'plugins/sidebar/inspector_bar.php';?>
 
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -7,11 +7,11 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Applicator In</h1>
+          <h1 class="m-0">Applicator Checksheet</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="applicator_list.php">Applicator In</a></li>
+            <li class="breadcrumb-item"><a href="applicator_list.php">Applicator Checksheet</a></li>
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -22,16 +22,11 @@
   <!-- Main content -->
   <section class="content">
     <div class="container-fluid">
-      <div class="row mb-4">
-        <div class="col-sm-2">
-          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#applicator_in"><i class="fas fa-plus-circle"></i> In Applicator</button>
-        </div>
-      </div>
       <div class="row">
         <div class="col-sm-12">
           <div class="card card-gray-dark card-outline">
             <div class="card-header">
-              <h3 class="card-title"><i class="fas fa-th-large"></i> Applicator In Table</h3>
+              <h3 class="card-title"><i class="fas fa-tasks"></i> Pending Applicator Checksheet Table</h3>
               <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                   <i class="fas fa-minus"></i>
@@ -88,4 +83,4 @@
 </div>
 
 <?php include 'plugins/footer.php';?>
-<?php include 'plugins/js/applicator_in_script.php';?>
+<?php include 'plugins/js/applicator_checksheet_script.php';?>

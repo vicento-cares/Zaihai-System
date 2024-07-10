@@ -37,6 +37,10 @@ const timerIncrement = () => {
             // Applicator In Interval
             clearInterval(realtime_get_recent_applicator_in);
             break;
+        case "/zaihai/inspector/applicator_checksheet.php":
+            // Applicator Checksheet Interval
+            clearInterval(realtime_get_recent_applicator_in_pending);
+            break;
         default:
     }
 

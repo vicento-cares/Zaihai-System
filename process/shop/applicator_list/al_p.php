@@ -6,7 +6,7 @@ $method = $_GET['method'];
 if ($method == 'get_recent_applicator_list') {
     $c = 0;
 
-    $sql = "SELECT car_maker, car_model, applicator_no, location, date_updated
+    $sql = "SELECT car_maker, car_model, applicator_no, location, status, date_updated
             FROM t_applicator_list";
     $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt->execute();
@@ -19,6 +19,7 @@ if ($method == 'get_recent_applicator_list') {
             echo '<td>'.$row['car_model'].'</td>';
             echo '<td>'.$row['applicator_no'].'</td>';
             echo '<td>'.$row['location'].'</td>';
+            echo '<td>'.$row['status'].'</td>';
             echo '<td>'.$row['date_updated'].'</td>';
             echo '</tr>';
         }

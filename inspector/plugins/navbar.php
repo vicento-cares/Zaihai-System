@@ -4,8 +4,8 @@ include '../process/login.php';
 
 if (!isset($_SESSION['emp_no'])) {
   header('location:/zaihai/login');
-} else if ($_SESSION['role'] == 'Inspector') {
-  header('location:/zaihai/inspector/applicator_checksheet.php');
+} else if ($_SESSION['role'] == 'Shop') {
+  header('location:/zaihai/shop/applicator_list.php');
 }
 ?>  
 <!DOCTYPE html>
@@ -13,7 +13,7 @@ if (!isset($_SESSION['emp_no'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shop</title>
+  <title>Inspector</title>
 
   <link rel="icon" href="../dist/img/logo.ico" type="image/x-icon" />
   <!-- Google Font: Source Sans Pro -->
