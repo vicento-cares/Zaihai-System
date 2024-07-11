@@ -353,6 +353,7 @@
                     let response_array = JSON.parse(response);
                     if (response_array.message == 'success') {
                         document.getElementById('serial_no_ac_i').innerHTML = response_array.serial_no;
+						document.getElementById('equipment_no_ac_i').innerHTML = response_array.equipment_no;
                         document.getElementById('machine_no_split_ac_i').innerHTML = response_array.applicator_no;
 						document.getElementById('machine_no_ac_i').value = applicator_no;
 						document.getElementById('terminal_name_ac_i').innerHTML = response_array.terminal_name;
@@ -419,7 +420,7 @@
 			document.getElementById("cont_1r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_1s_ac_i").disabled = false;
-				document.getElementById("cont_1r_ac_i").disabled = true;
+				document.getElementById("cont_1r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_1s_ac_i").disabled = true;
 				document.getElementById("cont_1r_ac_i").disabled = false;
@@ -442,7 +443,7 @@
 			document.getElementById("cont_2r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_2s_ac_i").disabled = false;
-				document.getElementById("cont_2r_ac_i").disabled = true;
+				document.getElementById("cont_2r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_2s_ac_i").disabled = true;
 				document.getElementById("cont_2r_ac_i").disabled = false;
@@ -465,7 +466,7 @@
 			document.getElementById("cont_3r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_3s_ac_i").disabled = false;
-				document.getElementById("cont_3r_ac_i").disabled = true;
+				document.getElementById("cont_3r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_3s_ac_i").disabled = true;
 				document.getElementById("cont_3r_ac_i").disabled = false;
@@ -488,7 +489,7 @@
 			document.getElementById("cont_4r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_4s_ac_i").disabled = false;
-				document.getElementById("cont_4r_ac_i").disabled = true;
+				document.getElementById("cont_4r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_4s_ac_i").disabled = true;
 				document.getElementById("cont_4r_ac_i").disabled = false;
@@ -511,7 +512,7 @@
 			document.getElementById("cont_5r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_5s_ac_i").disabled = false;
-				document.getElementById("cont_5r_ac_i").disabled = true;
+				document.getElementById("cont_5r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_5s_ac_i").disabled = true;
 				document.getElementById("cont_5r_ac_i").disabled = false;
@@ -534,7 +535,7 @@
 			document.getElementById("cont_6r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_6s_ac_i").disabled = false;
-				document.getElementById("cont_6r_ac_i").disabled = true;
+				document.getElementById("cont_6r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_6s_ac_i").disabled = true;
 				document.getElementById("cont_6r_ac_i").disabled = false;
@@ -557,7 +558,7 @@
 			document.getElementById("cont_7r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_7s_ac_i").disabled = false;
-				document.getElementById("cont_7r_ac_i").disabled = true;
+				document.getElementById("cont_7r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_7s_ac_i").disabled = true;
 				document.getElementById("cont_7r_ac_i").disabled = false;
@@ -580,7 +581,7 @@
 			document.getElementById("cont_8r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_8s_ac_i").disabled = false;
-				document.getElementById("cont_8r_ac_i").disabled = true;
+				document.getElementById("cont_8r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_8s_ac_i").disabled = true;
 				document.getElementById("cont_8r_ac_i").disabled = false;
@@ -603,7 +604,7 @@
 			document.getElementById("cont_9r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_9s_ac_i").disabled = false;
-				document.getElementById("cont_9r_ac_i").disabled = true;
+				document.getElementById("cont_9r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_9s_ac_i").disabled = true;
 				document.getElementById("cont_9r_ac_i").disabled = false;
@@ -626,7 +627,7 @@
 			document.getElementById("cont_10r_ac_i").value = '';
 			if (this.value == 2) {
 				document.getElementById("cont_10s_ac_i").disabled = false;
-				document.getElementById("cont_10r_ac_i").disabled = true;
+				document.getElementById("cont_10r_ac_i").disabled = false;
 			} else if (this.value == 3) {
 				document.getElementById("cont_10s_ac_i").disabled = true;
 				document.getElementById("cont_10r_ac_i").disabled = false;
@@ -639,7 +640,6 @@
 
 	$("#applicator_checksheet").on('hidden.bs.modal', e => {
 		document.getElementById('ai_location').value = '';
-        document.getElementById('equipment_no_ac_i').value = '';
 
 		var radio_button_arr = ["cont_1_ac_i", "cont_2_ac_i", "cont_3_ac_i", "cont_4_ac_i", "cont_5_ac_i", "cont_6_ac_i", "cont_7_ac_i", "cont_8_ac_i", "cont_9_ac_i", "cont_10_ac_i"];
 		for (var i = 0; i < radio_button_arr.length; i++) {
@@ -683,7 +683,7 @@
 		let terminal_name = document.getElementById("terminal_name_ac_i").innerHTML;
 
 		let serial_no = document.getElementById("serial_no_ac_i").innerHTML;
-		let equipment_no = document.getElementById("equipment_no_ac_i").value;
+		let equipment_no = document.getElementById("equipment_no_ac_i").innerHTML;
 		let inspection_date_time = document.getElementById("inspection_date_time_ac_i").value;
 		let inspection_shift = document.getElementById("inspection_shift_ac_i").innerHTML;
 

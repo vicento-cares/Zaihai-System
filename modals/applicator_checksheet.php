@@ -29,7 +29,7 @@
             </div>
             <div class="col-sm-4">
               <div class="form-group">
-                <input type="text" class="form-control" id="equipment_no_ac_i" name="equipment_no_ac_i" placeholder="Equipment No." autocomplete="off" maxlength="255" required>
+                <span id="equipment_no_ac_i" class="ml-2"></span>
               </div>
             </div>
           </div>
@@ -142,7 +142,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_1r_ac_i" placeholder="Replace Details 1 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_1r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 1" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -187,7 +187,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_2r_ac_i" placeholder="Replace Details 2 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_2r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 2" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -232,7 +232,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_3r_ac_i" placeholder="Replace Details 3 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_3r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 3" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -277,7 +277,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_4r_ac_i" placeholder="Replace Details 4 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_4r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 4" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -322,7 +322,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_5r_ac_i" placeholder="Replace Details 5 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_5r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 5" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -367,7 +367,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_6r_ac_i" placeholder="Replace Details 6 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_6r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 6" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -412,7 +412,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_7r_ac_i" placeholder="Replace Details 7 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_7r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 7" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -457,7 +457,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_8r_ac_i" placeholder="Replace Details 8 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_8r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 8" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -502,7 +502,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_9r_ac_i" placeholder="Replace Details 9 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_9r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 9" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
@@ -547,7 +547,7 @@
               </select>
             </div>
             <div class="col-lg-8 col-sm-12">
-              <input type="text" class="form-control" id="cont_10r_ac_i" placeholder="Replace Details 10 X" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="cont_10r_ac_i" placeholder="Repair/Adjust/Clean/Replace Details 10" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row">
