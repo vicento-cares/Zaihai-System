@@ -29,6 +29,11 @@ function is_valid_terminal_name($terminal_name) {
     }
 }
 
+function split_equipment_no($applicator_no) {
+    $applicator_no_arr = explode("/", $applicator_no);
+    return $applicator_no_arr[0];
+}
+
 function split_applicator_no($applicator_no) {
     $applicator_no_arr = explode("/", $applicator_no);
     return $applicator_no_arr[1];

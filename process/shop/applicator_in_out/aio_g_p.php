@@ -231,6 +231,7 @@ if ($method == 'get_applicator_in_pending_details') {
         } else if (is_valid_terminal_name($terminal_name) == false) {
             $message = 'Invalid Terminal Name';
         } else {
+            $equipment_no_split = split_equipment_no($applicator_no);
             $applicator_no_split = split_applicator_no($applicator_no);
             $terminal_name_split = split_terminal_name($terminal_name);
     
@@ -255,6 +256,7 @@ if ($method == 'get_applicator_in_pending_details') {
                     if ($row) {
                         $applicator_out_data_arr = array(
                             "serial_no" => $row['serial_no'],
+                            "equipment_no" => $equipment_no_split,
                             "applicator_no" => $applicator_no_split,
                             "terminal_name" => $terminal_name_split,
                             "inspection_date_time" => $server_date_time,
