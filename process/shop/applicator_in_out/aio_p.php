@@ -19,7 +19,6 @@ if ($method == 'out_applicator') {
     } else if (is_valid_terminal_name($terminal_name) == false) {
         echo 'Invalid Terminal Name';
     } else {
-        $applicator_no_split = split_applicator_no($applicator_no);
         $terminal_name_split = split_terminal_name($terminal_name);
 
         $sql = "SELECT id FROM m_applicator WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
@@ -29,7 +28,7 @@ if ($method == 'out_applicator') {
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            $status = get_applicator_list_status($applicator_no_split, $conn);
+            $status = get_applicator_list_status($applicator_no, $conn);
 
             if ($status == 'Ready To Use') {
                 $sql = "SELECT id FROM t_applicator_in_out 
@@ -53,7 +52,7 @@ if ($method == 'out_applicator') {
 
                     $sql = "UPDATE t_applicator_list 
                             SET location = '$location', status = 'Out', date_updated = '$server_date_time'
-                            WHERE applicator_no = '$applicator_no_split'";
+                            WHERE applicator_no = '$applicator_no'";
                     $stmt = $conn->prepare($sql);
                     $stmt->execute();
                     
@@ -84,7 +83,6 @@ if ($method == 'in_applicator') {
     } else if (is_valid_terminal_name($terminal_name) == false) {
         echo 'Invalid Terminal Name';
     } else {
-        $applicator_no_split = split_applicator_no($applicator_no);
         $terminal_name_split = split_terminal_name($terminal_name);
 
         $sql = "SELECT id FROM m_applicator WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
@@ -94,7 +92,7 @@ if ($method == 'in_applicator') {
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
-            $status = get_applicator_list_status($applicator_no_split, $conn);
+            $status = get_applicator_list_status($applicator_no, $conn);
 
             if ($status == 'Out') {
                 $sql = "SELECT TOP 1 trd_no FROM t_applicator_in_out 
@@ -116,7 +114,7 @@ if ($method == 'in_applicator') {
 
                     $sql = "UPDATE t_applicator_list 
                             SET location = '$location', status = 'Pending', date_updated = '$server_date_time'
-                            WHERE applicator_no = '$applicator_no_split'";
+                            WHERE applicator_no = '$applicator_no'";
                     $stmt = $conn->prepare($sql);
                     $stmt->execute();
                     

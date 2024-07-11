@@ -39,8 +39,8 @@ function split_terminal_name($terminal_name) {
     return $terminal_name_arr[0];
 }
 
-function get_applicator_list_status($applicator_no_split, $conn) {
-    $sql = "SELECT status FROM t_applicator_list WHERE applicator_no = '$applicator_no_split'";
+function get_applicator_list_status($applicator_no, $conn) {
+    $sql = "SELECT status FROM t_applicator_list WHERE applicator_no = '$applicator_no'";
     $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
     $stmt->execute();
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);

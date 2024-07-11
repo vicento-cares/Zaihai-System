@@ -34,6 +34,18 @@
             </p>
           </a>
         </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/inspector/applicator_history.php") { ?>
+          <a href="applicator_history.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_history.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-history"></i>
+            <p>
+              Applicator History
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>

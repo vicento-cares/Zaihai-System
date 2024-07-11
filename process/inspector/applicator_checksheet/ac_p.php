@@ -1,8 +1,4 @@
 <?php
-session_set_cookie_params(0, "/zaihai");
-session_name("zaihai");
-session_start();
-
 include '../../conn.php';
 include '../../lib/main.php';
 
@@ -12,6 +8,8 @@ if ($method == 'make_checksheet') {
     $location = $_POST['location'];
     $applicator_no = $_POST['applicator_no'];
     $terminal_name = $_POST['terminal_name'];
+
+    $applicator_no_split = split_applicator_no($applicator_no);
 
     $serial_no = $_POST['serial_no'];
     $equipment_no = $_POST['equipment_no'];
@@ -76,7 +74,7 @@ if ($method == 'make_checksheet') {
             ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
             ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s,
             ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r) 
-            VALUES ('$serial_no', '$equipment_no', '$applicator_no', '$terminal_name', '$inspection_date_time', '$inspection_shift', 
+            VALUES ('$serial_no', '$equipment_no', '$applicator_no_split', '$terminal_name', '$inspection_date_time', '$inspection_shift', 
             '$adjustment_content', '$cross_section_result', '$inspected_by', '$inspected_by_no',  
             '$ac_arr[0]', '$ac_arr[1]', '$ac_arr[2]', '$ac_arr[3]', '$ac_arr[4]', '$ac_arr[5]', '$ac_arr[6]', '$ac_arr[7]', '$ac_arr[8]', '$ac_arr[9]',
             '$ac_s_arr[0]', '$ac_s_arr[1]', '$ac_s_arr[2]', '$ac_s_arr[3]', '$ac_s_arr[4]', '$ac_s_arr[5]', '$ac_s_arr[6]', '$ac_s_arr[7]', '$ac_s_arr[8]', '$ac_s_arr[9]',
@@ -84,9 +82,21 @@ if ($method == 'make_checksheet') {
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
 
-    $sql = "UPDATE t_applicator_in_out 
+    $sql = "INSERT INTO t_applicator_in_out_history 
+            (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in)
+            SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in
+            FROM t_applicator_in_out
+            WHERE serial_no = '$serial_no'";
+    $stmt = $conn -> prepare($sql);
+    $stmt -> execute();
+
+    $sql = "UPDATE t_applicator_in_out_history 
             SET zaihai_stock_address = '$location', operator_in = '$inspected_by_no', date_time_in = '$server_date_time'
             WHERE serial_no = '$serial_no'";
+    $stmt = $conn -> prepare($sql);
+    $stmt -> execute();
+
+    $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = '$serial_no'";
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
 

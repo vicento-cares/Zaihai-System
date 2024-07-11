@@ -38,6 +38,47 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
+              <div class="row mb-4">
+                <div class="col-sm-2">
+                  <label>Car Maker</label>
+                  <select id="al_car_maker_search" class="form-control" onchange="get_recent_applicator_list()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <label>Car Model</label>
+                  <select id="al_car_model_search" class="form-control" onchange="get_recent_applicator_list()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <label>Status</label>
+                  <select id="al_status_search" class="form-control" onchange="get_recent_applicator_list()">
+                    <option selected value="">All</option>
+                    <option value="Ready To Use">Ready To Use</option>
+                    <option value="Out">Out</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
+                  <label>Applicator No.</label>
+                  <input list="al_applicator_no_search_list" class="form-control" id="al_applicator_no_search">
+                  <datalist id="al_applicator_no_search_list"></datalist>
+                </div>
+                <div class="col-sm-3">
+                  <label>Location</label>
+                  <input list="al_location_search_list" class="form-control" id="al_location_search">
+                  <datalist id="al_location_search_list"></datalist>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-3 offset-sm-6">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="export_recent_applicator_list('recentApplicatorListTable')"><i class="fas fa-download"></i> Export</button>
+                </div>
+                <div class="col-sm-3">
+                  <button type="button" class="btn btn-success btn-block" onclick="get_recent_applicator_list()"><i class="fas fa-search"></i> Search</button>
+                </div>
+              </div>
               <div class="row mb-2">
                 <div class="col-sm-2">
                   <span id="count_view"></span>
@@ -52,12 +93,13 @@
                       <th>Car Maker</th>
                       <th>Applicator No.</th>
                       <th>Location</th>
+                      <th>Status</th>
                       <th>Last Update</th>
                     </tr>
                   </thead>
                   <tbody id="recentApplicatorListData" style="text-align: center;">
                     <tr>
-                      <td colspan="6" style="text-align:center;">
+                      <td colspan="7" style="text-align:center;">
                         <div class="spinner-border text-dark" role="status">
                           <span class="sr-only">Loading...</span>
                         </div>

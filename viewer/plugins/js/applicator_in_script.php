@@ -4,17 +4,152 @@
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
+		get_car_maker_dropdown_in_search();
+		get_car_model_dropdown_in_search();
+		get_applicator_no_datalist_in_search();
+		get_terminal_name_datalist_in_search();
+		get_location_datalist_in_search();
 		get_recent_applicator_in();
 		realtime_get_recent_applicator_in = setInterval(get_recent_applicator_in, 10000);
 	});
 
+	const get_car_maker_dropdown_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_maker_dropdown_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_car_maker_search").innerHTML = response;
+			}
+		});
+	}
+
+	const get_car_model_dropdown_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_model_dropdown_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_car_model_search").innerHTML = response;
+			}
+		});
+	}
+
+	const get_applicator_no_datalist_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_applicator_no_datalist_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_applicator_no_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	const get_terminal_name_datalist_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_terminal_name_datalist_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_terminal_name_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	const get_location_datalist_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_location_datalist_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_location_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	var typingTimerAiApplicatorNoSearch;
+	var typingTimerAiTerminalNameSearch;
+    var typingTimerAiLocationSearch;
+    var doneTypingInterval = 250; // Time in ms
+
+    // On keyup, start the countdown
+    document.getElementById("ai_applicator_no_search").addEventListener('keyup', e => {
+        clearTimeout(typingTimerAiApplicatorNoSearch);
+        typingTimerAiApplicatorNoSearch = setTimeout(doneTypingGetRecentApplicatorIn, doneTypingInterval);
+    });
+
+    // On keydown, clear the countdown
+    document.getElementById("ai_applicator_no_search").addEventListener('keydown', e => {
+        clearTimeout(typingTimerAiApplicatorNoSearch);
+    });
+
+	// On keyup, start the countdown
+    document.getElementById("ai_terminal_name_search").addEventListener('keyup', e => {
+        clearTimeout(typingTimerAiTerminalNameSearch);
+        typingTimerAiTerminalNameSearch = setTimeout(doneTypingGetRecentApplicatorIn, doneTypingInterval);
+    });
+
+    // On keydown, clear the countdown
+    document.getElementById("ai_terminal_name_search").addEventListener('keydown', e => {
+        clearTimeout(typingTimerAiTerminalNameSearch);
+    });
+
+    // On keyup, start the countdown
+    document.getElementById("ai_location_search").addEventListener('keyup', e => {
+        clearTimeout(typingTimerAiLocationSearch);
+        typingTimerAiLocationSearch = setTimeout(doneTypingGetRecentApplicatorIn, doneTypingInterval);
+    });
+
+    // On keydown, clear the countdown
+    document.getElementById("ai_location_search").addEventListener('keydown', e => {
+        clearTimeout(typingTimerAiLocationSearch);
+    });
+
+    // User is "finished typing," do something
+    const doneTypingGetRecentApplicatorIn = () => {
+        get_recent_applicator_in();
+    }
+
     const get_recent_applicator_in = () => {
+		let car_maker = document.getElementById('ai_car_maker_search').value;
+		let car_model = document.getElementById('ai_car_model_search').value;
+		let applicator_no = document.getElementById('ai_applicator_no_search').value;
+		let terminal_name = document.getElementById('ai_terminal_name_search').value;
+		let location = document.getElementById('ai_location_search').value;
+
+		sessionStorage.setItem('zs_ai_car_maker_search', car_maker);
+		sessionStorage.setItem('zs_ai_car_model_search', car_model);
+		sessionStorage.setItem('zs_ai_applicator_no_search', applicator_no);
+		sessionStorage.setItem('zs_ai_terminal_name_search', terminal_name);
+		sessionStorage.setItem('zs_ai_location_search', location);
+
 		$.ajax({
 			type: "GET",
 			url: "../process/shop/applicator_in_out/aio_g_p.php",
 			cache: false,
 			data: {
-				method: "get_recent_applicator_in"
+				method: "get_recent_applicator_in",
+				car_maker: car_maker,
+				car_model: car_model,
+				applicator_no: applicator_no,
+				terminal_name: terminal_name,
+				location: location
 			},
 			success: (response) => {
                 $('#recentApplicatorInData').html(response);
@@ -24,79 +159,56 @@
 		});
 	}
 
-	const convert_num_to_desc_symbol = num => {
-		var value = '';
-		switch (num) {
-			case 1:
-				value = '◯';
-				break;
-			case 2:
-				value = '△';
-				break;
-			case 3:
-				value = 'X';
-				break;
-			case 4:
-				value = 'N/A';
-				break;
-			default:
+	const export_recent_applicator_in = (table_id, separator = ',') => {
+		let car_maker = sessionStorage.getItem('zs_ai_car_maker_search');
+		let car_model = sessionStorage.getItem('zs_ai_car_model_search');
+		let applicator_no = sessionStorage.getItem('zs_ai_applicator_no_search');
+		let terminal_name = sessionStorage.getItem('zs_ai_terminal_name_search');
+		let location = sessionStorage.getItem('zs_ai_location_search');
+
+        // Select rows from table_id
+        var rows = document.querySelectorAll('table#' + table_id + ' tr');
+
+        // Construct csv
+        var csv = [];
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll('td, th');
+            for (var j = 0; j < cols.length; j++) {
+                var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+                data = data.replace(/"/g, '""');
+                // Push escaped string
+                row.push('"' + data + '"');
+            }
+            csv.push(row.join(separator));
+        }
+
+        var csv_string = csv.join('\n');
+
+        // Download it
+        var filename = 'ZaihaiSystem_ApplicatorIn';
+		if (car_maker) {
+			filename += '_' + car_maker;
 		}
-		return value;
-	}
-
-	const get_ac_details = param => {
-        var string = param.split('~!~');
-        var serial_no = string[0];
-        var equipment_no = string[1];
-        var applicator_no = string[2];
-		var terminal_name = string[3];
-        var inspection_date = string[4];
-        var inspection_time = string[5];
-        var inspection_shift = string[6];
-
-		var adjustment_content = string[7];
-		var cross_section_result = parseInt(string[8]);
-		var inspected_by = string[9];
-		var checked_by = string[10];
-		var confirmed_by = string[11];
-		var judgement = parseInt(string[12]);
-
-		var ac1 = parseInt(string[13]);
-		var ac2 = parseInt(string[14]);
-		var ac3 = parseInt(string[15]);
-		var ac4 = parseInt(string[16]);
-		var ac5 = parseInt(string[17]);
-		var ac6 = parseInt(string[18]);
-		var ac7 = parseInt(string[19]);
-		var ac8 = parseInt(string[20]);
-		var ac9 = parseInt(string[21]);
-		var ac10 = parseInt(string[22]);
-
-        document.getElementById('serial_no_acv').innerHTML = serial_no;
-        document.getElementById('equipment_no_acv').innerHTML = equipment_no;
-        document.getElementById('machine_no_acv').innerHTML = applicator_no;
-		document.getElementById('terminal_name_acv').innerHTML = terminal_name;
-        document.getElementById('inspection_date_acv').innerHTML = inspection_date;
-        document.getElementById('inspection_time_acv').innerHTML = inspection_time;
-        document.getElementById('inspection_shift_acv').innerHTML = inspection_shift;
-
-		document.getElementById('adjustment_content_acv').innerHTML = adjustment_content;
-		document.getElementById('inspected_by_acv').innerHTML = inspected_by;
-		document.getElementById('checked_by_acv').innerHTML = checked_by;
-		document.getElementById('confirmed_by_no_acv').innerHTML = confirmed_by;
-
-		document.getElementById('cross_section_result_acv').innerHTML = convert_num_to_desc_symbol(cross_section_result);
-		document.getElementById('judgement_acv').innerHTML = convert_num_to_desc_symbol(judgement);
-
-		document.getElementById('ac1_acv').innerHTML = convert_num_to_desc_symbol(ac1);
-		document.getElementById('ac2_acv').innerHTML = convert_num_to_desc_symbol(ac2);
-		document.getElementById('ac3_acv').innerHTML = convert_num_to_desc_symbol(ac3);
-		document.getElementById('ac4_acv').innerHTML = convert_num_to_desc_symbol(ac4);
-		document.getElementById('ac5_acv').innerHTML = convert_num_to_desc_symbol(ac5);
-		document.getElementById('ac6_acv').innerHTML = convert_num_to_desc_symbol(ac6);
-		document.getElementById('ac7_acv').innerHTML = convert_num_to_desc_symbol(ac7);
-		document.getElementById('ac8_acv').innerHTML = convert_num_to_desc_symbol(ac8);
-		document.getElementById('ac9_acv').innerHTML = convert_num_to_desc_symbol(ac9);
-		document.getElementById('ac10_acv').innerHTML = convert_num_to_desc_symbol(ac10);
+		if (car_model) {
+			filename += '_' + car_model;
+		}
+		if (applicator_no) {
+			filename += '_' + applicator_no;
+		}
+		if (terminal_name) {
+			filename += '_' + terminal_name;
+		}
+		if (location) {
+			filename += '_' + location;
+		}
+		filename += '_' + new Date().toJSON().slice(0, 10) + '.csv';
+        var link = document.createElement('a');
+        link.style.display = 'none';
+        link.setAttribute('target', '_blank');
+        link.setAttribute('href', 'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURIComponent(csv_string));
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 </script>

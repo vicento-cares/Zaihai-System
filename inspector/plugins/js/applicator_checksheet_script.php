@@ -4,17 +4,152 @@
 
     // DOMContentLoaded function
     document.addEventListener("DOMContentLoaded", () => {
+		get_car_maker_dropdown_in_search();
+		get_car_model_dropdown_in_search();
+		get_applicator_no_datalist_in_search();
+		get_terminal_name_datalist_in_search();
+		get_location_datalist_in_search();
         get_recent_applicator_in_pending();
         realtime_get_recent_applicator_in_pending = setInterval(get_recent_applicator_in_pending, 15000);
     });
 
+	const get_car_maker_dropdown_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_maker_dropdown_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_car_maker_search").innerHTML = response;
+			}
+		});
+	}
+
+	const get_car_model_dropdown_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_model_dropdown_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_car_model_search").innerHTML = response;
+			}
+		});
+	}
+
+	const get_applicator_no_datalist_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_applicator_no_datalist_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_applicator_no_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	const get_terminal_name_datalist_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_terminal_name_datalist_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_terminal_name_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	const get_location_datalist_in_search = () => {
+		$.ajax({
+			url: '../process/shop/applicator_in_out/aio_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_location_datalist_in_search'
+			},  
+			success: response => {
+				document.getElementById("ai_location_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	var typingTimerAiApplicatorNoSearch;
+	var typingTimerAiTerminalNameSearch;
+    var typingTimerAiLocationSearch;
+    var doneTypingInterval = 250; // Time in ms
+
+    // On keyup, start the countdown
+    document.getElementById("ai_applicator_no_search").addEventListener('keyup', e => {
+        clearTimeout(typingTimerAiApplicatorNoSearch);
+        typingTimerAiApplicatorNoSearch = setTimeout(doneTypingGetRecentApplicatorIn, doneTypingInterval);
+    });
+
+    // On keydown, clear the countdown
+    document.getElementById("ai_applicator_no_search").addEventListener('keydown', e => {
+        clearTimeout(typingTimerAiApplicatorNoSearch);
+    });
+
+	// On keyup, start the countdown
+    document.getElementById("ai_terminal_name_search").addEventListener('keyup', e => {
+        clearTimeout(typingTimerAiTerminalNameSearch);
+        typingTimerAiTerminalNameSearch = setTimeout(doneTypingGetRecentApplicatorIn, doneTypingInterval);
+    });
+
+    // On keydown, clear the countdown
+    document.getElementById("ai_terminal_name_search").addEventListener('keydown', e => {
+        clearTimeout(typingTimerAiTerminalNameSearch);
+    });
+
+    // On keyup, start the countdown
+    document.getElementById("ai_location_search").addEventListener('keyup', e => {
+        clearTimeout(typingTimerAiLocationSearch);
+        typingTimerAiLocationSearch = setTimeout(doneTypingGetRecentApplicatorIn, doneTypingInterval);
+    });
+
+    // On keydown, clear the countdown
+    document.getElementById("ai_location_search").addEventListener('keydown', e => {
+        clearTimeout(typingTimerAiLocationSearch);
+    });
+
+    // User is "finished typing," do something
+    const doneTypingGetRecentApplicatorIn = () => {
+        get_recent_applicator_in_pending();
+    }
+
     const get_recent_applicator_in_pending = () => {
+		let car_maker = document.getElementById('ai_car_maker_search').value;
+		let car_model = document.getElementById('ai_car_model_search').value;
+		let applicator_no = document.getElementById('ai_applicator_no_search').value;
+		let terminal_name = document.getElementById('ai_terminal_name_search').value;
+		let location = document.getElementById('ai_location_search').value;
+
+		sessionStorage.setItem('zs_ai_car_maker_search', car_maker);
+		sessionStorage.setItem('zs_ai_car_model_search', car_model);
+		sessionStorage.setItem('zs_ai_applicator_no_search', applicator_no);
+		sessionStorage.setItem('zs_ai_terminal_name_search', terminal_name);
+		sessionStorage.setItem('zs_ai_location_search', location);
+
 		$.ajax({
 			type: "GET",
 			url: "../process/inspector/applicator_checksheet/ac_g_p.php",
 			cache: false,
 			data: {
-				method: "get_recent_applicator_in_pending"
+				method: "get_recent_applicator_in_pending",
+				car_maker: car_maker,
+				car_model: car_model,
+				applicator_no: applicator_no,
+				terminal_name: terminal_name,
+				location: location
 			},
 			success: (response) => {
                 $('#recentApplicatorInData').html(response);
@@ -23,6 +158,59 @@
 			}
 		});
 	}
+
+	const export_recent_applicator_in_pending = (table_id, separator = ',') => {
+		let car_maker = sessionStorage.getItem('zs_ai_car_maker_search');
+		let car_model = sessionStorage.getItem('zs_ai_car_model_search');
+		let applicator_no = sessionStorage.getItem('zs_ai_applicator_no_search');
+		let terminal_name = sessionStorage.getItem('zs_ai_terminal_name_search');
+		let location = sessionStorage.getItem('zs_ai_location_search');
+
+        // Select rows from table_id
+        var rows = document.querySelectorAll('table#' + table_id + ' tr');
+
+        // Construct csv
+        var csv = [];
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll('td, th');
+            for (var j = 0; j < cols.length; j++) {
+                var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\s\s)/gm, ' ')
+                data = data.replace(/"/g, '""');
+                // Push escaped string
+                row.push('"' + data + '"');
+            }
+            csv.push(row.join(separator));
+        }
+
+        var csv_string = csv.join('\n');
+
+        // Download it
+        var filename = 'ZaihaiSystem_ApplicatorInPending';
+		if (car_maker) {
+			filename += '_' + car_maker;
+		}
+		if (car_model) {
+			filename += '_' + car_model;
+		}
+		if (applicator_no) {
+			filename += '_' + applicator_no;
+		}
+		if (terminal_name) {
+			filename += '_' + terminal_name;
+		}
+		if (location) {
+			filename += '_' + location;
+		}
+		filename += '_' + new Date().toJSON().slice(0, 10) + '.csv';
+        var link = document.createElement('a');
+        link.style.display = 'none';
+        link.setAttribute('target', '_blank');
+        link.setAttribute('href', 'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURIComponent(csv_string));
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
 	const convert_num_to_desc_symbol = num => {
 		var value = '';
@@ -165,7 +353,8 @@
                     let response_array = JSON.parse(response);
                     if (response_array.message == 'success') {
                         document.getElementById('serial_no_ac_i').innerHTML = response_array.serial_no;
-                        document.getElementById('machine_no_ac_i').innerHTML = response_array.applicator_no;
+                        document.getElementById('machine_no_split_ac_i').innerHTML = response_array.applicator_no;
+						document.getElementById('machine_no_ac_i').value = applicator_no;
 						document.getElementById('terminal_name_ac_i').innerHTML = response_array.terminal_name;
 						document.getElementById('inspection_date_time_ac_i').value = response_array.inspection_date_time;
 						document.getElementById('inspection_date_ac_i').innerHTML = response_array.inspection_date;
@@ -490,7 +679,7 @@
 
 	const make_checksheet = () => {
 		let location = document.getElementById("ai_location").value;
-		let applicator_no = document.getElementById("machine_no_ac_i").innerHTML;
+		let applicator_no = document.getElementById("machine_no_ac_i").value;
 		let terminal_name = document.getElementById("terminal_name_ac_i").innerHTML;
 
 		let serial_no = document.getElementById("serial_no_ac_i").innerHTML;
