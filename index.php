@@ -75,8 +75,10 @@
                     <li class="nav-item dropdown">
                         <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle"><i class="fas fa-bars"></i> Menu</a>
                         <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                            <li><a href="viewer/applicator_list.php" class="dropdown-item">Applicator List</a></li>
                             <li><a href="viewer/applicator_out.php" class="dropdown-item">Applicator Out</a></li>
                             <li><a href="viewer/applicator_in.php" class="dropdown-item">Applicator In</a></li>
+                            <li><a href="viewer/applicator_history.php" class="dropdown-item">Applicator History</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -141,7 +143,23 @@
             <!--  News and Updates Section  -->
             <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel" data-interval="10000" data-pause="false">
             <div class="carousel-inner">
-                <div class="carousel-item active">
+            <div class="carousel-item active">
+                <img class="d-block w-100" src="dist/img/ProperShutdown/1.png"
+                alt="slide1">
+                </div>
+                <div class="carousel-item">
+                <img class="d-block w-100" src="dist/img/ProperShutdown/2.png"
+                alt="slide2">
+                </div>
+                <div class="carousel-item">
+                <img class="d-block w-100" src="dist/img/ProperShutdown/3.png"
+                alt="slide3">
+                </div>
+                <div class="carousel-item">
+                <img class="d-block w-100" src="dist/img/ProperShutdown/4.jpg"
+                alt="slide4">
+                </div>
+                <!-- <div class="carousel-item active">
                 <img class="d-block w-100" src="dist/img/HW_S/1.jpg"
                 alt="slide1">
                 </div>
@@ -180,7 +198,7 @@
                 <div class="carousel-item">
                 <img class="d-block w-100" src="dist/img/HW_S/10.jpg"
                 alt="slide10">
-                </div>
+                </div> -->
                 <!-- Valentines -->
                 <!-- <div class="carousel-item active">
                 <img class="d-block w-100" src="dist/img/feb/1.jpg"

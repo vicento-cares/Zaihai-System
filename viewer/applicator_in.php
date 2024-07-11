@@ -40,6 +40,43 @@ include 'plugins/navbar/viewer_navbar.php';
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
+                                    <div class="row mb-4">
+                                        <div class="col-sm-2">
+                                            <label>Car Maker</label>
+                                            <select id="ai_car_maker_search" class="form-control" onchange="get_recent_applicator_in()">
+                                                <option selected value="">All</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label>Car Model</label>
+                                            <select id="ai_car_model_search" class="form-control" onchange="get_recent_applicator_in()">
+                                                <option selected value="">All</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label>Location</label>
+                                            <input list="ai_location_search_list" class="form-control" id="ai_location_search">
+                                            <datalist id="ai_location_search_list"></datalist>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>Applicator No.</label>
+                                            <input list="ai_applicator_no_search_list" class="form-control" id="ai_applicator_no_search">
+                                            <datalist id="ai_applicator_no_search_list"></datalist>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label>Terminal Name</label>
+                                            <input list="ai_terminal_name_search_list" class="form-control" id="ai_terminal_name_search">
+                                            <datalist id="ai_terminal_name_search_list"></datalist>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-sm-3 offset-sm-6">
+                                            <button type="button" class="btn btn-secondary btn-block" onclick="export_recent_applicator_in('recentApplicatorInTable')"><i class="fas fa-download"></i> Export</button>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <button type="button" class="btn btn-success btn-block" onclick="get_recent_applicator_in()"><i class="fas fa-search"></i> Search</button>
+                                        </div>
+                                    </div>
                                     <div class="row mb-2">
                                         <div class="col-sm-2">
                                         <span id="count_view"></span>
@@ -50,7 +87,9 @@ include 'plugins/navbar/viewer_navbar.php';
                                             <thead style="text-align: center;">
                                                 <tr>
                                                 <th>#</th>
-                                                <th>Serial No</th>
+                                                <th>Serial No.</th>
+                                                <th>Car Maker</th>
+                                                <th>Car Model</th>
                                                 <th>Applicator No.</th>
                                                 <th>Terminal Name</th>
                                                 <th>TRD No.</th>
@@ -63,7 +102,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </thead>
                                             <tbody id="recentApplicatorInData" style="text-align: center;">
                                                 <tr>
-                                                <td colspan="10" style="text-align:center;">
+                                                <td colspan="12" style="text-align:center;">
                                                     <div class="spinner-border text-dark" role="status">
                                                     <span class="sr-only">Loading...</span>
                                                     </div>

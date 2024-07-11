@@ -43,6 +43,43 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
+              <div class="row mb-4">
+                <div class="col-sm-2">
+                  <label>Car Maker</label>
+                  <select id="ao_car_maker_search" class="form-control" onchange="get_recent_applicator_out()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                  <label>Car Model</label>
+                  <select id="ao_car_model_search" class="form-control" onchange="get_recent_applicator_out()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-2">
+                    <label>Location</label>
+                    <input list="ao_location_search_list" class="form-control" id="ao_location_search">
+                    <datalist id="ao_location_search_list"></datalist>
+                </div>
+                <div class="col-sm-3">
+                  <label>Applicator No.</label>
+                  <input list="ao_applicator_no_search_list" class="form-control" id="ao_applicator_no_search">
+                  <datalist id="ao_applicator_no_search_list"></datalist>
+                </div>
+                <div class="col-sm-3">
+                  <label>Terminal Name</label>
+                  <input list="ao_terminal_name_search_list" class="form-control" id="ao_terminal_name_search">
+                  <datalist id="ao_terminal_name_search_list"></datalist>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-3 offset-sm-6">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="export_recent_applicator_out('recentApplicatorOutTable')"><i class="fas fa-download"></i> Export</button>
+                </div>
+                <div class="col-sm-3">
+                  <button type="button" class="btn btn-success btn-block" onclick="get_recent_applicator_out()"><i class="fas fa-search"></i> Search</button>
+                </div>
+              </div>
               <div class="row mb-2">
                 <div class="col-sm-2">
                   <span id="count_view"></span>
@@ -53,7 +90,9 @@
                   <thead style="text-align: center;">
                     <tr>
                       <th>#</th>
-                      <th>Serial No</th>
+                      <th>Serial No.</th>
+                      <th>Car Maker</th>
+                      <th>Car Model</th>
                       <th>Applicator No.</th>
                       <th>Terminal Name</th>
                       <th>TRD No.</th>
@@ -63,7 +102,7 @@
                   </thead>
                   <tbody id="recentApplicatorOutData" style="text-align: center;">
                     <tr>
-                      <td colspan="7" style="text-align:center;">
+                      <td colspan="9" style="text-align:center;">
                         <div class="spinner-border text-dark" role="status">
                           <span class="sr-only">Loading...</span>
                         </div>

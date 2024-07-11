@@ -13,7 +13,7 @@ if (!isset($_SESSION['emp_no'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inspector</title>
+  <title>Zaihai | Inspector</title>
 
   <link rel="icon" href="../dist/img/logo.ico" type="image/x-icon" />
   <!-- Google Font: Source Sans Pro -->

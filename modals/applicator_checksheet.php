@@ -37,7 +37,8 @@
             <div class="col-sm-8">
               <div class="form-group">
                 <label>Machine No. (Appli. No.) : </label>
-                <span id="machine_no_ac_i" class="ml-2"></span>
+                <span id="machine_no_split_ac_i" class="ml-2"></span>
+                <input type="hidden" id="machine_no_ac_i" name="machine_no_ac_i" value="">
               </div>
             </div>
             <div class="col-sm-4">
