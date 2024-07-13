@@ -10,11 +10,6 @@
       </div>
       <form id="applicator_checksheet_form">
         <div class="modal-body">
-          <div class="row mb-4">
-            <div class="col-sm-12">
-              <input type="text" class="form-control" id="ai_location" placeholder="Zaihai Location" autocomplete="off" maxlength="255" required>
-            </div>
-          </div>
           <div class="row">
             <div class="col-sm-5">
               <div class="form-group">
@@ -22,35 +17,45 @@
                 <span id="serial_no_ac_i" class="ml-2"></span>
               </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-7">
               <div class="form-group">
                 <label>Equipment No. (F. No.) : </label>
-              </div>
-            </div>
-            <div class="col-sm-4">
-              <div class="form-group">
                 <span id="equipment_no_ac_i" class="ml-2"></span>
               </div>
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-5">
               <div class="form-group">
                 <label>Machine No. (Appli. No.) : </label>
                 <span id="machine_no_split_ac_i" class="ml-2"></span>
                 <input type="hidden" id="machine_no_ac_i" name="machine_no_ac_i" value="">
               </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-7">
+              <div class="form-group">
+                <label>Zaihai Location (Applicator) : </label>
+                <span id="ai_location" class="ml-2"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-5">
               <div class="form-group">
                 <label>Terminal Name : </label>
                 <span id="terminal_name_ac_i" class="ml-2"></span>
               </div>
             </div>
+            <div class="col-sm-7">
+              <div class="form-group">
+                <label>Terminal Line Address : </label>
+                <span id="line_address_ac_i" class="ml-2"></span>
+              </div>
+            </div>
           </div>
           <div class="row">
             <input type="hidden" id="inspection_date_time_ac_i" name="inspection_date_time_ac_i" value="">
-            <div class="col-sm-4">
+            <div class="col-sm-5">
               <div class="form-group">
                 <label>Inspection Date : </label>
                 <span id="inspection_date_ac_i" class="ml-2"></span>
@@ -62,7 +67,7 @@
                 <span id="inspection_time_ac_i" class="ml-2"></span>
               </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <div class="form-group">
                 <label>Inspection Shift : </label>
                 <span id="inspection_shift_ac_i" class="ml-2"></span>

@@ -215,7 +215,6 @@ if ($method == 'get_recent_applicator_out') {
 }
 
 if ($method == 'get_applicator_in_pending_details') {
-    $location_before = $_GET['location_before'];
     $applicator_no = $_GET['applicator_no'];
     $terminal_name = $_GET['terminal_name'];
 
@@ -235,13 +234,16 @@ if ($method == 'get_applicator_in_pending_details') {
             $applicator_no_split = split_applicator_no($applicator_no);
             $terminal_name_split = split_terminal_name($terminal_name);
     
-            $sql = "SELECT id FROM m_applicator WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
+            $sql = "SELECT zaihai_stock_address, line_address FROM m_applicator WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
             $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
             $stmt->execute();
     
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
     
             if ($row) {
+                $zaihai_stock_address = $row['zaihai_stock_address'];
+                $line_address = $row['line_address'];
+
                 $status = get_applicator_list_status($applicator_no, $conn);
 
                 if ($status == 'Pending') {
@@ -256,6 +258,8 @@ if ($method == 'get_applicator_in_pending_details') {
                     if ($row) {
                         $applicator_out_data_arr = array(
                             "serial_no" => $row['serial_no'],
+                            "zaihai_stock_address" => $zaihai_stock_address,
+                            "line_address" => $line_address,
                             "equipment_no" => $equipment_no_split,
                             "applicator_no" => $applicator_no_split,
                             "terminal_name" => $terminal_name_split,

@@ -6,6 +6,7 @@ $method = $_POST['method'];
 
 if ($method == 'make_checksheet') {
     $location = $_POST['location'];
+    $line_address = $_POST['line_address'];
     $applicator_no = $_POST['applicator_no'];
     $terminal_name = $_POST['terminal_name'];
 

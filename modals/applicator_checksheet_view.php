@@ -25,13 +25,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-5">
               <div class="form-group">
                 <label>Machine No. (Appli. No.) : </label>
                 <span id="machine_no_acv" class="ml-2"></span>
               </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-7">
               <div class="form-group">
                 <label>Terminal Name : </label>
                 <span id="terminal_name_acv" class="ml-2"></span>
@@ -39,7 +39,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-5">
               <div class="form-group">
                 <label>Inspection Date : </label>
                 <span id="inspection_date_acv" class="ml-2"></span>
@@ -51,7 +51,7 @@
                 <span id="inspection_time_acv" class="ml-2"></span>
               </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
               <div class="form-group">
                 <label>Inspection Shift : </label>
                 <span id="inspection_shift_acv" class="ml-2"></span>

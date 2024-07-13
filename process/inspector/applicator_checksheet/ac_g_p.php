@@ -54,7 +54,7 @@ if ($method == 'get_recent_applicator_in_pending') {
             $c++;
 
             echo '<tr style="cursor:pointer;" class="modal-trigger" 
-                    onclick="get_applicator_in_pending_details(&quot;'.$row['applicator_no'].'~!~'.$row['terminal_name'].'~!~'.$row['trd_no'].'&quot;)">';
+                    onclick="get_applicator_in_pending_details(&quot;'.$row['applicator_no'].'~!~'.$row['terminal_name'].'&quot;)">';
             echo '<td>'.$c.'</td>';
             echo '<td>'.$row['serial_no'].'</td>';
             echo '<td>'.$row['car_maker'].'</td>';

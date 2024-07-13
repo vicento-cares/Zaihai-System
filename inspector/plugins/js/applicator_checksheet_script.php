@@ -212,131 +212,10 @@
         document.body.removeChild(link);
     }
 
-	const convert_num_to_desc_symbol = num => {
-		var value = '';
-		switch (num) {
-			case 1:
-				value = '◯';
-				break;
-			case 2:
-				value = '△';
-				break;
-			case 3:
-				value = 'X';
-				break;
-			case 4:
-				value = 'N/A';
-				break;
-			default:
-		}
-		return value;
-	}
-
-	const get_ac_details = param => {
-        var string = param.split('~!~');
-        var serial_no = string[0];
-        var equipment_no = string[1];
-        var applicator_no = string[2];
-		var terminal_name = string[3];
-        var inspection_date = string[4];
-        var inspection_time = string[5];
-        var inspection_shift = string[6];
-
-		var adjustment_content = string[7];
-		var cross_section_result = parseInt(string[8]);
-		var inspected_by = string[9];
-		var checked_by = string[10];
-		var confirmed_by = string[11];
-		var judgement = parseInt(string[12]);
-
-		var ac1 = parseInt(string[13]);
-		var ac2 = parseInt(string[14]);
-		var ac3 = parseInt(string[15]);
-		var ac4 = parseInt(string[16]);
-		var ac5 = parseInt(string[17]);
-		var ac6 = parseInt(string[18]);
-		var ac7 = parseInt(string[19]);
-		var ac8 = parseInt(string[20]);
-		var ac9 = parseInt(string[21]);
-		var ac10 = parseInt(string[22]);
-
-		var ac1_s = string[23];
-		var ac2_s = string[24];
-		var ac3_s = string[25];
-		var ac4_s = string[26];
-		var ac5_s = string[27];
-		var ac6_s = string[28];
-		var ac7_s = string[29];
-		var ac8_s = string[30];
-		var ac9_s = string[31];
-		var ac10_s = string[32];
-
-		var ac1_r = string[33];
-		var ac2_r = string[34];
-		var ac3_r = string[35];
-		var ac4_r = string[36];
-		var ac5_r = string[37];
-		var ac6_r = string[38];
-		var ac7_r = string[39];
-		var ac8_r = string[40];
-		var ac9_r = string[41];
-		var ac10_r = string[42];
-
-        document.getElementById('serial_no_acv').innerHTML = serial_no;
-        document.getElementById('equipment_no_acv').innerHTML = equipment_no;
-        document.getElementById('machine_no_acv').innerHTML = applicator_no;
-		document.getElementById('terminal_name_acv').innerHTML = terminal_name;
-        document.getElementById('inspection_date_acv').innerHTML = inspection_date;
-        document.getElementById('inspection_time_acv').innerHTML = inspection_time;
-        document.getElementById('inspection_shift_acv').innerHTML = inspection_shift;
-
-		document.getElementById('adjustment_content_acv').innerHTML = adjustment_content;
-		document.getElementById('inspected_by_acv').innerHTML = inspected_by;
-		document.getElementById('checked_by_acv').innerHTML = checked_by;
-		document.getElementById('confirmed_by_no_acv').innerHTML = confirmed_by;
-
-		document.getElementById('cross_section_result_acv').innerHTML = convert_num_to_desc_symbol(cross_section_result);
-		document.getElementById('judgement_acv').innerHTML = convert_num_to_desc_symbol(judgement);
-
-		document.getElementById('ac1_acv').innerHTML = convert_num_to_desc_symbol(ac1);
-		document.getElementById('ac2_acv').innerHTML = convert_num_to_desc_symbol(ac2);
-		document.getElementById('ac3_acv').innerHTML = convert_num_to_desc_symbol(ac3);
-		document.getElementById('ac4_acv').innerHTML = convert_num_to_desc_symbol(ac4);
-		document.getElementById('ac5_acv').innerHTML = convert_num_to_desc_symbol(ac5);
-		document.getElementById('ac6_acv').innerHTML = convert_num_to_desc_symbol(ac6);
-		document.getElementById('ac7_acv').innerHTML = convert_num_to_desc_symbol(ac7);
-		document.getElementById('ac8_acv').innerHTML = convert_num_to_desc_symbol(ac8);
-		document.getElementById('ac9_acv').innerHTML = convert_num_to_desc_symbol(ac9);
-		document.getElementById('ac10_acv').innerHTML = convert_num_to_desc_symbol(ac10);
-
-		document.getElementById('cont_1s_acv').innerHTML = ac1_s;
-		document.getElementById('cont_2s_acv').innerHTML = ac2_s;
-		document.getElementById('cont_3s_acv').innerHTML = ac3_s;
-		document.getElementById('cont_4s_acv').innerHTML = ac4_s;
-		document.getElementById('cont_5s_acv').innerHTML = ac5_s;
-		document.getElementById('cont_6s_acv').innerHTML = ac6_s;
-		document.getElementById('cont_7s_acv').innerHTML = ac7_s;
-		document.getElementById('cont_8s_acv').innerHTML = ac8_s;
-		document.getElementById('cont_9s_acv').innerHTML = ac9_s;
-		document.getElementById('cont_10s_acv').innerHTML = ac10_s;
-
-		document.getElementById('cont_1r_acv').innerHTML += ac1_r;
-		document.getElementById('cont_2r_acv').innerHTML += ac2_r;
-		document.getElementById('cont_3r_acv').innerHTML += ac3_r;
-		document.getElementById('cont_4r_acv').innerHTML += ac4_r;
-		document.getElementById('cont_5r_acv').innerHTML += ac5_r;
-		document.getElementById('cont_6r_acv').innerHTML += ac6_r;
-		document.getElementById('cont_7r_acv').innerHTML += ac7_r;
-		document.getElementById('cont_8r_acv').innerHTML += ac8_r;
-		document.getElementById('cont_9r_acv').innerHTML += ac9_r;
-		document.getElementById('cont_10r_acv').innerHTML += ac10_r;
-    }
-
     const get_applicator_in_pending_details = param => {
         var string = param.split('~!~');
         var applicator_no = string[0];
         var terminal_name = string[1];
-        var location_before = string[2];
 
 		$.ajax({
 			type: "GET",
@@ -345,14 +224,15 @@
 			data: {
 				method: "get_applicator_in_pending_details",
 				applicator_no: applicator_no,
-				terminal_name: terminal_name,
-				location_before: location_before
+				terminal_name: terminal_name
 			},
 			success: (response) => {
 				try {
                     let response_array = JSON.parse(response);
                     if (response_array.message == 'success') {
                         document.getElementById('serial_no_ac_i').innerHTML = response_array.serial_no;
+						document.getElementById('ai_location').innerHTML = response_array.zaihai_stock_address;
+						document.getElementById('line_address_ac_i').innerHTML = response_array.line_address;
 						document.getElementById('equipment_no_ac_i').innerHTML = response_array.equipment_no;
                         document.getElementById('machine_no_split_ac_i').innerHTML = response_array.applicator_no;
 						document.getElementById('machine_no_ac_i').value = applicator_no;
@@ -639,8 +519,6 @@
 	}
 
 	$("#applicator_checksheet").on('hidden.bs.modal', e => {
-		document.getElementById('ai_location').value = '';
-
 		var radio_button_arr = ["cont_1_ac_i", "cont_2_ac_i", "cont_3_ac_i", "cont_4_ac_i", "cont_5_ac_i", "cont_6_ac_i", "cont_7_ac_i", "cont_8_ac_i", "cont_9_ac_i", "cont_10_ac_i"];
 		for (var i = 0; i < radio_button_arr.length; i++) {
 			clear_checked_radio_button(radio_button_arr[i]);
@@ -678,7 +556,8 @@
 	}
 
 	const make_checksheet = () => {
-		let location = document.getElementById("ai_location").value;
+		let location = document.getElementById("ai_location").innerHTML;
+		let line_address = document.getElementById("line_address_ac_i").innerHTML;
 		let applicator_no = document.getElementById("machine_no_ac_i").value;
 		let terminal_name = document.getElementById("terminal_name_ac_i").innerHTML;
 
@@ -732,6 +611,7 @@
 			data: {
 				method: "make_checksheet",
 				location: location,
+				line_address: line_address,
 				applicator_no: applicator_no,
 				terminal_name: terminal_name,
 				serial_no: serial_no,
