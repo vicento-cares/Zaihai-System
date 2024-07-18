@@ -21,7 +21,7 @@ if ($method == 'out_applicator') {
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
-        $sql = "SELECT id FROM m_applicator WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
+        $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
         $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
         $stmt->execute();
 
@@ -85,7 +85,7 @@ if ($method == 'in_applicator') {
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
-        $sql = "SELECT id FROM m_applicator WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
+        $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
         $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
         $stmt->execute();
 

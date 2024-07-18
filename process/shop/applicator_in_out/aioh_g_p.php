@@ -20,7 +20,7 @@ if ($method == 'get_applicator_history') {
                 aioh.trd_no, aioh.operator_out, aioh.date_time_out, 
                 aioh.zaihai_stock_address, aioh.operator_in, aioh.date_time_in, 
                 al.car_maker, al.car_model, 
-                ac.equipment_no, ac.inspection_date_time, ac.inspection_shift, ac.adjustment_content, ac.cross_section_result, 
+                ac.equipment_no, ac.line_address, ac.inspection_date_time, ac.inspection_shift, ac.adjustment_content, ac.cross_section_result, 
                 ac.inspected_by, ac.checked_by, ac.confirmed_by, ac.judgement, 
                 ac.ac1, ac.ac2, ac.ac3, ac.ac4, ac.ac5, ac.ac6, ac.ac7, ac.ac8, ac.ac9, ac.ac10, 
                 ac.ac1_s, ac.ac2_s, ac.ac3_s, ac.ac4_s, ac.ac5_s, ac.ac6_s, ac.ac7_s, ac.ac8_s, ac.ac9_s, ac.ac10_s, 
@@ -92,6 +92,7 @@ if ($method == 'get_applicator_history') {
             echo '<td>'.$row['operator_out'].'</td>';
             echo '<td>'.$row['date_time_out'].'</td>';
             echo '<td>'.$row['zaihai_stock_address'].'</td>';
+            echo '<td>'.$row['line_address'].'</td>';
             echo '<td>'.$row['operator_in'].'</td>';
             echo '<td>'.$row['date_time_in'].'</td>';
             echo '</tr>';

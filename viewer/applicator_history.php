@@ -110,6 +110,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                                 <th>Operator Out</th>
                                                 <th>Date Time Out</th>
                                                 <th>Zaihai Stock Address</th>
+                                                <th>Line Address</th>
                                                 <th>Operator In</th>
                                                 <th>Date Time In</th>
                                                 </tr>

@@ -70,12 +70,12 @@ if ($method == 'make_checksheet') {
     }
 
     $sql = "INSERT INTO t_applicator_c 
-            (serial_no, equipment_no, machine_no, terminal_name, inspection_date_time, inspection_shift, 
+            (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
             adjustment_content, cross_section_result, inspected_by, inspected_by_no,  
             ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
             ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s,
             ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r) 
-            VALUES ('$serial_no', '$equipment_no', '$applicator_no_split', '$terminal_name', '$inspection_date_time', '$inspection_shift', 
+            VALUES ('$serial_no', '$equipment_no', '$applicator_no_split', '$terminal_name', '$location', '$line_address', '$inspection_date_time', '$inspection_shift', 
             '$adjustment_content', '$cross_section_result', '$inspected_by', '$inspected_by_no',  
             '$ac_arr[0]', '$ac_arr[1]', '$ac_arr[2]', '$ac_arr[3]', '$ac_arr[4]', '$ac_arr[5]', '$ac_arr[6]', '$ac_arr[7]', '$ac_arr[8]', '$ac_arr[9]',
             '$ac_s_arr[0]', '$ac_s_arr[1]', '$ac_s_arr[2]', '$ac_s_arr[3]', '$ac_s_arr[4]', '$ac_s_arr[5]', '$ac_s_arr[6]', '$ac_s_arr[7]', '$ac_s_arr[8]', '$ac_s_arr[9]',

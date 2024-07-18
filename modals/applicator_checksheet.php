@@ -35,7 +35,7 @@
             <div class="col-sm-7">
               <div class="form-group">
                 <label>Zaihai Location (Applicator) : </label>
-                <span id="ai_location" class="ml-2"></span>
+                <select id="ai_location" class="form-control" required></select>
               </div>
             </div>
           </div>
@@ -49,7 +49,7 @@
             <div class="col-sm-7">
               <div class="form-group">
                 <label>Terminal Line Address : </label>
-                <span id="line_address_ac_i" class="ml-2"></span>
+                <select id="line_address_ac_i" class="form-control" required></select>
               </div>
             </div>
           </div>

@@ -212,6 +212,36 @@
         document.body.removeChild(link);
     }
 
+	const get_zaihai_stock_address_dropdown = applicator_no => {
+		$.ajax({
+			url: '../process/inspector/applicator_terminal/at_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_zaihai_stock_address_dropdown',
+				applicator_no: applicator_no
+			},  
+			success: response => {
+				document.getElementById("ai_location").innerHTML = response;
+			}
+		});
+	}
+
+	const get_line_address_dropdown = terminal_name => {
+		$.ajax({
+			url: '../process/inspector/applicator_terminal/at_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_line_address_dropdown',
+				terminal_name: terminal_name
+			},  
+			success: response => {
+				document.getElementById("line_address_ac_i").innerHTML = response;
+			}
+		});
+	}
+
     const get_applicator_in_pending_details = param => {
         var string = param.split('~!~');
         var applicator_no = string[0];
@@ -231,8 +261,6 @@
                     let response_array = JSON.parse(response);
                     if (response_array.message == 'success') {
                         document.getElementById('serial_no_ac_i').innerHTML = response_array.serial_no;
-						document.getElementById('ai_location').innerHTML = response_array.zaihai_stock_address;
-						document.getElementById('line_address_ac_i').innerHTML = response_array.line_address;
 						document.getElementById('equipment_no_ac_i').innerHTML = response_array.equipment_no;
                         document.getElementById('machine_no_split_ac_i').innerHTML = response_array.applicator_no;
 						document.getElementById('machine_no_ac_i').value = applicator_no;
@@ -243,6 +271,8 @@
 						document.getElementById('inspection_shift_ac_i').innerHTML = response_array.inspection_shift;
 						document.getElementById('inspected_by_ac_i').innerHTML = response_array.inspected_by;
 						document.getElementById('inspected_by_no_ac_i').value = response_array.inspected_by_no;
+						get_zaihai_stock_address_dropdown(applicator_no);
+						get_line_address_dropdown(response_array.terminal_name);
 						$('#applicator_checksheet').modal("show");
                     } else {
                         Swal.fire({
@@ -556,8 +586,8 @@
 	}
 
 	const make_checksheet = () => {
-		let location = document.getElementById("ai_location").innerHTML;
-		let line_address = document.getElementById("line_address_ac_i").innerHTML;
+		let location = document.getElementById("ai_location").value;
+		let line_address = document.getElementById("line_address_ac_i").value;
 		let applicator_no = document.getElementById("machine_no_ac_i").value;
 		let terminal_name = document.getElementById("terminal_name_ac_i").innerHTML;
 
