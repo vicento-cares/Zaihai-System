@@ -1,5 +1,5 @@
 <?php
-include '../../conn.php';
+require '../../conn.php';
 
 $method = $_GET['method'];
 
