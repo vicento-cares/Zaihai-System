@@ -3,7 +3,7 @@ session_set_cookie_params(0, "/zaihai");
 session_name("zaihai");
 session_start();
 
-include 'conn.php';
+require 'conn.php';
 
 if (isset($_POST['login_btn'])) {
 
