@@ -8,6 +8,7 @@ require 'conn.php';
 if (isset($_POST['login_btn'])) {
 
     $emp_no = addslashes($_POST['emp_no']);
+    $role = $_POST['role'];
 
     if (empty($emp_no)) {
         echo '<script>alert("Please Scan QR Code or Enter ID Number")</script>';
@@ -19,7 +20,7 @@ if (isset($_POST['login_btn'])) {
             foreach($stmt->fetchALL() as $x){
                 $emp_no = $x['emp_no'];
                 $full_name = $x['full_name'];
-                $role = $x['role'];
+                // $role = $x['role'];
             }
             $_SESSION['emp_no'] = $emp_no;
             $_SESSION['full_name'] = $full_name;
