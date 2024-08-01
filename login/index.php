@@ -38,6 +38,18 @@ if (isset($_SESSION['emp_no'])) {
 
         <form action="" method="POST" id="login_form">
           <div class="input-group mb-3">
+            <select class="form-control" id="role" name="role" required>
+              <option disabled selected value="">Select Account Type</option>
+              <option value="Shop">Shop</option>
+              <option value="Inspector">Inspector</option>
+            </select>
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-tasks"></span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group mb-3">
             <input type="password" class="form-control" id="emp_no" name="emp_no" placeholder="ID Number" oncopy="return false" onpaste="return false" autofocus autocomplete="off" maxlength="50" required>
             <div class="input-group-append">
               <div class="input-group-text">
