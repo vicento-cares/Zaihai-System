@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Zaihai | Homepage</title>
+    <title>Zaihai System</title>
 
     <link rel="icon" href="dist/img/logo.ico" type="image/x-icon" />
     <!-- Google Font: Source Sans Pro -->
