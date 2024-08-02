@@ -91,8 +91,8 @@ include 'plugins/navbar/viewer_navbar.php';
                                             <thead style="text-align: center;">
                                                 <tr>
                                                 <th>#</th>
-                                                <th>Car Model</th>
                                                 <th>Car Maker</th>
+                                                <th>Car Model</th>
                                                 <th>Applicator No.</th>
                                                 <th>Location</th>
                                                 <th>Status</th>
