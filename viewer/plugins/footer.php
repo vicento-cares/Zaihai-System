@@ -22,6 +22,9 @@
     <!-- AdminLTE App -->
     <script src="../dist/js/adminlte.min.js"></script>
 
+    <!-- Idletime Script -->
+    <script src="../dist/js/idletime_viewer.js"></script>
+
     <noscript>We are facing Script issues. Kindly enable JavaScript</noscript>
 
 </body>
