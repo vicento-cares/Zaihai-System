@@ -96,7 +96,7 @@ if ($method == 'in_applicator') {
 
             if ($status == 'Out') {
                 $sql = "SELECT TOP 1 trd_no FROM t_applicator_in_out 
-                    WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
+                    WHERE applicator_no = '$applicator_no' AND trd_no = '$location_before'
                     AND zaihai_stock_address IS NULL AND date_time_in IS NULL
                     ORDER BY id DESC";
                 $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
@@ -104,7 +104,7 @@ if ($method == 'in_applicator') {
 
                 $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
-                if ($location_before == $row['trd_no']) {
+                if ($row && $location_before == $row['trd_no']) {
                     $sql = "UPDATE t_applicator_in_out 
                             SET zaihai_stock_address = '$location', operator_in = '$operator_in', date_time_in = '$server_date_time'
                             WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
