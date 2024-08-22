@@ -6,6 +6,8 @@ if (!isset($_SESSION['emp_no'])) {
   header('location:/zaihai/login');
 } else if ($_SESSION['role'] == 'Inspector') {
   header('location:/zaihai/inspector/applicator_checksheet.php');
+} else if ($_SESSION['role'] == 'ME') {
+  header('location:/zaihai/me/accounts.php');
 }
 ?>  
 <!DOCTYPE html>
