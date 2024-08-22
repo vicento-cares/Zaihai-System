@@ -5,6 +5,8 @@ if (isset($_SESSION['emp_no'])) {
     header('location:/zaihai/shop/applicator_list.php');
   } else if ($_SESSION['role'] == 'Inspector') {
     header('location:/zaihai/inspector/applicator_checksheet.php');
+  } else if ($_SESSION['role'] == 'ME') {
+    header('location:/zaihai/me/accounts.php');
   }
 }
 ?>
@@ -42,6 +44,7 @@ if (isset($_SESSION['emp_no'])) {
               <option disabled selected value="">Select Account Type</option>
               <option value="Shop">Shop</option>
               <option value="Inspector">Inspector</option>
+              <option value="ME">ME</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">
