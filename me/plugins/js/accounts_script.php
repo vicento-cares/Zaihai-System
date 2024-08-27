@@ -1,27 +1,8 @@
 <script type="text/javascript">
-    // Global Variables for Realtime
-	var realtime_get_accounts;
-
     // DOMContentLoaded function
     document.addEventListener("DOMContentLoaded", () => {
-		// get_car_maker_dropdown_in_search();
         get_accounts();
-        realtime_get_accounts = setInterval(get_accounts, 15000);
     });
-
-	// const get_car_maker_dropdown_in_search = () => {
-	// 	$.ajax({
-	// 		url: '../process/shop/applicator_in_out/aio_g_p.php',
-	// 		type: 'GET',
-	// 		cache: false,
-	// 		data: {
-	// 			method: 'get_car_maker_dropdown_in_search'
-	// 		},  
-	// 		success: response => {
-	// 			document.getElementById("ai_car_maker_search").innerHTML = response;
-	// 		}
-	// 	});
-	// }
 
 	var typingTimerAcctEmpNoSearch;
 	var typingTimerAcctFullNameSearch;
@@ -105,7 +86,7 @@
         var csv_string = csv.join('\n');
 
         // Download it
-        var filename = 'ZaihaiSystem_ApplicatorInPending';
+        var filename = 'ZaihaiSystem_Accounts';
 		if (emp_no) {
 			filename += '_' + emp_no;
 		}
@@ -126,10 +107,19 @@
         document.body.removeChild(link);
     }
 
-	$("#new_account").on('hidden.bs.modal', e => {
+    const clear_account_details = () => {
         document.getElementById('emp_no_master').value = '';
         document.getElementById('full_name_master').value = '';
         document.getElementById('role_master').value = '';
+
+        document.getElementById('id_account_master_update').value = '';
+        document.getElementById('emp_no_master_update').value = '';
+        document.getElementById('full_name_master_update').value = '';
+        document.getElementById('role_master_update').value = '';
+    }
+
+	$("#new_account").on('hidden.bs.modal', e => {
+        clear_account_details();
     });
 
     document.getElementById('new_account_form').addEventListener('submit', e => {
@@ -160,9 +150,6 @@
                         showConfirmButton: false,
                         timer: 1000
                     });
-                    document.getElementById('emp_no_master').value = '';
-					document.getElementById('full_name_master').value = '';
-					document.getElementById('role_master').value = '';
                     get_accounts();
                     $('#new_account').modal('hide');
                 } else if (response == 'Already Exist') {
@@ -244,10 +231,7 @@
                         showConfirmButton: false,
                         timer: 1000
                     });
-                    document.getElementById('id_account_master_update').value = '';
-                    document.getElementById('emp_no_master_update').value = '';
-                    document.getElementById('full_name_master_update').value = '';
-                    document.getElementById('role_master_update').value = '';
+                    clear_account_details();
                     get_accounts();
                     $('#update_account').modal('hide');
                 } else if (response == 'Already Exist') {
@@ -289,10 +273,7 @@
                         showConfirmButton: false,
                         timer: 1000
                     });
-                    document.getElementById('id_account_master_update').value = '';
-                    document.getElementById('emp_no_master_update').value = '';
-                    document.getElementById('full_name_master_update').value = '';
-                    document.getElementById('role_master_update').value = '';
+                    clear_account_details();
                     get_accounts();
                     $('#update_account').modal('hide');
                 } else {
