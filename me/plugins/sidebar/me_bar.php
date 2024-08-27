@@ -24,13 +24,25 @@
              with font-awesome or any other icon font library -->
         <li class="nav-item">
           <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/accounts.php") { ?>
-          <a href="applicator_checksheet.php" class="nav-link active">
+          <a href="accounts.php" class="nav-link active">
           <?php } else { ?>
-          <a href="applicator_checksheet.php" class="nav-link">
+          <a href="accounts.php" class="nav-link">
           <?php } ?>
             <i class="nav-icon fas fa-user-cog"></i>
             <p>
               Accounts
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/terminal.php") { ?>
+          <a href="terminal.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="terminal.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-dot-circle"></i>
+            <p>
+              Terminal
             </p>
           </a>
         </li>
