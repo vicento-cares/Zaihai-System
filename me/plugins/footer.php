@@ -12,6 +12,8 @@ include '../modals/new_account.php';
 include '../modals/update_account.php';
 include '../modals/new_terminal.php';
 include '../modals/update_terminal.php';
+include '../modals/new_applicator.php';
+include '../modals/update_applicator.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>
