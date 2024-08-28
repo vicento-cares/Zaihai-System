@@ -55,7 +55,7 @@
             <div class="card-body">
               <div class="row mb-4">
                 <div class="col-sm-6">
-                  <label>Applicator</label>
+                  <label>Applicator No.</label>
                   <input list="a_applicator_no_search_list" class="form-control" id="a_applicator_no_search" maxlength="100" autocomplete="off">
                   <datalist id="a_applicator_no_search_list"></datalist>
                 </div>

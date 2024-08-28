@@ -58,6 +58,18 @@
             </p>
           </a>
         </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/applicator_list.php") { ?>
+          <a href="applicator_list.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_list.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-list"></i>
+            <p>
+              Applicator List
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>

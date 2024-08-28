@@ -16,6 +16,44 @@ if ($method == 'get_applicator_no_datalist_search') {
 	}
 }
 
+// Get Applicator Name Dropdown
+if ($method == 'get_applicator_no_dropdown') {
+	$sql = "SELECT applicator_no FROM m_applicator 
+            GROUP BY applicator_no ORDER BY applicator_no ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value=""></option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['applicator_no']).'">'.htmlspecialchars($row['applicator_no']).'</option>';
+		}
+	} else {
+		echo '<option selected value=""></option>';
+	}
+}
+
+// Get Zaihai Stock Address Dropdown By Applicator No
+if ($method == 'get_zaihai_stock_address_dropdown') {
+    $applicator_no = addslashes($_GET['applicator_no']);
+
+	$sql = "SELECT zaihai_stock_address FROM m_applicator";
+    if (!empty($applicator_no)) {
+		$sql .= " WHERE applicator_no = '$applicator_no'";
+	}
+    $sql .= " GROUP BY zaihai_stock_address ORDER BY zaihai_stock_address ASC";
+
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value=""></option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['zaihai_stock_address']).'">'.htmlspecialchars($row['zaihai_stock_address']).'</option>';
+		}
+	} else {
+		echo '<option selected value=""></option>';
+	}
+}
+
 if ($method == 'get_applicators') {
     $applicator_no = $_GET['applicator_no'];
     $zaihai_stock_address = $_GET['zaihai_stock_address'];

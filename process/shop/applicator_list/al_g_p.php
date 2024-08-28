@@ -102,3 +102,54 @@ if ($method == 'get_recent_applicator_list') {
         }
     }
 }
+
+if ($method == 'get_applicator_list') {
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $status = $_GET['status'];
+    $applicator_no = $_GET['applicator_no'];
+    $location = $_GET['location'];
+
+    $c = 0;
+
+    $sql = "SELECT id, car_maker, car_model, applicator_no, location, status, date_updated
+            FROM t_applicator_list WHERE 1=1";
+
+    if (!empty($car_maker)) {
+        $sql .= " AND car_maker='$car_maker'";
+    }
+    if (!empty($car_model)) {
+        $sql .= " AND car_model='$car_model'";
+    }
+    if (!empty($status)) {
+        $sql .= " AND status='$status'";
+    }
+    if (!empty($applicator_no)) {
+        $sql .= " AND applicator_no LIKE '%$applicator_no%'";
+    }
+    if (!empty($location)) {
+        $sql .= " AND location LIKE '%$location%'";
+    }
+
+    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt->execute();
+    if ($stmt->rowCount() > 0) {
+		foreach($stmt->fetchALL() as $row) {
+            $c++;
+			if ($row['status'] == 'Ready To Use') {
+				echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#update_applicator_list"
+                    onclick="get_applicator_list_details(&quot;'.$row['id'].'~!~'.$row['car_maker'].'~!~'.$row['car_model'].'~!~'.$row['applicator_no'].'~!~'.$row['location'].'&quot;)">';
+			} else {
+				echo '<tr>';
+			}
+            echo '<td>'.$c.'</td>';
+            echo '<td>'.$row['car_maker'].'</td>';
+            echo '<td>'.$row['car_model'].'</td>';
+            echo '<td>'.$row['applicator_no'].'</td>';
+            echo '<td>'.$row['location'].'</td>';
+            echo '<td>'.$row['status'].'</td>';
+            echo '<td>'.$row['date_updated'].'</td>';
+            echo '</tr>';
+        }
+    }
+}
