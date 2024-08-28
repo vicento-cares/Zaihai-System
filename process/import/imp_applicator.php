@@ -25,8 +25,8 @@ function check_csv ($file, $conn) {
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Terminal Name,Line Address";
-    $valid_first_line2 = '"Terminal Name","Line Address"';
+    $valid_first_line = "Applicator No.,Zaihai Stock Address";
+    $valid_first_line2 = '"Applicator No.","Zaihai Stock Address"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -36,10 +36,10 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $terminal_name = $line[0];
-            $line_address = $line[1];
+            $applicator_no = $line[0];
+            $zaihai_stock_address = $line[1];
 
-            if ($terminal_name == '' || $line_address == '') {
+            if ($applicator_no == '' || $zaihai_stock_address == '') {
                 // IF BLANK DETECTED ERROR += 1
                 $hasBlankError++;
                 $hasError = 1;
@@ -59,8 +59,8 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM m_terminal 
-                    WHERE terminal_name = '$terminal_name' AND line_address = '$line_address'";
+            $sql = "SELECT id FROM m_applicator 
+                    WHERE applicator_no = '$applicator_no' AND zaihai_stock_address = '$zaihai_stock_address'";
             $stmt = $conn -> prepare($sql);
             $stmt -> execute();
             if ($stmt -> rowCount() > 0) {
@@ -126,13 +126,13 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     continue; // Skip blank lines
                 }
 
-                $terminal_name = addslashes($line[0]);
-                $line_address = addslashes($line[1]);
+                $applicator_no = addslashes($line[0]);
+                $zaihai_stock_address = addslashes($line[1]);
 
                 // $conn->beginTransaction();
                 
-                $sql = "INSERT INTO m_terminal (terminal_name, line_address) 
-                        VALUES ('$terminal_name','$line_address')";
+                $sql = "INSERT INTO m_applicator (applicator_no, zaihai_stock_address) 
+                        VALUES ('$applicator_no','$zaihai_stock_address')";
 
                 $stmt = $conn->prepare($sql);
                 if (!$stmt->execute()) {
