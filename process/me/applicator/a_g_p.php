@@ -16,7 +16,7 @@ if ($method == 'get_applicator_no_datalist_search') {
 	}
 }
 
-// Get Applicator Name Dropdown
+// Get Applicator No. Dropdown
 if ($method == 'get_applicator_no_dropdown') {
 	$sql = "SELECT applicator_no FROM m_applicator 
             GROUP BY applicator_no ORDER BY applicator_no ASC";

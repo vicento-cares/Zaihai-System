@@ -335,10 +335,10 @@
         var button = document.activeElement;
 
         // Check the id or name of the button
-        if (button.id === 'btnUpdateApplicator') {
+        if (button.id === 'btnUpdateApplicatorList') {
             // Call the function for the first submit button
             update_applicator_list();
-        } else if (button.id === 'btnDeleteApplicator') {
+        } else if (button.id === 'btnDeleteApplicatorList') {
             // Call the function for the first submit button
             delete_applicator_list();
         }

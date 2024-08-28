@@ -70,6 +70,18 @@
             </p>
           </a>
         </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/applicator_terminal.php") { ?>
+          <a href="applicator_terminal.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_terminal.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>
+              Applicator Terminal
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>

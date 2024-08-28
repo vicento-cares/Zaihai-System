@@ -16,6 +16,38 @@ if ($method == 'get_terminal_name_datalist_search') {
 	}
 }
 
+// Get Terminal Name Dropdown
+if ($method == 'get_terminal_name_dropdown') {
+	$sql = "SELECT terminal_name FROM m_terminal 
+            GROUP BY terminal_name ORDER BY terminal_name ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value=""></option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['terminal_name']).'">'.htmlspecialchars($row['terminal_name']).'</option>';
+		}
+	} else {
+		echo '<option selected value=""></option>';
+	}
+}
+
+// Get Line Address By Terminal Name Dropdown
+if ($method == 'get_line_address_dropdown') {
+    $terminal_name = $_GET['terminal_name'];
+	$sql = "SELECT line_address FROM m_terminal WHERE terminal_name = '$terminal_name' ORDER BY line_address ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value=""></option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['line_address']).'">'.htmlspecialchars($row['line_address']).'</option>';
+		}
+	} else {
+		echo '<option selected value=""></option>';
+	}
+}
+
 if ($method == 'get_terminals') {
     $terminal_name = $_GET['terminal_name'];
     $line_address = $_GET['line_address'];

@@ -3,34 +3,40 @@ require '../../conn.php';
 
 $method = $_GET['method'];
 
-// Get Zaihai Stock Address By Applicator No Dropdown
-if ($method == 'get_zaihai_stock_address_dropdown') {
+if ($method == 'get_applicator_terminal') {
     $applicator_no = $_GET['applicator_no'];
-	$sql = "SELECT zaihai_stock_address FROM m_applicator WHERE applicator_no = '$applicator_no' ORDER BY zaihai_stock_address ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
-        echo '<option selected value=""></option>';
-		foreach($stmt -> fetchAll() as $row) {
-			echo '<option value="'.htmlspecialchars($row['zaihai_stock_address']).'">'.htmlspecialchars($row['zaihai_stock_address']).'</option>';
-		}
-	} else {
-		echo '<option selected value=""></option>';
-	}
+    $terminal_name = $_GET['terminal_name'];
+
+    $c = 0;
+
+    $sql = "SELECT id, applicator_no, terminal_name, date_updated FROM m_applicator_terminal";
+
+    if (!empty($applicator_no)) {
+        $sql .= " WHERE applicator_no LIKE '$applicator_no%'";
+    } else {
+        $sql .= " WHERE applicator_no != ''";
+    }
+    if (!empty($terminal_name)) {
+        $sql .= " AND terminal_name LIKE '$terminal_name%'";
+    }
+
+    $sql .= " ORDER BY date_updated DESC";
+
+    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt->execute();
+    if ($stmt->rowCount() > 0) {
+		foreach($stmt->fetchALL() as $row){
+            $c++;
+
+            echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#update_applicator_terminal"
+                    onclick="get_applicator_terminal_details(&quot;'.$row['id'].'~!~'.$row['applicator_no'].'~!~'.$row['terminal_name'].'&quot;)">';
+            echo '<td>'.$c.'</td>';
+            echo '<td>'.$row['applicator_no'].'</td>';
+            echo '<td>'.$row['terminal_name'].'</td>';
+            echo '<td>'.$row['date_updated'].'</td>';
+            echo '</tr>';
+        }
+    }
 }
 
-// Get Line Address By Terminal Name Dropdown
-if ($method == 'get_line_address_dropdown') {
-    $terminal_name = $_GET['terminal_name'];
-	$sql = "SELECT line_address FROM m_terminal WHERE terminal_name = '$terminal_name' ORDER BY line_address ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
-        echo '<option selected value=""></option>';
-		foreach($stmt -> fetchAll() as $row) {
-			echo '<option value="'.htmlspecialchars($row['line_address']).'">'.htmlspecialchars($row['line_address']).'</option>';
-		}
-	} else {
-		echo '<option selected value=""></option>';
-	}
-}
+$conn = null;
