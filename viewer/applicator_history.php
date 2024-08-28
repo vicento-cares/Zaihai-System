@@ -113,6 +113,10 @@ include 'plugins/navbar/viewer_navbar.php';
                                                 <th>Line Address</th>
                                                 <th>Operator In</th>
                                                 <th>Date Time In</th>
+                                                <th>Inspected By</th>
+                                                <th>Confirmation Date</th>
+                                                <th>Adjustment Content</th>
+                                                <th>Adjustment Content Remarks</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="applicatorHistoryData" style="text-align: center;"></tbody>
