@@ -214,7 +214,7 @@
 
 	const get_zaihai_stock_address_dropdown = applicator_no => {
 		$.ajax({
-			url: '../process/me/applicator_terminal/at_g_p.php',
+			url: '../process/me/applicator/a_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -229,7 +229,7 @@
 
 	const get_line_address_dropdown = terminal_name => {
 		$.ajax({
-			url: '../process/me/applicator_terminal/at_g_p.php',
+			url: '../process/me/terminal/term_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
