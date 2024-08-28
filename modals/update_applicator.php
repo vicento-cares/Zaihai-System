@@ -15,7 +15,7 @@
           <div class="row mb-2">
             <input type="hidden" id="id_applicator_master_update" class="form-control">
             <div class="col-12">
-              <label>Applicator</label><label style="color: red;">*</label>
+              <label>Applicator No.</label><label style="color: red;">*</label>
               <input type="text" id="applicator_no_master_update" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
           </div>

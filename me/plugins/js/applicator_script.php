@@ -332,7 +332,7 @@
                             showConfirmButton: false,
                             timer: 1000
                         });
-                        load_st(1);
+                        get_applicators();
                     }
                     document.getElementById("file").value = '';
                 }, 500);

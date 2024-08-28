@@ -14,6 +14,8 @@ include '../modals/new_terminal.php';
 include '../modals/update_terminal.php';
 include '../modals/new_applicator.php';
 include '../modals/update_applicator.php';
+include '../modals/new_applicator_list.php';
+include '../modals/update_applicator_list.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>
