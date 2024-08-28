@@ -291,24 +291,34 @@
 		});
 	}
 
+	document.getElementById("adjustment_content_ac_i").addEventListener('change', function() {
+		var adjustment_content = document.getElementById("adjustment_content_ac_i").value;
+		if (adjustment_content != '') {
+			document.getElementById("adjustment_content_remarks_ac_i").disabled = false;
+		} else {
+			document.getElementById("adjustment_content_remarks_ac_i").value = '';
+			document.getElementById("adjustment_content_remarks_ac_i").disabled = true;
+		}
+	});
+
 	$("#applicator_checksheet").on('show.bs.modal', e => {
-        load_adjustment_content_textarea();
+        load_adjustment_content_remarks_textarea();
     });
 
-    const load_adjustment_content_textarea = () => {
+    const load_adjustment_content_remarks_textarea = () => {
         setTimeout(() => {
-            var max_length = document.getElementById("adjustment_content_ac_i").getAttribute("maxlength");
-            var adjustment_content_length = document.getElementById("adjustment_content_ac_i").value.length;
-            var adjustment_content_count = `${adjustment_content_length} / ${max_length}`;
-            document.getElementById("adjustment_content_ac_i_count").innerHTML = adjustment_content_count;
+            var max_length = document.getElementById("adjustment_content_remarks_ac_i").getAttribute("maxlength");
+            var adjustment_content_remarks_length = document.getElementById("adjustment_content_remarks_ac_i").value.length;
+            var adjustment_content_remarks_count = `${adjustment_content_remarks_length} / ${max_length}`;
+            document.getElementById("adjustment_content_remarks_ac_i_count").innerHTML = adjustment_content_remarks_count;
         }, 100);
     }
 
-    const count_adjustment_content_char = () => {
-        var max_length = document.getElementById("adjustment_content_ac_i").getAttribute("maxlength");
-        var adjustment_content_length = document.getElementById("adjustment_content_ac_i").value.length;
-        var adjustment_content_count = `${adjustment_content_length} / ${max_length}`;
-        document.getElementById("adjustment_content_ac_i_count").innerHTML = adjustment_content_count;
+    const count_adjustment_content_remarks_char = () => {
+        var max_length = document.getElementById("adjustment_content_remarks_ac_i").getAttribute("maxlength");
+        var adjustment_content_remarks_length = document.getElementById("adjustment_content_remarks_ac_i").value.length;
+        var adjustment_content_remarks_count = `${adjustment_content_remarks_length} / ${max_length}`;
+        document.getElementById("adjustment_content_remarks_ac_i_count").innerHTML = adjustment_content_remarks_count;
     }
 
 	const clear_checked_radio_button = name => {
@@ -566,7 +576,7 @@
 			document.getElementById(radio_button_arr[i]).disabled = true;
 		}
 
-        document.getElementById('adjustment_content_ac_i').value = '';
+        document.getElementById('adjustment_content_remarks_ac_i').value = '';
 		clear_checked_radio_button("cross_section_result_ac_i");
     });
 
@@ -630,6 +640,7 @@
 		let ac10_r = document.getElementById("cont_10r_ac_i").value;
 
 		let adjustment_content = document.getElementById("adjustment_content_ac_i").value;
+		let adjustment_content_remarks = document.getElementById("adjustment_content_remarks_ac_i").value;
 		let cross_section_result = parseInt(get_checked_radio_button("cross_section_result_ac_i"));
 		let inspected_by = document.getElementById("inspected_by_ac_i").innerHTML;
 		let inspected_by_no = document.getElementById("inspected_by_no_ac_i").value;
@@ -649,6 +660,7 @@
 				inspection_date_time: inspection_date_time,
 				inspection_shift: inspection_shift,
 				adjustment_content: adjustment_content,
+				adjustment_content_remarks: adjustment_content_remarks,
 				cross_section_result: cross_section_result,
 				inspected_by: inspected_by,
 				inspected_by_no: inspected_by_no,

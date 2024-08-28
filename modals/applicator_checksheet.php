@@ -543,7 +543,7 @@
               </div>
             </div>
           </div>
-          <div class="row mb-2">
+          <div class="row mb-4">
             <div class="col-lg-4 col-sm-12">
               <select class="form-control" id="cont_10s_ac_i" style="width: 100%;" disabled>
                 <option selected value="">Select Option For 10 △</option>
@@ -556,11 +556,22 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-lg-4 col-sm-12">
+              <label>Content of Adjustment / Repair: </label>
+              <select class="form-control" id="adjustment_content_ac_i" style="width: 100%;">
+                <option selected value="">Select Option</option>
+                <option value="Repair">Repair</option>
+                <option value="Adjust">Adjust</option>
+                <option value="Clean">Clean</option>
+                <option value="Replace">Replace</option>
+                <option value="Beyond The Limit">Beyond The Limit</option>
+              </select>
+            </div>
+            <div class="col-lg-8 col-sm-12">
               <div class="form-group">
-                <label>Content of Adjustment / Repair : </label>
-                <textarea id="adjustment_content_ac_i" name="adjustment_content_ac_i" class="form-control" style="resize: none;" rows="3" maxlength="255" onkeyup="count_adjustment_content_char()"></textarea>
-                <span id="adjustment_content_ac_i_count"></span>
+                <label>Content of Adjustment / Repair (Remarks): </label>
+                <textarea id="adjustment_content_remarks_ac_i" name="adjustment_content_remarks_ac_i" class="form-control" style="resize: none;" rows="3" maxlength="255" onkeyup="count_adjustment_content_remarks_char()" disabled></textarea>
+                <span id="adjustment_content_remarks_ac_i_count"></span>
               </div>
             </div>
           </div>

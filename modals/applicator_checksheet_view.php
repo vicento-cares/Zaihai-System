@@ -350,10 +350,16 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-lg-4 col-sm-12">
               <div class="form-group">
                 <label>Content of Adjustment / Repair : </label>
                 <p id="adjustment_content_acv"></p>
+              </div>
+            </div>
+            <div class="col-lg-8 col-sm-12">
+              <div class="form-group">
+                <label>Content of Adjustment / Repair (Remarks): </label>
+                <p id="adjustment_content_remarks_acv"></p>
               </div>
             </div>
           </div>
