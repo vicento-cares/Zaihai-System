@@ -3,6 +3,38 @@ require '../../conn.php';
 
 $method = $_GET['method'];
 
+// Get Applicator No. Dropdown
+if ($method == 'get_applicator_no_dropdown') {
+	$sql = "SELECT applicator_no FROM m_applicator_terminal 
+            GROUP BY applicator_no ORDER BY applicator_no ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value=""></option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['applicator_no']).'">'.htmlspecialchars($row['applicator_no']).'</option>';
+		}
+	} else {
+		echo '<option selected value=""></option>';
+	}
+}
+
+// Get Terminal Name Dropdown
+if ($method == 'get_terminal_name_dropdown') {
+	$sql = "SELECT terminal_name FROM m_applicator_terminal 
+            GROUP BY terminal_name ORDER BY terminal_name ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value=""></option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['terminal_name']).'">'.htmlspecialchars($row['terminal_name']).'</option>';
+		}
+	} else {
+		echo '<option selected value=""></option>';
+	}
+}
+
 if ($method == 'get_applicator_terminal') {
     $applicator_no = $_GET['applicator_no'];
     $terminal_name = $_GET['terminal_name'];

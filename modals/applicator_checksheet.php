@@ -558,7 +558,7 @@
           <div class="row">
             <div class="col-lg-4 col-sm-12">
               <label>Content of Adjustment / Repair: </label>
-              <select class="form-control" id="adjustment_content_ac_i" style="width: 100%;">
+              <select class="form-control" id="adjustment_content_ac_i" style="width: 100%;" required>
                 <option selected value="">Select Option</option>
                 <option value="Repair">Repair</option>
                 <option value="Adjust">Adjust</option>

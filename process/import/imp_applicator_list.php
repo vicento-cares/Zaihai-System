@@ -20,11 +20,6 @@ function check_csv ($file, $conn) {
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
-    $row_valid_arr = array(0, 0);
-
-    $notExistsApplicatorLocationArr = array();
-    // $readyToUseOnlyArr = array();
-
     $message = "";
     $check_csv_row = 0;
 
@@ -52,35 +47,6 @@ function check_csv ($file, $conn) {
                 $hasError = 1;
                 array_push($hasBlankErrorArr, $check_csv_row);
             }
-
-            // CHECK ROW VALIDATION
-            // 0
-            $sql = "SELECT id FROM m_applicator 
-                    WHERE applicator_no = '$applicator_no' AND zaihai_stock_address = '$location'";
-            $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
-
-            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-
-            if (!$row) {
-                $hasError = 1;
-                $row_valid_arr[0] = 1;
-                array_push($notExistsApplicatorLocationArr, $check_csv_row);
-            }
-
-            // 1
-            // $sql = "SELECT status FROM t_applicator_list 
-            //         WHERE applicator_no = '$applicator_no'";
-            // $stmt = $conn -> prepare($sql);
-            // $stmt -> execute();
-
-            // $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-
-            // if ($row && $row['status'] != 'Ready To Use') {
-            //     $hasError = 1;
-            //     $row_valid_arr[1] = 1;
-            //     array_push($readyToUseOnlyArr, $check_csv_row);
-            // }
             
             // Joining all row values for checking duplicated rows
             $whole_line = join(',', $line);
@@ -113,13 +79,6 @@ function check_csv ($file, $conn) {
     fclose($csvFile);
 
     if ($hasError == 1) {
-        if ($row_valid_arr[0] == 1) {
-            $message = $message . 'Applicator and location not found on row/s ' . implode(", ", $notExistsApplicatorLocationArr) . '. ';
-        }
-        // if ($row_valid_arr[1] == 1) {
-        //     $message = $message . 'Ready to use status only to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
-        // }
-
         if ($isExistsOnDb == 1) {
             $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
         }
@@ -205,4 +164,3 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
 // KILL CONNECTION
 $conn = null;
-?>

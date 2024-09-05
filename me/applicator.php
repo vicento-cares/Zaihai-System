@@ -54,12 +54,24 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <div class="col-sm-6">
+                <div class="col-sm-3">
+                  <label>Car Maker</label>
+                  <select id="a_car_maker_search" class="form-control" onchange="get_applicators()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
+                  <label>Car Model</label>
+                  <select id="a_car_model_search" class="form-control" onchange="get_applicators()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
                   <label>Applicator No.</label>
                   <input list="a_applicator_no_search_list" class="form-control" id="a_applicator_no_search" maxlength="100" autocomplete="off">
                   <datalist id="a_applicator_no_search_list"></datalist>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-3">
                   <label>Zaihai Stock Address</label>
                   <input type="text" id="a_zaihai_stock_address_search" class="form-control" maxlength="100" autocomplete="off">
                 </div>
@@ -82,6 +94,8 @@
                   <thead style="text-align: center;">
                     <tr>
                       <th>#</th>
+                      <th>Car Maker</th>
+                      <th>Car Model</th>
                       <th>Applicator No.</th>
                       <th>Zaihai Stock Address</th>
                       <th>Date Updated</th>
@@ -89,7 +103,7 @@
                   </thead>
                   <tbody id="applicatorsData" style="text-align: center;">
                     <tr>
-                      <td colspan="4" style="text-align:center;">
+                      <td colspan="6" style="text-align:center;">
                         <div class="spinner-border text-dark" role="status">
                           <span class="sr-only">Loading...</span>
                         </div>

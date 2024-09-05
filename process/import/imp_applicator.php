@@ -20,13 +20,18 @@ function check_csv ($file, $conn) {
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
+    $row_valid_arr = array(0, 0);
+
+    $notExistsApplicatorArr = array();
+    // $readyToUseOnlyArr = array();
+
     $message = "";
     $check_csv_row = 0;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Applicator No.,Zaihai Stock Address";
-    $valid_first_line2 = '"Applicator No.","Zaihai Stock Address"';
+    $valid_first_line = "Car Maker,Car Model,Applicator No.,Zaihai Stock Address";
+    $valid_first_line2 = '"Car Maker","Car Model","Applicator No.","Zaihai Stock Address"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -36,15 +41,47 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $applicator_no = $line[0];
-            $zaihai_stock_address = $line[1];
+            $car_maker = addslashes($line[0]);
+            $car_model = addslashes($line[1]);
+            $applicator_no = addslashes($line[2]);
+            $zaihai_stock_address = addslashes($line[3]);
 
-            if ($applicator_no == '' || $zaihai_stock_address == '') {
+            if ($car_maker == '' || $car_model == '' || 
+                $applicator_no == '' || $zaihai_stock_address == '') {
                 // IF BLANK DETECTED ERROR += 1
                 $hasBlankError++;
                 $hasError = 1;
                 array_push($hasBlankErrorArr, $check_csv_row);
             }
+
+            // CHECK ROW VALIDATION
+            // 0
+            $sql = "SELECT id FROM m_applicator_terminal 
+                    WHERE applicator_no = '$applicator_no'";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> execute();
+
+            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                $hasError = 1;
+                $row_valid_arr[0] = 1;
+                array_push($notExistsApplicatorArr, $check_csv_row);
+            }
+
+            // 1
+            // $sql = "SELECT status FROM t_applicator_list 
+            //         WHERE applicator_no = '$applicator_no'";
+            // $stmt = $conn -> prepare($sql);
+            // $stmt -> execute();
+
+            // $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            // if ($row && $row['status'] != 'Ready To Use') {
+            //     $hasError = 1;
+            //     $row_valid_arr[1] = 1;
+            //     array_push($readyToUseOnlyArr, $check_csv_row);
+            // }
             
             // Joining all row values for checking duplicated rows
             $whole_line = join(',', $line);
@@ -60,7 +97,7 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM m_applicator 
-                    WHERE applicator_no = '$applicator_no' AND zaihai_stock_address = '$zaihai_stock_address'";
+                    WHERE zaihai_stock_address = '$zaihai_stock_address'";
             $stmt = $conn -> prepare($sql);
             $stmt -> execute();
             if ($stmt -> rowCount() > 0) {
@@ -77,6 +114,13 @@ function check_csv ($file, $conn) {
     fclose($csvFile);
 
     if ($hasError == 1) {
+        if ($row_valid_arr[0] == 1) {
+            $message = $message . 'Applicator No. not found on row/s ' . implode(", ", $notExistsApplicatorArr) . '. ';
+        }
+        // if ($row_valid_arr[1] == 1) {
+        //     $message = $message . 'Ready to use status only to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
+        // }
+
         if ($isExistsOnDb == 1) {
             $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
         }
@@ -126,13 +170,15 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     continue; // Skip blank lines
                 }
 
-                $applicator_no = addslashes($line[0]);
-                $zaihai_stock_address = addslashes($line[1]);
+                $car_maker = addslashes($line[0]);
+                $car_model = addslashes($line[1]);
+                $applicator_no = addslashes($line[2]);
+                $zaihai_stock_address = addslashes($line[3]);
 
                 // $conn->beginTransaction();
                 
-                $sql = "INSERT INTO m_applicator (applicator_no, zaihai_stock_address) 
-                        VALUES ('$applicator_no','$zaihai_stock_address')";
+                $sql = "INSERT INTO m_applicator (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                        VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address')";
 
                 $stmt = $conn->prepare($sql);
                 if (!$stmt->execute()) {
@@ -160,4 +206,3 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
 // KILL CONNECTION
 $conn = null;
-?>
