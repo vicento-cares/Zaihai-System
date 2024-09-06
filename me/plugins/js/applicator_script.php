@@ -310,11 +310,19 @@
                     clear_applicator_details();
                     get_applicators();
                     $('#update_applicator').modal('hide');
-                } else if (response == 'Duplicate') {
+                } else if (response == 'Zaihai Stock Address Not Found') {
                     Swal.fire({
                         icon: 'info',
                         title: 'Info',
-                        text: 'Record cannot be updated. Your input was already existed on other record',
+                        text: 'Record cannot be updated. Zaihai Stock Address Not Found on masterlist',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                } else if (response == 'Ready To Use Only') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Record cannot be updated. Ready to use status only on Applicator List to continue',
                         showConfirmButton: false,
                         timer: 2000
                     });
@@ -352,6 +360,14 @@
                     clear_applicator_details();
                     get_applicators();
                     $('#update_applicator').modal('hide');
+                } else if (response == 'Ready To Use Only') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Record cannot be deleted. Ready to use status only on Applicator List to continue',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',

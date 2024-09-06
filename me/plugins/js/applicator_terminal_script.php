@@ -8,7 +8,7 @@
 
 	const get_applicator_no_datalist_search = () => {
 		$.ajax({
-			url: '../process/me/applicator/a_g_p.php',
+			url: '../process/me/applicator_terminal/at_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -22,7 +22,7 @@
 
     const get_terminal_name_datalist_search = () => {
 		$.ajax({
-			url: '../process/me/terminal/term_g_p.php',
+			url: '../process/me/applicator_terminal/at_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -257,6 +257,14 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
+                } else if (response == 'Applicator No. or Terminal Name in use') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Record cannot be updated. Applicator No. or Terminal Name in use',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -291,6 +299,14 @@
                     clear_applicator_terminal_details();
                     get_applicator_terminal();
                     $('#update_applicator_terminal').modal('hide');
+                } else if (response == 'Applicator No. or Terminal Name in use') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Record cannot be deleted. Applicator No. or Terminal Name in use',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',

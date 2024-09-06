@@ -53,9 +53,7 @@ if ($method == 'update_applicator') {
 	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
-		echo 'Duplicate';
-	} else {
-		$check = "SELECT status FROM t_applicator_list WHERE applicator_no = '$applicator_no'";
+		$check = "SELECT status FROM t_applicator_list WHERE zaihai_stock_address = '$zaihai_stock_address'";
         $stmt = $conn->prepare($check, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
         $stmt->execute();
 
@@ -66,8 +64,8 @@ if ($method == 'update_applicator') {
                 echo 'Ready To Use Only';
             } else {
                 $query = "UPDATE t_applicator_list 
-                        SET location = '$zaihai_stock_address'
-                        WHERE id = '$id'";
+                        SET applicator_no = '$applicator_no'
+                        WHERE zaihai_stock_address = '$zaihai_stock_address'";
 
                 $stmt = $conn->prepare($query);
                 if ($stmt->execute()) {
@@ -87,37 +85,10 @@ if ($method == 'update_applicator') {
                 }
             }
         } else {
-            $check = "SELECT status FROM t_applicator_list WHERE id = '$id'";
-            $stmt = $conn->prepare($check, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt->execute();
-
-            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-
-            if ($row['status'] != 'Ready To Use') {
-                echo 'Ready To Use Only';
-            } else {
-                $query = "UPDATE t_applicator_list 
-                        SET applicator_no = '$applicator_no', location = '$zaihai_stock_address'
-                        WHERE id = '$id'";
-
-                $stmt = $conn->prepare($query);
-                if ($stmt->execute()) {
-                    $query = "UPDATE m_applicator 
-							SET car_maker = '$car_maker', car_model = '$car_model', 
-							applicator_no = '$applicator_no', zaihai_stock_address = '$zaihai_stock_address'
-							WHERE id = '$id'";
-
-					$stmt = $conn->prepare($query);
-					if ($stmt->execute()) {
-						echo 'success';
-					} else {
-						echo 'error';
-					}
-                } else {
-                    echo 'error';
-                }
-            }
+            echo 'Ready To Use Only';
         }
+	} else {
+		echo 'Zaihai Stock Address Not Found';
 	}
 }
 
@@ -134,7 +105,7 @@ if ($method == 'delete_applicator') {
 	$zaihai_stock_address = addslashes($row['zaihai_stock_address']);
 
 	$check = "SELECT status FROM t_applicator_list 
-				WHERE applicator_no = '$applicator_no' AND location = '$zaihai_stock_address'";
+				WHERE location = '$zaihai_stock_address'";
 	$stmt = $conn->prepare($check, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt->execute();
 
@@ -145,7 +116,7 @@ if ($method == 'delete_applicator') {
 			echo 'Ready To Use Only';
 		} else {
 			$query = "DELETE FROM t_applicator_list 
-						WHERE applicator_no = '$applicator_no' AND location = '$zaihai_stock_address'";
+						WHERE location = '$zaihai_stock_address'";
 			$stmt = $conn->prepare($query);
 			if ($stmt->execute()) {
 				$query = "DELETE FROM m_applicator WHERE id = '$id'";
@@ -160,7 +131,7 @@ if ($method == 'delete_applicator') {
 			}
 		}
 	} else {
-		echo 'Applicator Not Found';
+		echo 'Ready To Use Only';
 	}
 }
 

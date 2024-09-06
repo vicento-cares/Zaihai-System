@@ -81,15 +81,15 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM m_terminal 
-                    WHERE line_address = '$line_address'";
-            $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
-                $isExistsOnDb = 1;
-                $hasError = 1;
-                array_push($isExistsOnDbArr, $check_csv_row);
-            }
+            // $sql = "SELECT id FROM m_terminal 
+            //         WHERE line_address = '$line_address'";
+            // $stmt = $conn -> prepare($sql);
+            // $stmt -> execute();
+            // if ($stmt -> rowCount() > 0) {
+            //     $isExistsOnDb = 1;
+            //     $hasError = 1;
+            //     array_push($isExistsOnDbArr, $check_csv_row);
+            // }
         }
     } else {
         //$message = $first_line;
@@ -103,9 +103,9 @@ function check_csv ($file, $conn) {
             $message = $message . 'Terminal Name not found on row/s ' . implode(", ", $notExiststTerminalArr) . '. ';
         }
 
-        if ($isExistsOnDb == 1) {
-            $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
-        }
+        // if ($isExistsOnDb == 1) {
+        //     $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
+        // }
         if ($hasBlankError >= 1) {
             $message = $message . 'Blank Cell Exists on row/s ' . implode(", ", $hasBlankErrorArr) . '. ';
         }
@@ -158,15 +158,34 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                 $line_address = addslashes($line[3]);
 
                 // $conn->beginTransaction();
-                
-                $sql = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) 
+
+                $sql = "SELECT id FROM m_terminal 
+                        WHERE line_address = '$line_address'";
+                $stmt = $conn -> prepare($sql);
+                $stmt -> execute();
+
+                $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+                if ($row) {
+                    $sql = "UPDATE m_terminal 
+                            SET car_maker = '$car_maker', car_model = '$car_model', 
+                            terminal_name = '$terminal_name'
+                            WHERE line_address = '$line_address'";
+
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt->execute()) {
+                        $error++;
+                    }
+                } else {
+                    $sql = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) 
                         VALUES ('$car_maker','$car_model','$terminal_name','$line_address')";
 
-                $stmt = $conn->prepare($sql);
-                if (!$stmt->execute()) {
-                    $error++;
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt->execute()) {
+                        $error++;
+                    }
                 }
-
+                
                 // $conn->commit();
             }
             

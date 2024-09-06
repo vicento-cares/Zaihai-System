@@ -70,18 +70,22 @@ function check_csv ($file, $conn) {
             }
 
             // 1
-            // $sql = "SELECT status FROM t_applicator_list 
-            //         WHERE applicator_no = '$applicator_no'";
-            // $stmt = $conn -> prepare($sql);
-            // $stmt -> execute();
+            $sql = "SELECT status FROM t_applicator_list 
+                    WHERE zaihai_stock_address = '$zaihai_stock_address'";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> execute();
 
-            // $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
-            // if ($row && $row['status'] != 'Ready To Use') {
-            //     $hasError = 1;
-            //     $row_valid_arr[1] = 1;
-            //     array_push($readyToUseOnlyArr, $check_csv_row);
-            // }
+            if ($row && $row['status'] != 'Ready To Use') {
+                $hasError = 1;
+                $row_valid_arr[1] = 1;
+                array_push($readyToUseOnlyArr, $check_csv_row);
+            } else if (!$row) {
+                $hasError = 1;
+                $row_valid_arr[1] = 1;
+                array_push($readyToUseOnlyArr, $check_csv_row);
+            }
             
             // Joining all row values for checking duplicated rows
             $whole_line = join(',', $line);
@@ -96,15 +100,15 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM m_applicator 
-                    WHERE zaihai_stock_address = '$zaihai_stock_address'";
-            $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
-                $isExistsOnDb = 1;
-                $hasError = 1;
-                array_push($isExistsOnDbArr, $check_csv_row);
-            }
+            // $sql = "SELECT id FROM m_applicator 
+            //         WHERE zaihai_stock_address = '$zaihai_stock_address'";
+            // $stmt = $conn -> prepare($sql);
+            // $stmt -> execute();
+            // if ($stmt -> rowCount() > 0) {
+            //     $isExistsOnDb = 1;
+            //     $hasError = 1;
+            //     array_push($isExistsOnDbArr, $check_csv_row);
+            // }
         }
     } else {
         //$message = $first_line;
@@ -117,13 +121,13 @@ function check_csv ($file, $conn) {
         if ($row_valid_arr[0] == 1) {
             $message = $message . 'Applicator No. not found on row/s ' . implode(", ", $notExistsApplicatorArr) . '. ';
         }
-        // if ($row_valid_arr[1] == 1) {
-        //     $message = $message . 'Ready to use status only to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
-        // }
-
-        if ($isExistsOnDb == 1) {
-            $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
+        if ($row_valid_arr[1] == 1) {
+            $message = $message . 'Ready to use status only on Applicator List to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
         }
+
+        // if ($isExistsOnDb == 1) {
+        //     $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
+        // }
         if ($hasBlankError >= 1) {
             $message = $message . 'Blank Cell Exists on row/s ' . implode(", ", $hasBlankErrorArr) . '. ';
         }
@@ -176,13 +180,53 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                 $zaihai_stock_address = addslashes($line[3]);
 
                 // $conn->beginTransaction();
-                
-                $sql = "INSERT INTO m_applicator (car_maker, car_model, applicator_no, zaihai_stock_address) 
+
+                $sql = "SELECT id FROM m_applicator 
+                        WHERE zaihai_stock_address = '$zaihai_stock_address'";
+                $stmt = $conn -> prepare($sql);
+                $stmt -> execute();
+
+                $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+                if ($row) {
+                    $query = "UPDATE t_applicator_list 
+                        SET applicator_no = '$applicator_no'
+                        WHERE location = '$zaihai_stock_address'";
+
+                    $stmt = $conn->prepare($sql);
+                    if ($stmt->execute()) {
+                        $stmt = NULL;
+            
+                        $sql = "UPDATE m_applicator 
+                            SET car_maker = '$car_maker', car_model = '$car_model', 
+                            applicator_no = '$applicator_no'
+                            WHERE zaihai_stock_address = '$zaihai_stock_address'";
+            
+                        $stmt = $conn->prepare($query);
+                        if (!$stmt->execute()) {
+                            $error++;
+                        }
+                    } else {
+                        $error++;
+                    }
+                } else {
+                    $sql = "INSERT INTO m_applicator (car_maker, car_model, applicator_no, zaihai_stock_address) 
                         VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address')";
 
-                $stmt = $conn->prepare($sql);
-                if (!$stmt->execute()) {
-                    $error++;
+                    $stmt = $conn->prepare($sql);
+                    if ($stmt->execute()) {
+                        $stmt = NULL;
+            
+                        $query = "INSERT INTO t_applicator_list (applicator_no, location, status) 
+                                VALUES ('$applicator_no','$zaihai_stock_address','Ready To Use')";
+            
+                        $stmt = $conn->prepare($query);
+                        if (!$stmt->execute()) {
+                            $error++;
+                        }
+                    } else {
+                        $error++;
+                    }
                 }
 
                 // $conn->commit();

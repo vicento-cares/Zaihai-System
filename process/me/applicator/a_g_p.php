@@ -33,7 +33,7 @@ if ($method == 'get_car_model_dropdown_search') {
 	}
 }
 
-// Get Applicator Name Datalist
+// Get Applicator No. Datalist
 if ($method == 'get_applicator_no_datalist_search') {
 	$sql = "SELECT applicator_no FROM m_applicator 
             GROUP BY applicator_no ORDER BY applicator_no ASC";

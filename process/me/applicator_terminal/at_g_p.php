@@ -19,6 +19,19 @@ if ($method == 'get_applicator_no_dropdown') {
 	}
 }
 
+// Get Applicator No. Datalist
+if ($method == 'get_applicator_no_datalist_search') {
+	$sql = "SELECT applicator_no FROM m_applicator_terminal 
+            GROUP BY applicator_no ORDER BY applicator_no ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.$row['applicator_no'].'">';
+		}
+	}
+}
+
 // Get Terminal Name Dropdown
 if ($method == 'get_terminal_name_dropdown') {
 	$sql = "SELECT terminal_name FROM m_applicator_terminal 
@@ -32,6 +45,19 @@ if ($method == 'get_terminal_name_dropdown') {
 		}
 	} else {
 		echo '<option selected value=""></option>';
+	}
+}
+
+// Get Terminal Name Datalist
+if ($method == 'get_terminal_name_datalist_search') {
+	$sql = "SELECT terminal_name FROM m_applicator_terminal 
+            GROUP BY terminal_name ORDER BY terminal_name ASC";
+	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.$row['terminal_name'].'">';
+		}
 	}
 }
 

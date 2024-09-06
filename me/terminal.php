@@ -29,7 +29,7 @@
         <div class="col-sm-3">
           <button type="button" class="btn btn-warning btn-block btn-file">
             <form id="file_form" enctype="multipart/form-data">
-              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal (Add Only)</span><input type="file" id="file" name="file" onchange="upload_csv()" accept=".csv">
+              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal</span><input type="file" id="file" name="file" onchange="upload_csv()" accept=".csv">
             </form>
           </button>
         </div>
