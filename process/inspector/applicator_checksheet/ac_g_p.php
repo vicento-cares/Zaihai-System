@@ -15,7 +15,7 @@ if ($method == 'get_recent_applicator_in_pending') {
     $sql = "SELECT t1.serial_no, t1.applicator_no, t1.terminal_name, 
                 t1.trd_no, t1.operator_out, t1.date_time_out, 
                 t1.zaihai_stock_address, t1.operator_in, t1.date_time_in, 
-                al.car_maker, al.car_model
+                a.car_maker, a.car_model
             FROM t_applicator_in_out t1
             JOIN (
                 SELECT applicator_no, terminal_name, MAX(date_time_in) AS max_date_time_in
@@ -26,7 +26,7 @@ if ($method == 'get_recent_applicator_in_pending') {
             ON t1.applicator_no = t2.applicator_no
             AND t1.terminal_name = t2.terminal_name
             AND t1.date_time_in = t2.max_date_time_in
-            LEFT JOIN t_applicator_list al ON t1.applicator_no = al.applicator_no
+            LEFT JOIN m_applicator a ON t1.applicator_no = a.applicator_no
             WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL";
 
     if (!empty($car_maker)) {

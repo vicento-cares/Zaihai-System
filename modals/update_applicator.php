@@ -15,14 +15,26 @@
           <div class="row mb-2">
             <input type="hidden" id="id_applicator_master_update" class="form-control">
             <div class="col-12">
-              <label>Applicator No.</label><label style="color: red;">*</label>
-              <input type="text" id="applicator_no_master_update" class="form-control" maxlength="100" autocomplete="off" required>
+              <label>Car Maker</label><label style="color: red;">*</label>
+              <input type="text" id="a_car_maker_master_update" class="form-control" maxlength="255" autocomplete="off" required>
             </div>
           </div>
-          <div class="row">
+          <div class="row mb-2">
+            <div class="col-12">
+              <label>Car Model</label><label style="color: red;">*</label>
+              <input type="text" id="a_car_model_master_update" class="form-control" maxlength="255" autocomplete="off" required>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label>Applicator No.</label><label style="color: red;">*</label>
+              <select id="a_applicator_no_master_update" class="form-control" required></select>
+            </div>
+          </div>
+          <div class="row mb-2">
             <div class="col-12">
               <label>Zaihai Stock Address</label><label style="color: red;">*</label>
-              <input type="text" id="zaihai_stock_address_master_update" class="form-control" maxlength="100" autocomplete="off" required>
+              <input type="text" id="a_zaihai_stock_address_master_update" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
           </div>
           <br>

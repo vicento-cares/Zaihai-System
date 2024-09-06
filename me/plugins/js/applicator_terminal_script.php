@@ -2,15 +2,13 @@
     // DOMContentLoaded function
     document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_no_datalist_search();
-        get_applicator_no_dropdown();
         get_terminal_name_datalist_search();
-        get_terminal_name_dropdown();
         get_applicator_terminal();
     });
 
 	const get_applicator_no_datalist_search = () => {
 		$.ajax({
-			url: '../process/me/applicator/a_g_p.php',
+			url: '../process/me/applicator_terminal/at_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -22,24 +20,9 @@
 		});
 	}
 
-    const get_applicator_no_dropdown = () => {
-		$.ajax({
-			url: '../process/me/applicator/a_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_applicator_no_dropdown'
-			},  
-			success: response => {
-				document.getElementById("at_applicator_no_master").innerHTML = response;
-                document.getElementById("at_applicator_no_master_update").innerHTML = response;
-			}
-		});
-	}
-
     const get_terminal_name_datalist_search = () => {
 		$.ajax({
-			url: '../process/me/terminal/term_g_p.php',
+			url: '../process/me/applicator_terminal/at_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -47,21 +30,6 @@
 			},  
 			success: response => {
 				document.getElementById("at_terminal_name_search_list").innerHTML = response;
-			}
-		});
-	}
-
-    const get_terminal_name_dropdown = () => {
-		$.ajax({
-			url: '../process/me/terminal/term_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_terminal_name_dropdown'
-			},  
-			success: response => {
-				document.getElementById("at_terminal_name_master").innerHTML = response;
-                document.getElementById("at_terminal_name_master_update").innerHTML = response;
 			}
 		});
 	}
@@ -289,6 +257,14 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
+                } else if (response == 'Applicator No. or Terminal Name in use') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Record cannot be updated. Applicator No. or Terminal Name in use',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',
@@ -323,6 +299,14 @@
                     clear_applicator_terminal_details();
                     get_applicator_terminal();
                     $('#update_applicator_terminal').modal('hide');
+                } else if (response == 'Applicator No. or Terminal Name in use') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Info',
+                        text: 'Record cannot be deleted. Applicator No. or Terminal Name in use',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',

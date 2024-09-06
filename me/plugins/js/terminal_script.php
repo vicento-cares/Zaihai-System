@@ -1,9 +1,40 @@
 <script type="text/javascript">
     // DOMContentLoaded function
     document.addEventListener("DOMContentLoaded", () => {
+        get_car_maker_dropdown_search();
+		get_car_model_dropdown_search();
 		get_terminal_name_datalist_search();
+        get_terminal_name_dropdown();
         get_terminals();
     });
+
+    const get_car_maker_dropdown_search = () => {
+		$.ajax({
+			url: '../process/me/terminal/term_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_maker_dropdown_search'
+			},  
+			success: response => {
+				document.getElementById("term_car_maker_search").innerHTML = response;
+			}
+		});
+	}
+
+	const get_car_model_dropdown_search = () => {
+		$.ajax({
+			url: '../process/me/terminal/term_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_model_dropdown_search'
+			},  
+			success: response => {
+				document.getElementById("term_car_model_search").innerHTML = response;
+			}
+		});
+	}
 
 	const get_terminal_name_datalist_search = () => {
 		$.ajax({
@@ -15,6 +46,21 @@
 			},  
 			success: response => {
 				document.getElementById("term_terminal_name_search_list").innerHTML = response;
+			}
+		});
+	}
+
+    const get_terminal_name_dropdown = () => {
+		$.ajax({
+			url: '../process/me/applicator_terminal/at_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_terminal_name_dropdown'
+			},  
+			success: response => {
+				document.getElementById("term_terminal_name_master").innerHTML = response;
+                document.getElementById("term_terminal_name_master_update").innerHTML = response;
 			}
 		});
 	}
@@ -51,9 +97,13 @@
     }
 
     const get_terminals = () => {
+        let car_maker = document.getElementById('term_car_maker_search').value;
+        let car_model = document.getElementById('term_car_model_search').value;
 		let terminal_name = document.getElementById('term_terminal_name_search').value;
 		let line_address = document.getElementById('term_line_address_search').value;
 
+        sessionStorage.setItem('zs_term_car_maker_search', car_maker);
+        sessionStorage.setItem('zs_term_car_model_search', car_model);
 		sessionStorage.setItem('zs_term_terminal_name_search', terminal_name);
 		sessionStorage.setItem('zs_term_line_address_search', line_address);
 
@@ -63,6 +113,8 @@
 			cache: false,
 			data: {
 				method: "get_terminals",
+                car_maker: car_maker,
+                car_model: car_model,
 				terminal_name: terminal_name,
 				line_address: line_address
 			},
@@ -75,6 +127,8 @@
 	}
 
 	const export_terminals = (table_id, separator = ',') => {
+        let car_maker = sessionStorage.getItem('zs_term_car_maker_search');
+        let car_model = sessionStorage.getItem('zs_term_car_model_search');
 		let terminal_name = sessionStorage.getItem('zs_term_terminal_name_search');
 		let line_address = sessionStorage.getItem('zs_term_line_address_search');
 
@@ -98,6 +152,12 @@
 
         // Download it
         var filename = 'ZaihaiSystem_Terminal';
+        if (car_maker) {
+			filename += '_' + car_maker;
+		}
+        if (car_model) {
+			filename += '_' + car_model;
+		}
 		if (terminal_name) {
 			filename += '_' + terminal_name;
 		}
@@ -116,12 +176,16 @@
     }
 
     const clear_terminal_details = () => {
-        document.getElementById('terminal_name_master').value = '';
-        document.getElementById('line_address_master').value = '';
+        document.getElementById('term_car_maker_master').value = '';
+        document.getElementById('term_car_model_master').value = '';
+        document.getElementById('term_terminal_name_master').value = '';
+        document.getElementById('term_line_address_master').value = '';
 
         document.getElementById('id_terminal_master_update').value = '';
-        document.getElementById('terminal_name_master_update').value = '';
-        document.getElementById('line_address_master_update').value = '';
+        document.getElementById('term_car_maker_master_update').value = '';
+        document.getElementById('term_car_model_master_update').value = '';
+        document.getElementById('term_terminal_name_master_update').value = '';
+        document.getElementById('term_line_address_master_update').value = '';
     }
 
 	$("#new_terminal").on('hidden.bs.modal', e => {
@@ -134,8 +198,10 @@
     });
 
     const add_terminal = () => {
-        var terminal_name = document.getElementById('terminal_name_master').value;
-        var line_address = document.getElementById('line_address_master').value;
+        var car_maker = document.getElementById('term_car_maker_master').value;
+        var car_model = document.getElementById('term_car_model_master').value;
+        var terminal_name = document.getElementById('term_terminal_name_master').value;
+        var line_address = document.getElementById('term_line_address_master').value;
 
         $.ajax({
             url: '../process/me/terminal/term_p.php',
@@ -143,6 +209,8 @@
             cache: false,
             data: {
                 method: 'add_terminal',
+                car_maker: car_maker,
+                car_model: car_model,
                 terminal_name: terminal_name,
                 line_address: line_address
             }, success: function (response) {
@@ -180,12 +248,16 @@
 	const get_terminal_details = param => {
 		var string = param.split('~!~');
         var id = string[0];
-        var terminal_name = string[1];
-        var line_address = string[2];
+        var car_maker = string[1];
+        var car_model = string[2];
+        var terminal_name = string[3];
+        var line_address = string[4];
 
         document.getElementById('id_terminal_master_update').value = id;
-        document.getElementById('terminal_name_master_update').value = terminal_name;
-        document.getElementById('line_address_master_update').value = line_address;
+        document.getElementById('term_car_maker_master_update').value = car_maker;
+        document.getElementById('term_car_model_master_update').value = car_model;
+        document.getElementById('term_terminal_name_master_update').value = terminal_name;
+        document.getElementById('term_line_address_master_update').value = line_address;
 	}
 
 	// Get the form element
@@ -210,8 +282,10 @@
 
     const update_terminal = () => {
         var id = document.getElementById('id_terminal_master_update').value;
-        var terminal_name = document.getElementById('terminal_name_master_update').value;
-        var line_address = document.getElementById('line_address_master_update').value;
+        var car_maker = document.getElementById('term_car_maker_master_update').value;
+        var car_model = document.getElementById('term_car_model_master_update').value;
+        var terminal_name = document.getElementById('term_terminal_name_master_update').value;
+        var line_address = document.getElementById('term_line_address_master_update').value;
 
         $.ajax({
             url: '../process/me/terminal/term_p.php',
@@ -220,6 +294,8 @@
             data: {
                 method: 'update_terminal',
                 id: id,
+                car_maker: car_maker,
+                car_model: car_model,
                 terminal_name: terminal_name,
                 line_address: line_address
             }, success: function (response) {

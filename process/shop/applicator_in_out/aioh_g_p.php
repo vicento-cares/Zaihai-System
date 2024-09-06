@@ -19,14 +19,14 @@ if ($method == 'get_applicator_history') {
     $sql = "SELECT aioh.serial_no, aioh.applicator_no, aioh.terminal_name, 
                 aioh.trd_no, aioh.operator_out, aioh.date_time_out, 
                 aioh.zaihai_stock_address, aioh.operator_in, aioh.date_time_in, aioh.inspected_by AS inspected_by_no, aioh.confirmation_date, 
-                al.car_maker, al.car_model, 
+                a.car_maker, a.car_model, 
                 ac.equipment_no, ac.line_address, ac.inspection_date_time, ac.inspection_shift, ac.adjustment_content, ac.adjustment_content_remarks, ac.cross_section_result, 
                 ac.inspected_by, ac.checked_by, ac.confirmed_by, ac.judgement, 
                 ac.ac1, ac.ac2, ac.ac3, ac.ac4, ac.ac5, ac.ac6, ac.ac7, ac.ac8, ac.ac9, ac.ac10, 
                 ac.ac1_s, ac.ac2_s, ac.ac3_s, ac.ac4_s, ac.ac5_s, ac.ac6_s, ac.ac7_s, ac.ac8_s, ac.ac9_s, ac.ac10_s, 
                 ac.ac1_r, ac.ac2_r, ac.ac3_r, ac.ac4_r, ac.ac5_r, ac.ac6_r, ac.ac7_r, ac.ac8_r, ac.ac9_r, ac.ac10_r 
             FROM t_applicator_in_out_history aioh
-            LEFT JOIN t_applicator_list al ON aioh.applicator_no = al.applicator_no
+            LEFT JOIN m_applicator a ON aioh.applicator_no = a.applicator_no
             LEFT JOIN t_applicator_c ac ON aioh.serial_no = ac.serial_no
             WHERE aioh.zaihai_stock_address IS NOT NULL AND aioh.date_time_in IS NOT NULL";
     
@@ -37,10 +37,10 @@ if ($method == 'get_applicator_history') {
     }
 
     if (!empty($car_maker)) {
-        $sql .= " AND al.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker='$car_maker'";
     }
     if (!empty($car_model)) {
-        $sql .= " AND al.car_model='$car_model'";
+        $sql .= " AND a.car_model='$car_model'";
     }
     if (!empty($applicator_no)) {
         $sql .= " AND aioh.applicator_no LIKE '%$applicator_no%'";

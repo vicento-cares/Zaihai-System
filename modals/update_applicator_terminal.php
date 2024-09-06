@@ -16,13 +16,13 @@
             <input type="hidden" id="id_applicator_terminal_master_update" class="form-control">
             <div class="col-12">
               <label>Applicator No.</label><label style="color: red;">*</label>
-              <select id="at_applicator_no_master_update" class="form-control" required></select>
+              <input type="text" id="at_applicator_no_master_update" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
           </div>
-          <div class="row">
+          <div class="row mb-2">
             <div class="col-12">
               <label>Terminal Name</label><label style="color: red;">*</label>
-              <select id="at_terminal_name_master_update" class="form-control" required></select>
+              <input type="text" id="at_terminal_name_master_update" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
           </div>
           <br>

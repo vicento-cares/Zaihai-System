@@ -29,7 +29,7 @@
         <div class="col-sm-3">
           <button type="button" class="btn btn-warning btn-block btn-file">
             <form id="file_form" enctype="multipart/form-data">
-              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal (Add Only)</span><input type="file" id="file" name="file" onchange="upload_csv()" accept=".csv">
+              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal</span><input type="file" id="file" name="file" onchange="upload_csv()" accept=".csv">
             </form>
           </button>
         </div>
@@ -54,12 +54,24 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <div class="col-sm-6">
+                <div class="col-sm-3">
+                  <label>Car Maker</label>
+                  <select id="term_car_maker_search" class="form-control" onchange="get_terminals()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
+                  <label>Car Model</label>
+                  <select id="term_car_model_search" class="form-control" onchange="get_terminals()">
+                    <option selected value="">All</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
                   <label>Terminal</label>
                   <input list="term_terminal_name_search_list" class="form-control" id="term_terminal_name_search" maxlength="100" autocomplete="off">
                   <datalist id="term_terminal_name_search_list"></datalist>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-3">
                   <label>Line Address</label>
                   <input type="text" id="term_line_address_search" class="form-control" maxlength="100" autocomplete="off">
                 </div>
@@ -82,6 +94,8 @@
                   <thead style="text-align: center;">
                     <tr>
                       <th>#</th>
+                      <th>Car Maker</th>
+                      <th>Car Model</th>
                       <th>Terminal Name</th>
                       <th>Line Address</th>
                       <th>Date Updated</th>
@@ -89,7 +103,7 @@
                   </thead>
                   <tbody id="terminalsData" style="text-align: center;">
                     <tr>
-                      <td colspan="4" style="text-align:center;">
+                      <td colspan="6" style="text-align:center;">
                         <div class="spinner-border text-dark" role="status">
                           <span class="sr-only">Loading...</span>
                         </div>

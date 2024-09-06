@@ -10,14 +10,12 @@
 include '../modals/logout_modal.php';
 include '../modals/new_account.php';
 include '../modals/update_account.php';
-include '../modals/new_terminal.php';
-include '../modals/update_terminal.php';
-include '../modals/new_applicator.php';
-include '../modals/update_applicator.php';
-include '../modals/new_applicator_list.php';
-include '../modals/update_applicator_list.php';
 include '../modals/new_applicator_terminal.php';
 include '../modals/update_applicator_terminal.php';
+include '../modals/new_applicator.php';
+include '../modals/update_applicator.php';
+include '../modals/new_terminal.php';
+include '../modals/update_terminal.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>

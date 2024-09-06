@@ -35,14 +35,14 @@
           </a>
         </li>
         <li class="nav-item">
-          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/terminal.php") { ?>
-          <a href="terminal.php" class="nav-link active">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/applicator_terminal.php") { ?>
+          <a href="applicator_terminal.php" class="nav-link active">
           <?php } else { ?>
-          <a href="terminal.php" class="nav-link">
+          <a href="applicator_terminal.php" class="nav-link">
           <?php } ?>
-            <i class="nav-icon fas fa-dot-circle"></i>
+            <i class="nav-icon fas fa-cogs"></i>
             <p>
-              Terminal
+              Applicator Terminal
             </p>
           </a>
         </li>
@@ -59,26 +59,14 @@
           </a>
         </li>
         <li class="nav-item">
-          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/applicator_list.php") { ?>
-          <a href="applicator_list.php" class="nav-link active">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/terminal.php") { ?>
+          <a href="terminal.php" class="nav-link active">
           <?php } else { ?>
-          <a href="applicator_list.php" class="nav-link">
+          <a href="terminal.php" class="nav-link">
           <?php } ?>
-            <i class="nav-icon fas fa-list"></i>
+            <i class="nav-icon fas fa-dot-circle"></i>
             <p>
-              Applicator List
-            </p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/applicator_terminal.php") { ?>
-          <a href="applicator_terminal.php" class="nav-link active">
-          <?php } else { ?>
-          <a href="applicator_terminal.php" class="nav-link">
-          <?php } ?>
-            <i class="nav-icon fas fa-cogs"></i>
-            <p>
-              Applicator Terminal
+              Terminal
             </p>
           </a>
         </li>

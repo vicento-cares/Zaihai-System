@@ -20,13 +20,17 @@ function check_csv ($file, $conn) {
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
+    $row_valid_arr = array(0);
+
+    $notExiststTerminalArr = array();
+
     $message = "";
     $check_csv_row = 0;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Terminal Name,Line Address";
-    $valid_first_line2 = '"Terminal Name","Line Address"';
+    $valid_first_line = "Car Maker,Car Model,Terminal Name,Line Address";
+    $valid_first_line2 = '"Car Maker","Car Model","Terminal Name","Line Address"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -36,14 +40,32 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $terminal_name = $line[0];
-            $line_address = $line[1];
+            $car_maker = addslashes($line[0]);
+            $car_model = addslashes($line[1]);
+            $terminal_name = addslashes($line[2]);
+            $line_address = addslashes($line[3]);
 
-            if ($terminal_name == '' || $line_address == '') {
+            if ($car_maker == '' || $car_model == '' || 
+                $terminal_name == '' || $line_address == '') {
                 // IF BLANK DETECTED ERROR += 1
                 $hasBlankError++;
                 $hasError = 1;
                 array_push($hasBlankErrorArr, $check_csv_row);
+            }
+
+            // CHECK ROW VALIDATION
+            // 0
+            $sql = "SELECT id FROM m_applicator_terminal 
+                    WHERE terminal_name = '$terminal_name'";
+            $stmt = $conn -> prepare($sql);
+            $stmt -> execute();
+
+            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                $hasError = 1;
+                $row_valid_arr[0] = 1;
+                array_push($notExiststTerminalArr, $check_csv_row);
             }
             
             // Joining all row values for checking duplicated rows
@@ -59,15 +81,15 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM m_terminal 
-                    WHERE terminal_name = '$terminal_name' AND line_address = '$line_address'";
-            $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
-                $isExistsOnDb = 1;
-                $hasError = 1;
-                array_push($isExistsOnDbArr, $check_csv_row);
-            }
+            // $sql = "SELECT id FROM m_terminal 
+            //         WHERE line_address = '$line_address'";
+            // $stmt = $conn -> prepare($sql);
+            // $stmt -> execute();
+            // if ($stmt -> rowCount() > 0) {
+            //     $isExistsOnDb = 1;
+            //     $hasError = 1;
+            //     array_push($isExistsOnDbArr, $check_csv_row);
+            // }
         }
     } else {
         //$message = $first_line;
@@ -77,9 +99,13 @@ function check_csv ($file, $conn) {
     fclose($csvFile);
 
     if ($hasError == 1) {
-        if ($isExistsOnDb == 1) {
-            $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
+        if ($row_valid_arr[0] == 1) {
+            $message = $message . 'Terminal Name not found on row/s ' . implode(", ", $notExiststTerminalArr) . '. ';
         }
+
+        // if ($isExistsOnDb == 1) {
+        //     $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
+        // }
         if ($hasBlankError >= 1) {
             $message = $message . 'Blank Cell Exists on row/s ' . implode(", ", $hasBlankErrorArr) . '. ';
         }
@@ -126,19 +152,40 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     continue; // Skip blank lines
                 }
 
-                $terminal_name = addslashes($line[0]);
-                $line_address = addslashes($line[1]);
+                $car_maker = addslashes($line[0]);
+                $car_model = addslashes($line[1]);
+                $terminal_name = addslashes($line[2]);
+                $line_address = addslashes($line[3]);
 
                 // $conn->beginTransaction();
-                
-                $sql = "INSERT INTO m_terminal (terminal_name, line_address) 
-                        VALUES ('$terminal_name','$line_address')";
 
-                $stmt = $conn->prepare($sql);
-                if (!$stmt->execute()) {
-                    $error++;
+                $sql = "SELECT id FROM m_terminal 
+                        WHERE line_address = '$line_address'";
+                $stmt = $conn -> prepare($sql);
+                $stmt -> execute();
+
+                $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+                if ($row) {
+                    $sql = "UPDATE m_terminal 
+                            SET car_maker = '$car_maker', car_model = '$car_model', 
+                            terminal_name = '$terminal_name'
+                            WHERE line_address = '$line_address'";
+
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt->execute()) {
+                        $error++;
+                    }
+                } else {
+                    $sql = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) 
+                        VALUES ('$car_maker','$car_model','$terminal_name','$line_address')";
+
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt->execute()) {
+                        $error++;
+                    }
                 }
-
+                
                 // $conn->commit();
             }
             
@@ -160,4 +207,3 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
 // KILL CONNECTION
 $conn = null;
-?>
