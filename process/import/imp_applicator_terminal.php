@@ -2,7 +2,7 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../../conn.php';
+require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -36,8 +36,8 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $applicator_no = $line[0];
-            $terminal_name = $line[1];
+            $applicator_no = addslashes($line[0]);
+            $terminal_name = addslashes($line[1]);
 
             if ($applicator_no == '' || $terminal_name == '') {
                 // IF BLANK DETECTED ERROR += 1
@@ -61,7 +61,7 @@ function check_csv ($file, $conn) {
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM m_applicator_terminal 
                     WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'";
-            $stmt = $conn -> prepare($sql);
+            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
             $stmt -> execute();
             if ($stmt -> rowCount() > 0) {
                 $isExistsOnDb = 1;
