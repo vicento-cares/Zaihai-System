@@ -5,6 +5,8 @@
 		get_car_model_dropdown_search();
 		get_terminal_name_datalist_search();
         get_terminal_name_dropdown();
+        get_car_maker_dropdown();
+		get_car_model_dropdown();
         get_terminals();
     });
 
@@ -61,6 +63,36 @@
 			success: response => {
 				document.getElementById("term_terminal_name_master").innerHTML = response;
                 document.getElementById("term_terminal_name_master_update").innerHTML = response;
+			}
+		});
+	}
+
+    const get_car_maker_dropdown = () => {
+		$.ajax({
+			url: '../process/me/car_maker/cm_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_maker_dropdown'
+			},  
+			success: response => {
+				document.getElementById("term_car_maker_master").innerHTML = response;
+                document.getElementById("term_car_maker_master_update").innerHTML = response;
+			}
+		});
+	}
+
+	const get_car_model_dropdown = () => {
+		$.ajax({
+			url: '../process/me/car_maker/cm_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_car_model_dropdown'
+			},  
+			success: response => {
+                document.getElementById("term_car_model_master").innerHTML = response;
+				document.getElementById("term_car_model_master_update").innerHTML = response;
 			}
 		});
 	}

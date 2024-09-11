@@ -1,41 +1,41 @@
 <script type="text/javascript">
     // DOMContentLoaded function
     document.addEventListener("DOMContentLoaded", () => {
-		get_applicator_no_datalist_search();
+        get_applicator_no_datalist_search();
         get_terminal_name_datalist_search();
         get_applicator_terminal();
     });
 
-	const get_applicator_no_datalist_search = () => {
-		$.ajax({
-			url: '../process/me/applicator_terminal/at_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_applicator_no_datalist_search'
-			},  
-			success: response => {
-				document.getElementById("at_applicator_no_search_list").innerHTML = response;
-			}
-		});
-	}
+    const get_applicator_no_datalist_search = () => {
+        $.ajax({
+            url: '../process/me/applicator_terminal/at_g_p.php',
+            type: 'GET',
+            cache: false,
+            data: {
+                method: 'get_applicator_no_datalist_search'
+            },
+            success: response => {
+                document.getElementById("at_applicator_no_search_list").innerHTML = response;
+            }
+        });
+    }
 
     const get_terminal_name_datalist_search = () => {
-		$.ajax({
-			url: '../process/me/applicator_terminal/at_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_terminal_name_datalist_search'
-			},  
-			success: response => {
-				document.getElementById("at_terminal_name_search_list").innerHTML = response;
-			}
-		});
-	}
+        $.ajax({
+            url: '../process/me/applicator_terminal/at_g_p.php',
+            type: 'GET',
+            cache: false,
+            data: {
+                method: 'get_terminal_name_datalist_search'
+            },
+            success: response => {
+                document.getElementById("at_terminal_name_search_list").innerHTML = response;
+            }
+        });
+    }
 
-	var typingTimerAtApplicatorSearch;
-	var typingTimerAtTerminalNameSearch;
+    var typingTimerAtApplicatorSearch;
+    var typingTimerAtTerminalNameSearch;
     var doneTypingInterval = 250; // Time in ms
 
     // On keyup, start the countdown
@@ -49,7 +49,7 @@
         clearTimeout(typingTimerAtApplicatorSearch);
     });
 
-	// On keyup, start the countdown
+    // On keyup, start the countdown
     document.getElementById("at_terminal_name_search").addEventListener('keyup', e => {
         clearTimeout(typingTimerAtTerminalNameSearch);
         typingTimerAtTerminalNameSearch = setTimeout(doneTypingGetApplicatorTerminal, doneTypingInterval);
@@ -66,32 +66,32 @@
     }
 
     const get_applicator_terminal = () => {
-		let applicator_no = document.getElementById('at_applicator_no_search').value;
-		let terminal_name = document.getElementById('at_terminal_name_search').value;
+        let applicator_no = document.getElementById('at_applicator_no_search').value;
+        let terminal_name = document.getElementById('at_terminal_name_search').value;
 
-		sessionStorage.setItem('zs_at_applicator_no_search', applicator_no);
-		sessionStorage.setItem('zs_at_terminal_name_search', terminal_name);
+        sessionStorage.setItem('zs_at_applicator_no_search', applicator_no);
+        sessionStorage.setItem('zs_at_terminal_name_search', terminal_name);
 
-		$.ajax({
-			type: "GET",
-			url: "../process/me/applicator_terminal/at_g_p.php",
-			cache: false,
-			data: {
-				method: "get_applicator_terminal",
-				applicator_no: applicator_no,
-				terminal_name: terminal_name
-			},
-			success: (response) => {
+        $.ajax({
+            type: "GET",
+            url: "../process/me/applicator_terminal/at_g_p.php",
+            cache: false,
+            data: {
+                method: "get_applicator_terminal",
+                applicator_no: applicator_no,
+                terminal_name: terminal_name
+            },
+            success: (response) => {
                 $('#applicatorTerminalData').html(response);
-				let table_rows = parseInt(document.getElementById("applicatorTerminalData").childNodes.length);
-				$('#count_view').html("Total: " + table_rows);
-			}
-		});
-	}
+                let table_rows = parseInt(document.getElementById("applicatorTerminalData").childNodes.length);
+                $('#count_view').html("Total: " + table_rows);
+            }
+        });
+    }
 
-	const export_applicator_terminal = (table_id, separator = ',') => {
-		let applicator_no = sessionStorage.getItem('zs_at_applicator_no_search');
-		let terminal_name = sessionStorage.getItem('zs_at_terminal_name_search');
+    const export_applicator_terminal = (table_id, separator = ',') => {
+        let applicator_no = sessionStorage.getItem('zs_at_applicator_no_search');
+        let terminal_name = sessionStorage.getItem('zs_at_terminal_name_search');
 
         // Select rows from table_id
         var rows = document.querySelectorAll('table#' + table_id + ' tr');
@@ -113,13 +113,13 @@
 
         // Download it
         var filename = 'ZaihaiSystem_ApplicatorTerminal';
-		if (applicator_no) {
-			filename += '_' + applicator_no;
-		}
-		if (terminal_name) {
-			filename += '_' + terminal_name;
-		}
-		filename += '_' + new Date().toJSON().slice(0, 10) + '.csv';
+        if (applicator_no) {
+            filename += '_' + applicator_no;
+        }
+        if (terminal_name) {
+            filename += '_' + terminal_name;
+        }
+        filename += '_' + new Date().toJSON().slice(0, 10) + '.csv';
         var link = document.createElement('a');
         link.style.display = 'none';
         link.setAttribute('target', '_blank');
@@ -130,6 +130,30 @@
         document.body.removeChild(link);
     }
 
+    var delay = (function () {
+        var timer = 0;
+        return function (callback, ms) {
+            clearTimeout(timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+    $("#at_applicator_no_master").on("input", function () {
+        delay(function () {
+            if ($("#at_applicator_no_master").val().length < 256) {
+                $("#at_applicator_no_master").val("");
+            }
+        }, 100);
+    });
+
+    $("#at_applicator_no_master_update").on("input", function () {
+        delay(function () {
+            if ($("#at_applicator_no_master_update").val().length < 256) {
+                $("#at_applicator_no_master_update").val("");
+            }
+        }, 100);
+    });
+
     const clear_applicator_terminal_details = () => {
         document.getElementById('at_applicator_no_master').value = '';
         document.getElementById('at_terminal_name_master').value = '';
@@ -139,13 +163,34 @@
         document.getElementById('at_terminal_name_master_update').value = '';
     }
 
-	$("#new_applicator_terminal").on('hidden.bs.modal', e => {
+    $("#new_applicator_terminal").on('hidden.bs.modal', e => {
         clear_applicator_terminal_details();
     });
 
-    document.getElementById('new_applicator_terminal_form').addEventListener('submit', e => {
+    // Get the form element
+    var new_applicator_terminal_form = document.getElementById('new_applicator_terminal_form');
+
+    new_applicator_terminal_form.addEventListener('submit', e => {
         e.preventDefault();
-        add_applicator_terminal();
+
+        // Get the button that triggered the submit event
+        var button = document.activeElement;
+
+        // Check the id or name of the button
+        if (button.id === 'btnAddApplicatorTerminal') {
+            add_applicator_terminal();
+        }
+    });
+
+    new_applicator_terminal_form.addEventListener('keypress', e => {
+        var applicator_no = document.getElementById('at_applicator_no_master').value;
+        if (e.which == '13') {
+            e.preventDefault();
+
+            setTimeout(() => {
+                document.getElementById('at_applicator_no_master').value = applicator_no;
+            }, 100)
+        }
     });
 
     const add_applicator_terminal = () => {
@@ -192,8 +237,8 @@
         });
     }
 
-	const get_applicator_terminal_details = param => {
-		var string = param.split('~!~');
+    const get_applicator_terminal_details = param => {
+        var string = param.split('~!~');
         var id = string[0];
         var applicator_no = string[1];
         var terminal_name = string[2];
@@ -201,9 +246,9 @@
         document.getElementById('id_applicator_terminal_master_update').value = id;
         document.getElementById('at_applicator_no_master_update').value = applicator_no;
         document.getElementById('at_terminal_name_master_update').value = terminal_name;
-	}
+    }
 
-	// Get the form element
+    // Get the form element
     var update_applicator_terminal_form = document.getElementById('update_applicator_terminal_form');
 
     // Add a submit event listener to the form
@@ -220,6 +265,17 @@
         } else if (button.id === 'btnDeleteApplicatorTerminal') {
             // Call the function for the first submit button
             delete_applicator_terminal();
+        }
+    });
+
+    update_applicator_terminal_form.addEventListener('keypress', e => {
+        var applicator_no = document.getElementById('at_applicator_no_master_update').value;
+        if (e.which == '13') {
+            e.preventDefault();
+
+            setTimeout(() => {
+                document.getElementById('at_applicator_no_master_update').value = applicator_no;
+            }, 100)
         }
     });
 
@@ -369,9 +425,9 @@
                 }, 500);
             }
         })
-        .fail((jqXHR, textStatus, errorThrown) => {
-            console.log(jqXHR);
-            swal('System Error', `Call IT Personnel Immediately!!! They will fix it right away. Error: url: ${jqXHR.url}, method: ${jqXHR.type} ( HTTP ${jqXHR.status} - ${jqXHR.statusText} ) Press F12 to see Console Log for more info.`, 'error');
-        });
+            .fail((jqXHR, textStatus, errorThrown) => {
+                console.log(jqXHR);
+                swal('System Error', `Call IT Personnel Immediately!!! They will fix it right away. Error: url: ${jqXHR.url}, method: ${jqXHR.type} ( HTTP ${jqXHR.status} - ${jqXHR.statusText} ) Press F12 to see Console Log for more info.`, 'error');
+            });
     }
 </script>
