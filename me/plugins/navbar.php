@@ -8,6 +8,8 @@ if (!isset($_SESSION['emp_no'])) {
   header('location:/zaihai/shop/applicator_list.php');
 } else if ($_SESSION['role'] == 'Inspector') {
   header('location:/zaihai/inspector/applicator_checksheet.php');
+} else if ($_SESSION['role'] == 'BM') {
+  header('location:/zaihai/bm/applicator_in.php');
 }
 ?>  
 <!DOCTYPE html>

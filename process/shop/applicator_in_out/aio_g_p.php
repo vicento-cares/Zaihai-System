@@ -8,6 +8,8 @@ include '../../lib/main.php';
 
 $method = $_GET['method'];
 
+$role = $_SESSION['role'];
+
 // Get Car Maker Dropdown Out
 if ($method == 'get_car_maker_dropdown_out_search') {
 	$sql = "SELECT a.car_maker FROM t_applicator_in_out aio
@@ -90,8 +92,19 @@ if ($method == 'get_location_datalist_out_search') {
 if ($method == 'get_car_maker_dropdown_in_search') {
 	$sql = "SELECT a.car_maker FROM t_applicator_in_out aio
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
-            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL
-            GROUP BY a.car_maker ORDER BY a.car_maker ASC";
+            LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
+            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+
+    if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
+        if ($role == 'BM') {
+            $sql .= " AND acct.role = '$role'";
+        } else if ($role == 'Shop' || $role == 'Inspector') {
+            $sql .= " AND acct.role IN ('Shop', 'Inspector')";
+        }
+    }
+
+    $sql .= " GROUP BY a.car_maker ORDER BY a.car_maker ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -108,8 +121,19 @@ if ($method == 'get_car_maker_dropdown_in_search') {
 if ($method == 'get_car_model_dropdown_in_search') {
 	$sql = "SELECT a.car_model FROM t_applicator_in_out aio
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
-            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL
-            GROUP BY a.car_model ORDER BY a.car_model ASC";
+            LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
+            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+
+    if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
+        if ($role == 'BM') {
+            $sql .= " AND acct.role = '$role'";
+        } else if ($role == 'Shop' || $role == 'Inspector') {
+            $sql .= " AND acct.role IN ('Shop', 'Inspector')";
+        }
+    }
+
+    $sql .= " GROUP BY a.car_model ORDER BY a.car_model ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -124,9 +148,20 @@ if ($method == 'get_car_model_dropdown_in_search') {
 
 // Get Applicator No. Datalist In
 if ($method == 'get_applicator_no_datalist_in_search') {
-	$sql = "SELECT applicator_no FROM t_applicator_in_out 
-            WHERE zaihai_stock_address IS NOT NULL AND date_time_in IS NOT NULL
-            GROUP BY applicator_no ORDER BY applicator_no ASC";
+	$sql = "SELECT aio.applicator_no FROM t_applicator_in_out aio
+            LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
+            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+    
+    if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
+        if ($role == 'BM') {
+            $sql .= " AND acct.role = '$role'";
+        } else if ($role == 'Shop' || $role == 'Inspector') {
+            $sql .= " AND acct.role IN ('Shop', 'Inspector')";
+        }
+    }
+
+    $sql .= " GROUP BY aio.applicator_no ORDER BY aio.applicator_no ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -138,9 +173,20 @@ if ($method == 'get_applicator_no_datalist_in_search') {
 
 // Get Terminal Name Datalist In
 if ($method == 'get_terminal_name_datalist_in_search') {
-	$sql = "SELECT terminal_name FROM t_applicator_in_out 
-            WHERE zaihai_stock_address IS NOT NULL AND date_time_in IS NOT NULL
-            GROUP BY terminal_name ORDER BY terminal_name ASC";
+	$sql = "SELECT aio.terminal_name FROM t_applicator_in_out aio
+            LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
+            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+    
+    if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
+        if ($role == 'BM') {
+            $sql .= " AND acct.role = '$role'";
+        } else if ($role == 'Shop' || $role == 'Inspector') {
+            $sql .= " AND acct.role IN ('Shop', 'Inspector')";
+        }
+    }
+
+    $sql .= " GROUP BY aio.terminal_name ORDER BY aio.terminal_name ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -152,9 +198,20 @@ if ($method == 'get_terminal_name_datalist_in_search') {
 
 // Get Location Datalist In
 if ($method == 'get_location_datalist_in_search') {
-	$sql = "SELECT trd_no FROM t_applicator_in_out 
-            WHERE zaihai_stock_address IS NOT NULL AND date_time_in IS NOT NULL
-            GROUP BY trd_no ORDER BY trd_no ASC";
+	$sql = "SELECT aio.trd_no FROM t_applicator_in_out aio
+            LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
+            WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+    
+    if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
+        if ($role == 'BM') {
+            $sql .= " AND acct.role = '$role'";
+        } else if ($role == 'Shop' || $role == 'Inspector') {
+            $sql .= " AND acct.role IN ('Shop', 'Inspector')";
+        }
+    }
+
+    $sql .= " GROUP BY aio.trd_no ORDER BY aio.trd_no ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -173,7 +230,7 @@ if ($method == 'get_recent_applicator_out') {
 
     $c = 0;
 
-    $sql = "SELECT aio.serial_no, aio.applicator_no, aio.terminal_name, aio.trd_no, aio.operator_out, aio.date_time_out,
+    $sql = "SELECT aio.id, aio.serial_no, aio.applicator_no, aio.terminal_name, aio.trd_no, aio.operator_out, aio.date_time_out,
             a.car_maker, a.car_model
             FROM t_applicator_in_out aio
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
@@ -199,7 +256,14 @@ if ($method == 'get_recent_applicator_out') {
     if ($stmt->rowCount() > 0) {
 		foreach($stmt->fetchALL() as $row){
             $c++;
-            echo '<tr>';
+
+            // If Role is BM
+            if ($role == 'BM') {
+                echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#applicator_in_bm"
+                    onclick="get_applicator_out_details(&quot;'.$row['id'].'&quot;)">';
+            } else {
+                echo '<tr>';
+            }
             echo '<td>'.$c.'</td>';
             echo '<td>'.$row['serial_no'].'</td>';
             echo '<td>'.$row['car_maker'].'</td>';
