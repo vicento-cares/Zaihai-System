@@ -49,7 +49,12 @@ if (isset($_POST['login_btn'])) {
                     echo '<script>alert("Incorrect or Unmatched Role Selected on Sign In!!!")</script>';
                 }
             } else {
-                if ($role_check == 'ME' && $role == 'ME') {
+                if ($role_check == 'BM' && $role == 'BM') {
+                    $_SESSION['emp_no'] = $emp_no;
+                    $_SESSION['full_name'] = $full_name;
+                    $_SESSION['role'] = $role;
+                    header('location:/zaihai/bm/applicator_in.php');
+                } else if ($role_check == 'ME' && $role == 'ME') {
                     $_SESSION['emp_no'] = $emp_no;
                     $_SESSION['full_name'] = $full_name;
                     $_SESSION['role'] = $role;

@@ -2,7 +2,7 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../../conn.php';
+require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -102,7 +102,7 @@ function check_csv ($file, $conn) {
             // CHECK ROWS IF EXISTS
             // $sql = "SELECT id FROM m_applicator 
             //         WHERE zaihai_stock_address = '$zaihai_stock_address'";
-            // $stmt = $conn -> prepare($sql);
+            // $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
             // $stmt -> execute();
             // if ($stmt -> rowCount() > 0) {
             //     $isExistsOnDb = 1;
@@ -183,7 +183,7 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
                 $sql = "SELECT id FROM m_applicator 
                         WHERE zaihai_stock_address = '$zaihai_stock_address'";
-                $stmt = $conn -> prepare($sql);
+                $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
                 $stmt -> execute();
 
                 $row = $stmt -> fetch(PDO::FETCH_ASSOC);

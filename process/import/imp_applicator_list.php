@@ -2,7 +2,7 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../../conn.php';
+require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -63,7 +63,7 @@ function check_csv ($file, $conn) {
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM t_applicator_list 
                     WHERE applicator_no = '$applicator_no'";
-            $stmt = $conn -> prepare($sql);
+            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
             $stmt -> execute();
             if ($stmt -> rowCount() > 0) {
                 $isExistsOnDb = 1;

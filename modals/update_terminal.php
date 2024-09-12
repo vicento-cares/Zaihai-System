@@ -16,13 +16,13 @@
             <input type="hidden" id="id_terminal_master_update" class="form-control">
             <div class="col-12">
               <label>Car Maker</label><label style="color: red;">*</label>
-              <input type="text" id="term_car_maker_master_update" class="form-control" maxlength="255" autocomplete="off" required>
+              <select id="term_car_maker_master_update" class="form-control" required></select>
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-12">
               <label>Car Model</label><label style="color: red;">*</label>
-              <input type="text" id="term_car_model_master_update" class="form-control" maxlength="255" autocomplete="off" required>
+              <select id="term_car_model_master_update" class="form-control" required></select>
             </div>
           </div>
           <div class="row mb-2">

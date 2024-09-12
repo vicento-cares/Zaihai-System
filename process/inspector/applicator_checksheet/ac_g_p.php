@@ -1,4 +1,8 @@
 <?php
+session_set_cookie_params(0, "/zaihai");
+session_name("zaihai");
+session_start();
+
 require '../../conn.php';
 
 $method = $_GET['method'];
@@ -9,6 +13,7 @@ if ($method == 'get_recent_applicator_in_pending') {
     $applicator_no = $_GET['applicator_no'];
     $terminal_name = $_GET['terminal_name'];
     $location = $_GET['location'];
+    $role = $_SESSION['role'];
 
     $c = 0;
 
@@ -27,6 +32,7 @@ if ($method == 'get_recent_applicator_in_pending') {
             AND t1.terminal_name = t2.terminal_name
             AND t1.date_time_in = t2.max_date_time_in
             LEFT JOIN m_applicator a ON t1.applicator_no = a.applicator_no
+            LEFT JOIN m_accounts acct ON t1.operator_in = acct.emp_no
             WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL";
 
     if (!empty($car_maker)) {
@@ -42,7 +48,12 @@ if ($method == 'get_recent_applicator_in_pending') {
         $sql .= " AND t1.terminal_name LIKE '%$terminal_name%'";
     }
     if (!empty($location)) {
-        $sql .= " AND t1.location LIKE '%$location%'";
+        $sql .= " AND t1.trd_no LIKE '%$location%'";
+    }
+    if ($role == 'BM') {
+        $sql .= " AND acct.role = '$role'";
+    } else if ($role == 'Shop' || $role == 'Inspector') {
+        $sql .= " AND acct.role IN ('Shop', 'Inspector')";
     }
 
     $sql .= " ORDER BY t1.date_time_in DESC";

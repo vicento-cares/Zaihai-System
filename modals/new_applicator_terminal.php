@@ -15,7 +15,7 @@
           <div class="row mb-2">
             <div class="col-12">
               <label>Applicator No.</label><label style="color: red;">*</label>
-              <input type="text" id="at_applicator_no_master" class="form-control" maxlength="100" autocomplete="off" required>
+              <input type="text" id="at_applicator_no_master" class="form-control" maxlength="100" autocomplete="off" oncopy="return false" onpaste="return false" autofocus required>
             </div>
           </div>
           <div class="row mb-2">
