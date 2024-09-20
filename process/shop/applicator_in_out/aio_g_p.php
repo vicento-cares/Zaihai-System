@@ -8,7 +8,11 @@ include '../../lib/main.php';
 
 $method = $_GET['method'];
 
-$role = $_SESSION['role'];
+$role = "";
+
+if (isset($_SESSION['role'])) {
+    $role = $_SESSION['role'];
+}
 
 // Get Car Maker Dropdown Out
 if ($method == 'get_car_maker_dropdown_out_search') {
