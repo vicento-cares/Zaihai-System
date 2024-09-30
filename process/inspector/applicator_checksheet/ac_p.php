@@ -70,7 +70,10 @@ if ($method == 'make_checksheet') {
         }
     }
 
-    $sql = "INSERT INTO t_applicator_c 
+    try {
+        $conn->beginTransaction();
+    
+        $sql = "INSERT INTO t_applicator_c 
             (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
             adjustment_content, adjustment_content_remarks, cross_section_result, inspected_by, inspected_by_no,  
             ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
@@ -81,41 +84,46 @@ if ($method == 'make_checksheet') {
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn -> prepare($sql);
-    $params = array($serial_no, $equipment_no, $applicator_no_split, $terminal_name, $location, $line_address, $inspection_date_time, $inspection_shift, 
-                    $adjustment_content, $adjustment_content_remarks, $cross_section_result, $inspected_by, $inspected_by_no, 
-                    $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
-                    $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
-                    $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9]);
-    $stmt -> execute($params);
+        $stmt = $conn -> prepare($sql);
+        $params = array($serial_no, $equipment_no, $applicator_no_split, $terminal_name, $location, $line_address, $inspection_date_time, $inspection_shift, 
+                        $adjustment_content, $adjustment_content_remarks, $cross_section_result, $inspected_by, $inspected_by_no, 
+                        $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
+                        $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
+                        $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9]);
+        $stmt -> execute($params);
 
-    $sql = "INSERT INTO t_applicator_in_out_history 
-            (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
-            SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date
-            FROM t_applicator_in_out
-            WHERE serial_no = ?";
-    $stmt = $conn -> prepare($sql);
-    $params = array($serial_no);
-    $stmt -> execute($params);
+        $sql = "INSERT INTO t_applicator_in_out_history 
+                (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
+                SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date
+                FROM t_applicator_in_out
+                WHERE serial_no = ?";
+        $stmt = $conn -> prepare($sql);
+        $params = array($serial_no);
+        $stmt -> execute($params);
 
-    $sql = "UPDATE t_applicator_in_out_history 
-            SET zaihai_stock_address = ?, inspected_by = ?, confirmation_date = ?
-            WHERE serial_no = ?";
-    $stmt = $conn -> prepare($sql);
-    $params = array($location, $inspected_by_no, $server_date_time, $serial_no);
-    $stmt -> execute($params);
+        $sql = "UPDATE t_applicator_in_out_history 
+                SET zaihai_stock_address = ?, inspected_by = ?, confirmation_date = ?
+                WHERE serial_no = ?";
+        $stmt = $conn -> prepare($sql);
+        $params = array($location, $inspected_by_no, $server_date_time, $serial_no);
+        $stmt -> execute($params);
 
-    $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = ?";
-    $stmt = $conn -> prepare($sql);
-    $params = array($serial_no);
-    $stmt -> execute($params);
+        $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = ?";
+        $stmt = $conn -> prepare($sql);
+        $params = array($serial_no);
+        $stmt -> execute($params);
 
-    $sql = "UPDATE t_applicator_list 
-            SET location = ?, status = 'Ready To Use', date_updated = ?
-            WHERE applicator_no = ?";
-    $stmt = $conn->prepare($sql);
-    $params = array($location, $server_date_time, $applicator_no);
-    $stmt->execute($params);
-
-    echo 'success';
+        $sql = "UPDATE t_applicator_list 
+                SET location = ?, status = 'Ready To Use', date_updated = ?
+                WHERE applicator_no = ?";
+        $stmt = $conn->prepare($sql);
+        $params = array($location, $server_date_time, $applicator_no);
+        $stmt->execute($params);
+    
+        $conn->commit();
+        echo 'success';
+    } catch (Exception $e) {
+        $conn->rollBack();
+        echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+    }
 }
