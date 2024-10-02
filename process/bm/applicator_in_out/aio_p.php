@@ -16,6 +16,8 @@ if ($method == 'in_applicator') {
 
     if (is_valid_applicator_no($applicator_no_new) == false) {
         echo 'Invalid Applicator No.';
+    } else if (empty($operator_bm)) {
+        echo 'Session was expired. Please Re-Login your account.';
     } else {
         $sql = "SELECT applicator_no, terminal_name, trd_no FROM t_applicator_in_out WHERE id = '$id'
                 AND zaihai_stock_address IS NULL AND date_time_in IS NULL";

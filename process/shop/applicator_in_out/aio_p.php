@@ -18,6 +18,8 @@ if ($method == 'out_applicator') {
         echo 'Invalid Applicator No.';
     } else if (is_valid_terminal_name($terminal_name) == false) {
         echo 'Invalid Terminal Name';
+    } else if (empty($operator_out)) {
+        echo 'Session was expired. Please Re-Login your account.';
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
@@ -92,6 +94,8 @@ if ($method == 'in_applicator') {
         echo 'Invalid Applicator No.';
     } else if (is_valid_terminal_name($terminal_name) == false) {
         echo 'Invalid Terminal Name';
+    } else if (empty($operator_in)) {
+        echo 'Session was expired. Please Re-Login your account.';
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
