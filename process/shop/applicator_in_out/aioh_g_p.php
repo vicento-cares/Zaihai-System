@@ -7,12 +7,12 @@ $method = $_GET['method'];
 if ($method == 'get_applicator_history') {
     $date_time_in_from = $_GET['date_time_in_from'];
     $date_time_in_to = $_GET['date_time_in_to'];
-    $car_maker = $_GET['car_maker'];
-    $car_model = $_GET['car_model'];
-    $applicator_no = $_GET['applicator_no'];
-    $terminal_name = $_GET['terminal_name'];
-    $trd_no = $_GET['trd_no'];
-    $zaihai_stock_address = $_GET['zaihai_stock_address'];
+    $car_maker = addslashes($_GET['car_maker']);
+    $car_model = addslashes($_GET['car_model']);
+    $applicator_no = addslashes($_GET['applicator_no']);
+    $terminal_name = addslashes($_GET['terminal_name']);
+    $trd_no = addslashes($_GET['trd_no']);
+    $zaihai_stock_address = addslashes($_GET['zaihai_stock_address']);
 
     $c = 0;
 

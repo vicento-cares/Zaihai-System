@@ -23,9 +23,10 @@ if ($method == 'out_applicator') {
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
-        $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
-        $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-        $stmt->execute();
+        $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ? AND terminal_name = ?";
+        $stmt = $conn->prepare($sql);
+        $params = array($applicator_no, $terminal_name_split);
+        $stmt->execute($params);
 
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -34,10 +35,11 @@ if ($method == 'out_applicator') {
 
             if ($status == 'Ready To Use') {
                 $sql = "SELECT id FROM t_applicator_in_out 
-                    WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
+                    WHERE applicator_no = ? AND terminal_name = ?
                     AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
-                $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-                $stmt->execute();
+                $stmt = $conn->prepare($sql);
+                $params = array($applicator_no, $terminal_name);
+                $stmt->execute($params);
 
                 $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -99,9 +101,10 @@ if ($method == 'in_applicator') {
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
-        $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
-        $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-        $stmt->execute();
+        $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ? AND terminal_name = ?";
+        $stmt = $conn->prepare($sql);
+        $params = array($applicator_no, $terminal_name_split);
+        $stmt->execute($params);
 
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -110,11 +113,12 @@ if ($method == 'in_applicator') {
 
             if ($status == 'Out') {
                 $sql = "SELECT TOP 1 trd_no FROM t_applicator_in_out 
-                    WHERE applicator_no = '$applicator_no' AND trd_no = '$location_before'
+                    WHERE applicator_no = ? AND trd_no = ?
                     AND zaihai_stock_address IS NULL AND date_time_in IS NULL
                     ORDER BY id DESC";
-                $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-                $stmt->execute();
+                $stmt = $conn->prepare($sql);
+                $params = array($applicator_no, $location_before);
+                $stmt->execute($params);
 
                 $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 

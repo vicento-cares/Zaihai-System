@@ -19,10 +19,11 @@ if ($method == 'in_applicator') {
     } else if (empty($operator_bm)) {
         echo 'Session was expired. Please Re-Login your account.';
     } else {
-        $sql = "SELECT applicator_no, terminal_name, trd_no FROM t_applicator_in_out WHERE id = '$id'
+        $sql = "SELECT applicator_no, terminal_name, trd_no FROM t_applicator_in_out WHERE id = ?
                 AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
-        $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-        $stmt->execute();
+        $stmt = $conn->prepare($sql);
+        $params = array($id);
+        $stmt->execute($params);
 
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -33,9 +34,10 @@ if ($method == 'in_applicator') {
 
             $terminal_name_split = split_terminal_name($terminal_name);
 
-            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = '$applicator_no_new' AND terminal_name = '$terminal_name_split'";
-            $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt->execute();
+            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ? AND terminal_name = ?";
+            $stmt = $conn->prepare($sql);
+            $params = array($applicator_no_new, $terminal_name_split);
+            $stmt->execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
