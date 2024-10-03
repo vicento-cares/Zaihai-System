@@ -80,7 +80,29 @@ if ($method == 'out_applicator') {
                 echo 'Applicator Still Pending';
             }
         } else {
-            echo 'Applicator Not Found';
+            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ?";
+            $stmt = $conn->prepare($sql);
+            $params = array($applicator_no);
+            $stmt->execute($params);
+
+            $is_applicator_found = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            $sql = "SELECT id FROM m_applicator_terminal WHERE terminal_name = ?";
+            $stmt = $conn->prepare($sql);
+            $params = array($terminal_name_split);
+            $stmt->execute($params);
+
+            $is_terminal_found = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            if (!$is_applicator_found && !$is_terminal_found) {
+                echo 'Applicator And Terminal Not Found';
+            } else if (!$is_applicator_found) {
+                echo 'Applicator Not Found';
+            } else if (!$is_terminal_found) {
+                echo 'Terminal Not Found';
+            } else {
+                echo 'Unmatched Or Record Not Found On Applicator Terminal';
+            }
         }
     }
 }
@@ -158,7 +180,29 @@ if ($method == 'in_applicator') {
                 echo 'Applicator Currently Ready To Use';
             }
         } else {
-            echo 'Applicator Not Found';
+            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ?";
+            $stmt = $conn->prepare($sql);
+            $params = array($applicator_no);
+            $stmt->execute($params);
+
+            $is_applicator_found = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            $sql = "SELECT id FROM m_applicator_terminal WHERE terminal_name = ?";
+            $stmt = $conn->prepare($sql);
+            $params = array($terminal_name_split);
+            $stmt->execute($params);
+
+            $is_terminal_found = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+            if (!$is_applicator_found && !$is_terminal_found) {
+                echo 'Applicator And Terminal Not Found';
+            } else if (!$is_applicator_found) {
+                echo 'Applicator Not Found';
+            } else if (!$is_terminal_found) {
+                echo 'Terminal Not Found';
+            } else {
+                echo 'Unmatched Or Record Not Found On Applicator Terminal';
+            }
         }
     }
 }
