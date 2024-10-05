@@ -244,7 +244,7 @@
 		var duration = 0;
 		var error_message = 'Error: ';
 		if (type == 'error') {
-			duration = 2000;
+			duration = 5000;
 			message = error_message + message;
 			document.getElementById(id).classList.add('text-red');
 		} else {

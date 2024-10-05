@@ -226,11 +226,11 @@ if ($method == 'get_location_datalist_in_search') {
 }
 
 if ($method == 'get_recent_applicator_out') {
-    $car_maker = $_GET['car_maker'];
-    $car_model = $_GET['car_model'];
-    $applicator_no = $_GET['applicator_no'];
-    $terminal_name = $_GET['terminal_name'];
-    $location = $_GET['location'];
+    $car_maker = addslashes($_GET['car_maker']);
+    $car_model = addslashes($_GET['car_model']);
+    $applicator_no = addslashes($_GET['applicator_no']);
+    $terminal_name = addslashes($_GET['terminal_name']);
+    $location = addslashes($_GET['location']);
 
     $c = 0;
 
@@ -252,7 +252,7 @@ if ($method == 'get_recent_applicator_out') {
         $sql .= " AND aio.terminal_name LIKE '%$terminal_name%'";
     }
     if (!empty($location)) {
-        $sql .= " AND aio.location LIKE '%$location%'";
+        $sql .= " AND aio.trd_no LIKE '%$location%'";
     }
     $sql .= " ORDER BY aio.date_time_out DESC";
     $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
@@ -361,11 +361,11 @@ if ($method == 'get_applicator_in_pending_details') {
 }
 
 if ($method == 'get_recent_applicator_in') {
-    $car_maker = $_GET['car_maker'];
-    $car_model = $_GET['car_model'];
-    $applicator_no = $_GET['applicator_no'];
-    $terminal_name = $_GET['terminal_name'];
-    $location = $_GET['location'];
+    $car_maker = addslashes($_GET['car_maker']);
+    $car_model = addslashes($_GET['car_model']);
+    $applicator_no = addslashes($_GET['applicator_no']);
+    $terminal_name = addslashes($_GET['terminal_name']);
+    $location = addslashes($_GET['location']);
 
     $c = 0;
 
@@ -399,7 +399,7 @@ if ($method == 'get_recent_applicator_in') {
         $sql .= " AND t1.terminal_name LIKE '%$terminal_name%'";
     }
     if (!empty($location)) {
-        $sql .= " AND t1.location LIKE '%$location%'";
+        $sql .= " AND t1.trd_no LIKE '%$location%'";
     }
 
     $sql .= " ORDER BY t1.date_time_in DESC";
