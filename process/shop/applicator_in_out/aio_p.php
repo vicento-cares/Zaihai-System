@@ -158,15 +158,23 @@ if ($method == 'in_applicator') {
                         $params = array($location, $operator_in, $server_date_time, $applicator_no, $terminal_name_param);
                         $stmt -> execute($params);
 
-                        $sql = "UPDATE t_applicator_list 
+                        // Check the count of updated rows
+                        $updated_rows = $stmt->rowCount();
+
+                        if ($updated_rows === 0) {
+                            // No rows were updated
+                            echo 'Failed. Unmatched Out And Scanned Terminal';
+                        } else {
+                            $sql = "UPDATE t_applicator_list 
                                 SET location = ?, status = 'Pending', date_updated = ?
                                 WHERE applicator_no = ?";
-                        $stmt = $conn->prepare($sql);
-                        $params = array($location, $server_date_time, $applicator_no);
-                        $stmt->execute($params);
-                    
-                        $conn->commit();
-                        echo 'success';
+                            $stmt = $conn->prepare($sql);
+                            $params = array($location, $server_date_time, $applicator_no);
+                            $stmt->execute($params);
+                        
+                            $conn->commit();
+                            echo 'success';
+                        }
                     } catch (Exception $e) {
                         $conn->rollBack();
                         echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();

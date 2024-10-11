@@ -190,7 +190,7 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
                 if ($row) {
                     $query = "UPDATE t_applicator_list 
-                        SET applicator_no = '$applicator_no'
+                        SET car_maker = '$car_maker', car_model = '$car_model', applicator_no = '$applicator_no'
                         WHERE location = '$zaihai_stock_address'";
 
                     $stmt = $conn->prepare($sql);
@@ -217,8 +217,8 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     if ($stmt->execute()) {
                         $stmt = NULL;
             
-                        $query = "INSERT INTO t_applicator_list (applicator_no, location, status) 
-                                VALUES ('$applicator_no','$zaihai_stock_address','Ready To Use')";
+                        $query = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) 
+                                VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address','Ready To Use')";
             
                         $stmt = $conn->prepare($query);
                         if (!$stmt->execute()) {
