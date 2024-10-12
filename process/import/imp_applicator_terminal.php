@@ -120,26 +120,81 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
             // PARSE
             $error = 0;
-            while (($line = fgetcsv($csvFile)) !== false) {
-                // Check if the row is blank or consists only of whitespace
-                if (empty(implode('', $line))) {
-                    continue; // Skip blank lines
+
+            $isTransactionActive = false;
+            $chunkSize = 250; // Set your desired chunk size
+
+            try {
+                if (!$isTransactionActive) {
+                    $conn->beginTransaction();
+                    $isTransactionActive = true;
                 }
 
-                $applicator_no = addslashes($line[0]);
-                $terminal_name = addslashes($line[1]);
+                $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) VALUES ";
+                $values = [];
+                $placeholders = [];
 
-                // $conn->beginTransaction();
-                
-                $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) 
-                        VALUES ('$applicator_no','$terminal_name')";
+                while (($line = fgetcsv($csvFile)) !== false) {
+                    // Check if the row is blank or consists only of whitespace
+                    if (empty(implode('', $line))) {
+                        continue; // Skip blank lines
+                    }
 
-                $stmt = $conn->prepare($sql);
-                if (!$stmt->execute()) {
-                    $error++;
+                    $applicator_no = $line[0];
+                    $terminal_name = $line[1];
+
+                    // Create placeholders for each row
+                    $placeholders[] = "(?, ?)";
+                    $values[] = $applicator_no;
+                    $values[] = $terminal_name;
+
+                    // Check if we reached the chunk size
+                    if (count($placeholders) === $chunkSize) {
+                        // Combine the SQL statement with the placeholders
+                        $sql .= implode(', ', $placeholders);
+                        
+                        // Prepare the statement
+                        $stmt = $conn->prepare($sql);
+                        
+                        // Execute the statement with the values
+                        if (!$stmt->execute($values)) {
+                            $error++;
+                        }
+
+                        // Reset for the next chunk
+                        $placeholders = [];
+                        $values = [];
+                        $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) VALUES ";
+                    }
                 }
 
-                // $conn->commit();
+                // Insert any remaining rows that didn't fill a complete chunk
+                if (!empty($placeholders)) {
+                    $sql .= implode(', ', $placeholders);
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt->execute($values)) {
+                        $error++;
+                    }
+                }
+
+                if ($error > 0) {
+                    if ($isTransactionActive) {
+                        $conn->rollBack();
+                        $isTransactionActive = false;
+                    }
+                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+                    exit();
+                }
+
+                $conn->commit();
+                $isTransactionActive = false;
+            } catch (Exception $e) {
+                if ($isTransactionActive) {
+                    $conn->rollBack();
+                    $isTransactionActive = false;
+                }
+                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                exit();
             }
             
             fclose($csvFile);

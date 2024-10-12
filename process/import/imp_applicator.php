@@ -168,68 +168,167 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
             // PARSE
             $error = 0;
-            while (($line = fgetcsv($csvFile)) !== false) {
-                // Check if the row is blank or consists only of whitespace
-                if (empty(implode('', $line))) {
-                    continue; // Skip blank lines
+
+            $isTransactionActive = false;
+            $chunkSize = 250; // Set your desired chunk size
+
+            try {
+                if (!$isTransactionActive) {
+                    $conn->beginTransaction();
+                    $isTransactionActive = true;
                 }
 
-                $car_maker = addslashes($line[0]);
-                $car_model = addslashes($line[1]);
-                $applicator_no = addslashes($line[2]);
-                $zaihai_stock_address = addslashes($line[3]);
+                $sql_insert_applicator = "INSERT INTO m_applicator 
+                                            (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                                            VALUES ";
+                $values = [];
+                $placeholders = [];
 
-                // $conn->beginTransaction();
+                $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
+                                            (car_maker, car_model, applicator_no, location, status) 
+                                            VALUES ";
+                $values2 = [];
+                $placeholders2 = [];
 
-                $sql = "SELECT id FROM m_applicator 
+                while (($line = fgetcsv($csvFile)) !== false) {
+                    // Check if the row is blank or consists only of whitespace
+                    if (empty(implode('', $line))) {
+                        continue; // Skip blank lines
+                    }
+
+                    $car_maker = addslashes($line[0]);
+                    $car_model = addslashes($line[1]);
+                    $applicator_no = addslashes($line[2]);
+                    $zaihai_stock_address = addslashes($line[3]);
+
+                    $sql = "SELECT id FROM m_applicator 
                         WHERE zaihai_stock_address = '$zaihai_stock_address'";
-                $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-                $stmt -> execute();
+                    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+                    $stmt->execute();
 
-                $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if ($row) {
-                    $query = "UPDATE t_applicator_list 
+                    if ($row) {
+                        $query = "UPDATE t_applicator_list 
                         SET car_maker = '$car_maker', car_model = '$car_model', applicator_no = '$applicator_no'
                         WHERE location = '$zaihai_stock_address'";
 
-                    $stmt = $conn->prepare($sql);
-                    if ($stmt->execute()) {
-                        $stmt = NULL;
-            
-                        $sql = "UPDATE m_applicator 
+                        $stmt = $conn->prepare($sql);
+                        if ($stmt->execute()) {
+                            $stmt = NULL;
+
+                            $sql = "UPDATE m_applicator 
                             SET car_maker = '$car_maker', car_model = '$car_model', 
                             applicator_no = '$applicator_no'
                             WHERE zaihai_stock_address = '$zaihai_stock_address'";
-            
-                        $stmt = $conn->prepare($query);
-                        if (!$stmt->execute()) {
-                            $error++;
-                        }
-                    } else {
-                        $error++;
-                    }
-                } else {
-                    $sql = "INSERT INTO m_applicator (car_maker, car_model, applicator_no, zaihai_stock_address) 
-                        VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address')";
 
-                    $stmt = $conn->prepare($sql);
-                    if ($stmt->execute()) {
-                        $stmt = NULL;
-            
-                        $query = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) 
-                                VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address','Ready To Use')";
-            
-                        $stmt = $conn->prepare($query);
-                        if (!$stmt->execute()) {
+                            $stmt = $conn->prepare($query);
+                            if (!$stmt->execute()) {
+                                $error++;
+                            }
+                        } else {
                             $error++;
                         }
                     } else {
+                        $car_maker = $line[0];
+                        $car_model = $line[1];
+                        $applicator_no = $line[2];
+                        $zaihai_stock_address = $line[3];
+
+                        // Create placeholders for each row
+                        $placeholders[] = "(?, ?, ?, ?)";
+                        $values[] = $car_maker;
+                        $values[] = $car_model;
+                        $values[] = $applicator_no;
+                        $values[] = $zaihai_stock_address;
+
+                        $placeholders2[] = "(?, ?, ?, ?, ?)";
+                        $values2[] = $car_maker;
+                        $values2[] = $car_model;
+                        $values2[] = $applicator_no;
+                        $values2[] = $zaihai_stock_address;
+                        $values2[] = 'Ready To Use';
+
+                        // Check if we reached the chunk size
+                        if (count($placeholders) === $chunkSize) {
+                            // Combine the SQL statement with the placeholders
+                            $sql_insert_applicator .= implode(', ', $placeholders);
+                            
+                            // Prepare the statement
+                            $stmt = $conn->prepare($sql_insert_applicator);
+                            
+                            // Execute the statement with the values
+                            if (!$stmt->execute($values)) {
+                                $error++;
+                            }
+
+                            // Reset for the next chunk
+                            $placeholders = [];
+                            $values = [];
+                            $sql_insert_applicator = "INSERT INTO m_applicator 
+                                            (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                                            VALUES ";
+                        }
+
+                        // Check if we reached the chunk size
+                        if (count($placeholders2) === $chunkSize) {
+                            // Combine the SQL statement with the placeholders
+                            $sql_insert_applicator_list .= implode(', ', $placeholders2);
+                            
+                            // Prepare the statement
+                            $stmt = $conn->prepare($sql_insert_applicator_list);
+                            
+                            // Execute the statement with the values
+                            if (!$stmt->execute($values2)) {
+                                $error++;
+                            }
+
+                            // Reset for the next chunk
+                            $placeholders2 = [];
+                            $values2 = [];
+                            $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
+                                            (car_maker, car_model, applicator_no, location, status) 
+                                            VALUES ";
+                        }
+                    }
+                }
+
+                // Insert any remaining rows that didn't fill a complete chunk
+                if (!empty($placeholders)) {
+                    $sql_insert_applicator .= implode(', ', $placeholders);
+                    $stmt = $conn->prepare($sql_insert_applicator);
+                    if (!$stmt->execute($values)) {
                         $error++;
                     }
                 }
 
-                // $conn->commit();
+                // Insert any remaining rows that didn't fill a complete chunk
+                if (!empty($placeholders2)) {
+                    $sql_insert_applicator_list .= implode(', ', $placeholders2);
+                    $stmt = $conn->prepare($sql_insert_applicator_list);
+                    if (!$stmt->execute($values2)) {
+                        $error++;
+                    }
+                }
+
+                if ($error > 0) {
+                    if ($isTransactionActive) {
+                        $conn->rollBack();
+                        $isTransactionActive = false;
+                    }
+                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+                    exit();
+                }
+
+                $conn->commit();
+                $isTransactionActive = false;
+            } catch (Exception $e) {
+                if ($isTransactionActive) {
+                    $conn->rollBack();
+                    $isTransactionActive = false;
+                }
+                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                exit();
             }
             
             fclose($csvFile);

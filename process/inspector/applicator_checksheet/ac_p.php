@@ -70,8 +70,13 @@ if ($method == 'make_checksheet') {
         }
     }
 
+    $isTransactionActive = false;
+
     try {
-        $conn->beginTransaction();
+        if (!$isTransactionActive) {
+            $conn->beginTransaction();
+            $isTransactionActive = true;
+        }
     
         $sql = "INSERT INTO t_applicator_c 
             (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
@@ -121,9 +126,14 @@ if ($method == 'make_checksheet') {
         $stmt->execute($params);
     
         $conn->commit();
+        $isTransactionActive = false;
         echo 'success';
     } catch (Exception $e) {
-        $conn->rollBack();
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
         echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+        exit();
     }
 }

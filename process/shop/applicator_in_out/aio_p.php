@@ -49,8 +49,13 @@ if ($method == 'out_applicator') {
                     $serial_no = 'MEI-295-AC-'.$serial_no;
                     $serial_no = $serial_no.''.$rand;
 
+                    $isTransactionActive = false;
+
                     try {
-                        $conn->beginTransaction();
+                        if (!$isTransactionActive) {
+                            $conn->beginTransaction();
+                            $isTransactionActive = true;
+                        }
                     
                         $sql = "INSERT INTO t_applicator_in_out (serial_no, applicator_no, terminal_name, trd_no, operator_out) 
                             VALUES (?, ?, ?, ?, ?)";
@@ -66,10 +71,15 @@ if ($method == 'out_applicator') {
                         $stmt->execute($params);
                     
                         $conn->commit();
+                        $isTransactionActive = false;
                         echo 'success';
                     } catch (Exception $e) {
-                        $conn->rollBack();
+                        if ($isTransactionActive) {
+                            $conn->rollBack();
+                            $isTransactionActive = false;
+                        }
                         echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                        exit();
                     }
                 } else {
                     echo 'Applicator Already Out';
@@ -145,38 +155,51 @@ if ($method == 'in_applicator') {
                 $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
                 if ($row && $location_before == $row['trd_no']) {
+                    $isTransactionActive = false;
+                    
                     try {
-                        $conn->beginTransaction();
-
+                        if (!$isTransactionActive) {
+                            $conn->beginTransaction();
+                            $isTransactionActive = true;
+                        }
+                    
                         $id = $row['id'];
                     
                         $sql = "UPDATE t_applicator_in_out 
-                            SET zaihai_stock_address = ?, operator_in = ?, date_time_in = ?
-                            WHERE id = ?";
-                        $stmt = $conn -> prepare($sql);
+                                SET zaihai_stock_address = ?, operator_in = ?, date_time_in = ?
+                                WHERE id = ?";
+                        $stmt = $conn->prepare($sql);
                         $params = array($location, $operator_in, $server_date_time, $id);
-                        $stmt -> execute($params);
-
+                        $stmt->execute($params);
+                    
                         // Check the count of updated rows
                         $updated_rows = $stmt->rowCount();
-
+                    
                         if ($updated_rows === 0) {
-                            // No rows were updated
+                            // No rows were updated, roll back the transaction
+                            $conn->rollBack();
                             echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
-                        } else {
-                            $sql = "UPDATE t_applicator_list 
+                            exit();
+                        }
+                    
+                        $sql = "UPDATE t_applicator_list 
                                 SET location = ?, status = 'Pending', date_updated = ?
                                 WHERE applicator_no = ?";
-                            $stmt = $conn->prepare($sql);
-                            $params = array($location, $server_date_time, $applicator_no);
-                            $stmt->execute($params);
-                        
-                            $conn->commit();
-                            echo 'success';
-                        }
+                        $stmt = $conn->prepare($sql);
+                        $params = array($location, $server_date_time, $applicator_no);
+                        $stmt->execute($params);
+                    
+                        // Commit the transaction
+                        $conn->commit();
+                        $isTransactionActive = false;
+                        echo 'success';
                     } catch (Exception $e) {
-                        $conn->rollBack();
+                        if ($isTransactionActive) {
+                            $conn->rollBack();
+                            $isTransactionActive = false;
+                        }
                         echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                        exit();
                     }
                 } else {
                     echo 'Unmatched TRD / Cart Location';
