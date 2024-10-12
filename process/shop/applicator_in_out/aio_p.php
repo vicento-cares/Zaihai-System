@@ -134,7 +134,7 @@ if ($method == 'in_applicator') {
             $status = get_applicator_list_status($applicator_no, $conn);
 
             if ($status == 'Out') {
-                $sql = "SELECT TOP 1 trd_no FROM t_applicator_in_out 
+                $sql = "SELECT TOP 1 id, trd_no FROM t_applicator_in_out 
                     WHERE applicator_no = ? AND trd_no = ?
                     AND zaihai_stock_address IS NULL AND date_time_in IS NULL
                     ORDER BY id DESC";
@@ -148,14 +148,13 @@ if ($method == 'in_applicator') {
                     try {
                         $conn->beginTransaction();
 
-                        $terminal_name_param = $terminal_name_split . '%';
+                        $id = $row['id'];
                     
                         $sql = "UPDATE t_applicator_in_out 
                             SET zaihai_stock_address = ?, operator_in = ?, date_time_in = ?
-                            WHERE applicator_no = ? AND terminal_name LIKE ?
-                            AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
+                            WHERE id = ?";
                         $stmt = $conn -> prepare($sql);
-                        $params = array($location, $operator_in, $server_date_time, $applicator_no, $terminal_name_param);
+                        $params = array($location, $operator_in, $server_date_time, $id);
                         $stmt -> execute($params);
 
                         // Check the count of updated rows
@@ -163,7 +162,7 @@ if ($method == 'in_applicator') {
 
                         if ($updated_rows === 0) {
                             // No rows were updated
-                            echo 'Failed. Unmatched Out And Scanned Terminal';
+                            echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
                         } else {
                             $sql = "UPDATE t_applicator_list 
                                 SET location = ?, status = 'Pending', date_updated = ?

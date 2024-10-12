@@ -650,6 +650,8 @@
 		let inspected_by = document.getElementById("inspected_by_ac_i").innerHTML;
 		let inspected_by_no = document.getElementById("inspected_by_no_ac_i").value;
 
+		document.getElementById("btnMakeAc").disabled = true;
+
 		$.ajax({
 			type: "POST",
 			url: "../process/inspector/applicator_checksheet/ac_p.php",
@@ -720,6 +722,7 @@
                         timer: 2000
                     });
 				}
+				document.getElementById("btnMakeAc").disabled = false;
 			}
 		});
 	}
