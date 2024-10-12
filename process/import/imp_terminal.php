@@ -146,47 +146,109 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
             // PARSE
             $error = 0;
-            while (($line = fgetcsv($csvFile)) !== false) {
-                // Check if the row is blank or consists only of whitespace
-                if (empty(implode('', $line))) {
-                    continue; // Skip blank lines
+
+            $isTransactionActive = false;
+            $chunkSize = 250; // Set your desired chunk size
+
+            try {
+                if (!$isTransactionActive) {
+                    $conn->beginTransaction();
+                    $isTransactionActive = true;
                 }
 
-                $car_maker = addslashes($line[0]);
-                $car_model = addslashes($line[1]);
-                $terminal_name = addslashes($line[2]);
-                $line_address = addslashes($line[3]);
+                $sql_insert = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) VALUES ";
+                $values = [];
+                $placeholders = [];
 
-                // $conn->beginTransaction();
+                while (($line = fgetcsv($csvFile)) !== false) {
+                    // Check if the row is blank or consists only of whitespace
+                    if (empty(implode('', $line))) {
+                        continue; // Skip blank lines
+                    }
 
-                $sql = "SELECT id FROM m_terminal 
+                    $car_maker = addslashes($line[0]);
+                    $car_model = addslashes($line[1]);
+                    $terminal_name = addslashes($line[2]);
+                    $line_address = addslashes($line[3]);
+
+                    $sql = "SELECT id FROM m_terminal 
                         WHERE line_address = '$line_address'";
-                $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-                $stmt -> execute();
+                    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+                    $stmt->execute();
 
-                $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                if ($row) {
-                    $sql = "UPDATE m_terminal 
+                    if ($row) {
+                        $sql = "UPDATE m_terminal 
                             SET car_maker = '$car_maker', car_model = '$car_model', 
                             terminal_name = '$terminal_name'
                             WHERE line_address = '$line_address'";
 
-                    $stmt = $conn->prepare($sql);
-                    if (!$stmt->execute()) {
-                        $error++;
-                    }
-                } else {
-                    $sql = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) 
-                        VALUES ('$car_maker','$car_model','$terminal_name','$line_address')";
+                        $stmt = $conn->prepare($sql);
+                        if (!$stmt->execute()) {
+                            $error++;
+                        }
+                    } else {
+                        $car_maker = $line[0];
+                        $car_model = $line[1];
+                        $terminal_name = $line[2];
+                        $line_address = $line[3];
 
-                    $stmt = $conn->prepare($sql);
-                    if (!$stmt->execute()) {
+                        // Create placeholders for each row
+                        $placeholders[] = "(?, ?, ?, ?)";
+                        $values[] = $car_maker;
+                        $values[] = $car_model;
+                        $values[] = $terminal_name;
+                        $values[] = $line_address;
+
+                        // Check if we reached the chunk size
+                        if (count($placeholders) === $chunkSize) {
+                            // Combine the SQL statement with the placeholders
+                            $sql_insert .= implode(', ', $placeholders);
+                            
+                            // Prepare the statement
+                            $stmt = $conn->prepare($sql_insert);
+                            
+                            // Execute the statement with the values
+                            if (!$stmt->execute($values)) {
+                                $error++;
+                            }
+
+                            // Reset for the next chunk
+                            $placeholders = [];
+                            $values = [];
+                            $sql_insert = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) VALUES ";
+                        }
+                    }
+                }
+
+                // Insert any remaining rows that didn't fill a complete chunk
+                if (!empty($placeholders)) {
+                    $sql_insert .= implode(', ', $placeholders);
+                    $stmt = $conn->prepare($sql_insert);
+                    if (!$stmt->execute($values)) {
                         $error++;
                     }
                 }
-                
-                // $conn->commit();
+
+                if ($error > 0) {
+                    if ($isTransactionActive) {
+                        $conn->rollBack();
+                        $isTransactionActive = false;
+                    }
+                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+                    exit();
+                }
+
+                $conn->commit();
+                $isTransactionActive = false;
+            } catch (Exception $e) {
+                if ($isTransactionActive) {
+                    $conn->rollBack();
+                    $isTransactionActive = false;
+                }
+                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                exit();
             }
             
             fclose($csvFile);

@@ -122,28 +122,86 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
 
             // PARSE
             $error = 0;
-            while (($line = fgetcsv($csvFile)) !== false) {
-                // Check if the row is blank or consists only of whitespace
-                if (empty(implode('', $line))) {
-                    continue; // Skip blank lines
+
+            $isTransactionActive = false;
+            $chunkSize = 250; // Set your desired chunk size
+
+            try {
+                if (!$isTransactionActive) {
+                    $conn->beginTransaction();
+                    $isTransactionActive = true;
                 }
 
-                $car_maker = addslashes($line[0]);
-                $car_model = addslashes($line[1]);
-                $applicator_no = addslashes($line[2]);
-                $location = addslashes($line[3]);
+                $sql = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) VALUES ";
+                $values = [];
+                $placeholders = [];
 
-                // $conn->beginTransaction();
-                
-                $query = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) 
-                    VALUES ('$car_maker','$car_model','$applicator_no','$location','Ready To Use')";
+                while (($line = fgetcsv($csvFile)) !== false) {
+                    // Check if the row is blank or consists only of whitespace
+                    if (empty(implode('', $line))) {
+                        continue; // Skip blank lines
+                    }
 
-                $stmt = $conn->prepare($sql);
-                if (!$stmt->execute()) {
-                    $error++;
+                    $car_maker = $line[0];
+                    $car_model = $line[1];
+                    $applicator_no = $line[2];
+                    $location = $line[3];
+
+                    // Create placeholders for each row
+                    $placeholders[] = "(?, ?, ?, ?, ?)";
+                    $values[] = $car_maker;
+                    $values[] = $car_model;
+                    $values[] = $applicator_no;
+                    $values[] = $location;
+                    $values[] = 'Ready To Use';
+
+                    // Check if we reached the chunk size
+                    if (count($placeholders) === $chunkSize) {
+                        // Combine the SQL statement with the placeholders
+                        $sql .= implode(', ', $placeholders);
+                        
+                        // Prepare the statement
+                        $stmt = $conn->prepare($sql);
+                        
+                        // Execute the statement with the values
+                        if (!$stmt->execute($values)) {
+                            $error++;
+                        }
+
+                        // Reset for the next chunk
+                        $placeholders = [];
+                        $values = [];
+                        $sql = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) VALUES ";
+                    }
                 }
 
-                // $conn->commit();
+                // Insert any remaining rows that didn't fill a complete chunk
+                if (!empty($placeholders)) {
+                    $sql .= implode(', ', $placeholders);
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt->execute($values)) {
+                        $error++;
+                    }
+                }
+
+                if ($error > 0) {
+                    if ($isTransactionActive) {
+                        $conn->rollBack();
+                        $isTransactionActive = false;
+                    }
+                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+                    exit();
+                }
+
+                $conn->commit();
+                $isTransactionActive = false;
+            } catch (Exception $e) {
+                if ($isTransactionActive) {
+                    $conn->rollBack();
+                    $isTransactionActive = false;
+                }
+                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                exit();
             }
             
             fclose($csvFile);
