@@ -24,8 +24,8 @@ if ($method == 'add_applicator') {
 		if ($stmt->execute()) {
 			$stmt = NULL;
 
-            $query = "INSERT INTO t_applicator_list (applicator_no, location, status) 
-                    VALUES ('$applicator_no','$zaihai_stock_address','Ready To Use')";
+            $query = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) 
+                    VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address','Ready To Use')";
 
             $stmt = $conn->prepare($query);
             if ($stmt->execute()) {
@@ -64,7 +64,7 @@ if ($method == 'update_applicator') {
                 echo 'Ready To Use Only';
             } else {
                 $query = "UPDATE t_applicator_list 
-                        SET applicator_no = '$applicator_no'
+                        SET car_maker = '$car_maker', car_model = '$car_model', applicator_no = '$applicator_no'
                         WHERE zaihai_stock_address = '$zaihai_stock_address'";
 
                 $stmt = $conn->prepare($query);
