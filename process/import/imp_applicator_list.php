@@ -147,13 +147,21 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     $applicator_no = $line[2];
                     $location = $line[3];
 
+                    // Create a temporary array for the current row
+                    $currentValues = [
+                        $car_maker,
+                        $car_model,
+                        $applicator_no,
+                        $location,
+                        'Ready To Use'
+                    ];
+
                     // Create placeholders for each row
-                    $placeholders[] = "(?, ?, ?, ?, ?)";
-                    $values[] = $car_maker;
-                    $values[] = $car_model;
-                    $values[] = $applicator_no;
-                    $values[] = $location;
-                    $values[] = 'Ready To Use';
+                    $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
+                    $placeholders[] = "($generated_placeholders)";
+
+                    // Add current values to the main values array
+                    $values = array_merge($values, $currentValues);
 
                     // Check if we reached the chunk size
                     if (count($placeholders) === $chunkSize) {

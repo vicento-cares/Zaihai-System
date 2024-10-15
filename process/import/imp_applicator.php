@@ -235,19 +235,36 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                         $applicator_no = $line[2];
                         $zaihai_stock_address = $line[3];
 
-                        // Create placeholders for each row
-                        $placeholders[] = "(?, ?, ?, ?)";
-                        $values[] = $car_maker;
-                        $values[] = $car_model;
-                        $values[] = $applicator_no;
-                        $values[] = $zaihai_stock_address;
+                        // Create a temporary array for the current row
+                        $currentValues = [
+                            $car_maker,
+                            $car_model,
+                            $applicator_no,
+                            $zaihai_stock_address
+                        ];
 
-                        $placeholders2[] = "(?, ?, ?, ?, ?)";
-                        $values2[] = $car_maker;
-                        $values2[] = $car_model;
-                        $values2[] = $applicator_no;
-                        $values2[] = $zaihai_stock_address;
-                        $values2[] = 'Ready To Use';
+                        // Create a temporary array for the current row
+                        $currentValues2 = [
+                            $car_maker,
+                            $car_model,
+                            $applicator_no,
+                            $zaihai_stock_address,
+                            'Ready To Use'
+                        ];
+
+                        // Create placeholders for each row
+                        $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
+                        $placeholders[] = "($generated_placeholders)";
+
+                        // Create placeholders for each row
+                        $generated_placeholders2 = implode(',', array_fill(0, count($currentValues2), '?'));
+                        $placeholders2[] = "($generated_placeholders2)";
+
+                        // Add current values to the main values array
+                        $values = array_merge($values, $currentValues);
+
+                        // Add current values to the main values array
+                        $values2 = array_merge($values2, $currentValues2);
 
                         // Check if we reached the chunk size
                         if (count($placeholders) === $chunkSize) {

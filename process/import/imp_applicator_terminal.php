@@ -143,10 +143,18 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     $applicator_no = $line[0];
                     $terminal_name = $line[1];
 
+                    // Create a temporary array for the current row
+                    $currentValues = [
+                        $applicator_no,
+                        $terminal_name
+                    ];
+
                     // Create placeholders for each row
-                    $placeholders[] = "(?, ?)";
-                    $values[] = $applicator_no;
-                    $values[] = $terminal_name;
+                    $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
+                    $placeholders[] = "($generated_placeholders)";
+
+                    // Add current values to the main values array
+                    $values = array_merge($values, $currentValues);
 
                     // Check if we reached the chunk size
                     if (count($placeholders) === $chunkSize) {
