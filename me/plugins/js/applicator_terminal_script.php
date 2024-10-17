@@ -89,7 +89,13 @@
         });
     }
 
-    const export_applicator_terminal = (table_id, separator = ',') => {
+    const export_applicator_terminal = () => {
+        let applicator_no = sessionStorage.getItem('zs_at_applicator_no_search');
+        let terminal_name = sessionStorage.getItem('zs_at_terminal_name_search');
+        window.open('../process/export/exp_applicator_terminal.php?applicator_no=' + applicator_no + "&terminal_name=" + terminal_name, '_blank');
+    }
+
+    const export_applicator_terminal_shown = (table_id, separator = ',') => {
         let applicator_no = sessionStorage.getItem('zs_at_applicator_no_search');
         let terminal_name = sessionStorage.getItem('zs_at_terminal_name_search');
 
@@ -376,11 +382,22 @@
         });
     }
 
-    const upload_csv = () => {
-        var file_form = document.getElementById('file_form');
-        var form_data = new FormData(file_form);
+    const upload_csv = opt => {
+        let file_form;
+        let url;
+
+        if (opt == 1) {
+            file_form = document.getElementById('file_form');
+            url = '../process/import/imp_applicator_terminal.php';
+        } else if (opt == 2) {
+            file_form = document.getElementById('file_form2');
+            url = '../process/import/imp_applicator_terminal_update.php';
+        }
+
+        let form_data = new FormData(file_form);
+
         $.ajax({
-            url: '../process/import/imp_applicator_terminal.php',
+            url: url,
             type: 'POST',
             dataType: 'text',
             cache: false,
@@ -422,6 +439,7 @@
                         get_applicator_terminal();
                     }
                     document.getElementById("file").value = '';
+                    document.getElementById("file2").value = '';
                 }, 500);
             }
         })

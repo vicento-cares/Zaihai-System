@@ -20,17 +20,13 @@ function check_csv ($file, $conn) {
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
-    $row_valid_arr = array(0);
-
-    $notExiststTerminalArr = array();
-
     $message = "";
     $check_csv_row = 0;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Car Maker,Car Model,Terminal Name,Line Address,Car Maker New,Car Model New,Terminal Name New,Line Address New";
-    $valid_first_line2 = '"Car Maker","Car Model","Terminal Name","Line Address","Car Maker New","Car Model New","Terminal Name New","Line Address New"';
+    $valid_first_line = "Applicator No.,Terminal Name,Applicator No. New,Terminal Name New";
+    $valid_first_line2 = '"Applicator No.","Terminal Name","Applicator No. New","Terminal Name New"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -40,32 +36,24 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $car_maker = addslashes($line[0]);
-            $car_model = addslashes($line[1]);
-            $terminal_name = addslashes($line[2]);
-            $line_address = addslashes($line[3]);
+            $applicator_no = addslashes($line[0]);
+            $terminal_name = addslashes($line[1]);
+            $applicator_no_new = addslashes($line[2]);
+            $terminal_name_new = addslashes($line[3]);
 
-            if ($car_maker == '' || $car_model == '' || 
-                $terminal_name == '' || $line_address == '') {
+            if (empty($applicator_no_new) && empty($terminal_name_new)) {
+                continue; // Skip blank lines
+            } else if (empty($applicator_no_new)) {
+                $applicator_no_new = $applicator_no;
+            } else if (empty($terminal_name_new)) {
+                $terminal_name_new = $terminal_name;
+            }
+
+            if ($applicator_no == '' || $terminal_name == '') {
                 // IF BLANK DETECTED ERROR += 1
                 $hasBlankError++;
                 $hasError = 1;
                 array_push($hasBlankErrorArr, $check_csv_row);
-            }
-
-            // CHECK ROW VALIDATION
-            // 0
-            $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE terminal_name = '$terminal_name'";
-            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt -> execute();
-
-            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-
-            if (!$row) {
-                $hasError = 1;
-                $row_valid_arr[0] = 1;
-                array_push($notExiststTerminalArr, $check_csv_row);
             }
             
             // Joining all row values for checking duplicated rows
@@ -81,11 +69,14 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM m_terminal 
-                    WHERE line_address = '$line_address'";
+            $sql = "SELECT id FROM m_applicator_terminal 
+                    WHERE applicator_no = '$applicator_no_new' AND terminal_name = '$terminal_name_new'";
             $stmt = $conn -> prepare($sql);
             $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
+
+            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+	        if ($row) {
                 $isExistsOnDb = 1;
                 $hasError = 1;
                 array_push($isExistsOnDbArr, $check_csv_row);
@@ -99,10 +90,6 @@ function check_csv ($file, $conn) {
     fclose($csvFile);
 
     if ($hasError == 1) {
-        if ($row_valid_arr[0] == 1) {
-            $message = $message . 'Terminal Name not found on row/s ' . implode(", ", $notExiststTerminalArr) . '. ';
-        }
-
         if ($isExistsOnDb == 1) {
             $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
         }
@@ -148,7 +135,6 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
             $error = 0;
 
             $isTransactionActive = false;
-            $chunkSize = 250; // Set your desired chunk size
 
             try {
                 if (!$isTransactionActive) {
@@ -156,61 +142,31 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     $isTransactionActive = true;
                 }
 
-                $sql_insert = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) VALUES ";
-                $values = [];
-                $placeholders = [];
-
                 while (($line = fgetcsv($csvFile)) !== false) {
                     // Check if the row is blank or consists only of whitespace
                     if (empty(implode('', $line))) {
                         continue; // Skip blank lines
                     }
 
-                    $car_maker = $line[0];
-                    $car_model = $line[1];
-                    $terminal_name = $line[2];
-                    $line_address = $line[3];
+                    $applicator_no = $line[0];
+                    $terminal_name = $line[1];
+                    $applicator_no_new = $line[2];
+                    $terminal_name_new = $line[3];
 
-                    // Create a temporary array for the current row
-                    $currentValues = [
-                        $car_maker,
-                        $car_model,
-                        $terminal_name,
-                        $line_address
-                    ];
-
-                    // Create placeholders for each row
-                    $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
-                    $placeholders[] = "($generated_placeholders)";
-
-                    // Add current values to the main values array
-                    $values = array_merge($values, $currentValues);
-
-                    // Check if we reached the chunk size
-                    if (count($placeholders) === $chunkSize) {
-                        // Combine the SQL statement with the placeholders
-                        $sql_insert .= implode(', ', $placeholders);
-                        
-                        // Prepare the statement
-                        $stmt = $conn->prepare($sql_insert);
-                        
-                        // Execute the statement with the values
-                        if (!$stmt->execute($values)) {
-                            $error++;
-                        }
-
-                        // Reset for the next chunk
-                        $placeholders = [];
-                        $values = [];
-                        $sql_insert = "INSERT INTO m_terminal (car_maker, car_model, terminal_name, line_address) VALUES ";
+                    if (empty($applicator_no_new) && empty($terminal_name_new)) {
+                        continue; // Skip blank lines
+                    } else if (empty($applicator_no_new)) {
+                        $applicator_no_new = $applicator_no;
+                    } else if (empty($terminal_name_new)) {
+                        $terminal_name_new = $terminal_name;
                     }
-                }
 
-                // Insert any remaining rows that didn't fill a complete chunk
-                if (!empty($placeholders)) {
-                    $sql_insert .= implode(', ', $placeholders);
-                    $stmt = $conn->prepare($sql_insert);
-                    if (!$stmt->execute($values)) {
+                    $query = "UPDATE m_applicator_terminal 
+                                SET applicator_no = ?, terminal_name = ?
+                                WHERE applicator_no = ? AND terminal_name = ?";
+                    $stmt = $conn->prepare($query);
+                    $params = array($applicator_no_new, $terminal_name_new, $applicator_no, $terminal_name);
+                    if (!$stmt->execute()) {
                         $error++;
                     }
                 }

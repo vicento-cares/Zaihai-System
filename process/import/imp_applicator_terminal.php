@@ -25,8 +25,8 @@ function check_csv ($file, $conn) {
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Applicator No.,Terminal Name";
-    $valid_first_line2 = '"Applicator No.","Terminal Name"';
+    $valid_first_line = "Applicator No.,Terminal Name,Applicator No. New,Terminal Name New";
+    $valid_first_line2 = '"Applicator No.","Terminal Name","Applicator No. New","Terminal Name New"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -61,9 +61,12 @@ function check_csv ($file, $conn) {
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM m_applicator_terminal 
                     WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'";
-            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+            $stmt = $conn -> prepare($sql);
             $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
+
+            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+	        if ($row) {
                 $isExistsOnDb = 1;
                 $hasError = 1;
                 array_push($isExistsOnDbArr, $check_csv_row);

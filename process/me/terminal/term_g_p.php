@@ -88,16 +88,16 @@ if ($method == 'get_terminals') {
 
     $sql = "SELECT id, car_maker, car_model, terminal_name, line_address, date_updated FROM m_terminal";
 
+	if (!empty($terminal_name)) {
+        $sql .= " WHERE terminal_name LIKE '$terminal_name%'";
+    } else {
+        $sql .= " WHERE terminal_name != ''";
+    }
     if (!empty($car_maker)) {
         $sql .= " AND car_maker LIKE '$car_maker%'";
     }
     if (!empty($car_model)) {
         $sql .= " AND car_model LIKE '$car_model%'";
-    }
-    if (!empty($terminal_name)) {
-        $sql .= " WHERE terminal_name LIKE '$terminal_name%'";
-    } else {
-        $sql .= " WHERE terminal_name != ''";
     }
     if (!empty($line_address)) {
         $sql .= " AND line_address LIKE '$line_address%'";

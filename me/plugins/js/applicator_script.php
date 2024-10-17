@@ -158,7 +158,15 @@
 		});
 	}
 
-	const export_applicators = (table_id, separator = ',') => {
+    const export_applicators = () => {
+        let car_maker = sessionStorage.getItem('zs_a_car_maker_search');
+        let car_model = sessionStorage.getItem('zs_a_car_model_search');
+		let applicator_no = sessionStorage.getItem('zs_a_applicator_no_search');
+		let zaihai_stock_address = sessionStorage.getItem('zs_a_zaihai_stock_address_search');
+        window.open('../process/export/exp_applicator.php?car_maker=' + car_maker + "&car_model=" + car_model + "&applicator_no=" + applicator_no + "&zaihai_stock_address=" + zaihai_stock_address, '_blank');
+    }
+
+	const export_applicators_shown = (table_id, separator = ',') => {
         let car_maker = sessionStorage.getItem('zs_a_car_maker_search');
         let car_model = sessionStorage.getItem('zs_a_car_model_search');
 		let applicator_no = sessionStorage.getItem('zs_a_applicator_no_search');
@@ -342,11 +350,11 @@
                     clear_applicator_details();
                     get_applicators();
                     $('#update_applicator').modal('hide');
-                } else if (response == 'Zaihai Stock Address Not Found') {
+                } else if (response == 'Record Not Found') {
                     Swal.fire({
                         icon: 'info',
                         title: 'Info',
-                        text: 'Record cannot be updated. Zaihai Stock Address Not Found on masterlist',
+                        text: 'Record cannot be updated. Record Not Found',
                         showConfirmButton: false,
                         timer: 2000
                     });
@@ -413,11 +421,22 @@
         });
     }
 
-    const upload_csv = () => {
-        var file_form = document.getElementById('file_form');
-        var form_data = new FormData(file_form);
+    const upload_csv = opt => {
+        let file_form;
+        let url;
+
+        if (opt == 1) {
+            file_form = document.getElementById('file_form');
+            url = '../process/import/imp_applicator.php';
+        } else if (opt == 2) {
+            file_form = document.getElementById('file_form2');
+            url = '../process/import/imp_applicator_update.php';
+        }
+
+        let form_data = new FormData(file_form);
+
         $.ajax({
-            url: '../process/import/imp_applicator.php',
+            url: url,
             type: 'POST',
             dataType: 'text',
             cache: false,
@@ -459,6 +478,7 @@
                         get_applicators();
                     }
                     document.getElementById("file").value = '';
+                    document.getElementById("file2").value = '';
                 }, 500);
             }
         })

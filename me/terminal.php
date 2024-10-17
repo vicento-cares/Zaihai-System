@@ -29,7 +29,14 @@
         <div class="col-sm-3">
           <button type="button" class="btn btn-warning btn-block btn-file">
             <form id="file_form" enctype="multipart/form-data">
-              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal</span><input type="file" id="file" name="file" onchange="upload_csv()" accept=".csv">
+              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal (Add Only)</span><input type="file" id="file" name="file" onchange="upload_csv(1)" accept=".csv">
+            </form>
+          </button>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-warning btn-block btn-file">
+            <form id="file_form2" enctype="multipart/form-data">
+              <span class="mx-0 my-0"><i class="fas fa-upload"></i> Import Terminal (Update Only)</span><input type="file" id="file2" name="file" onchange="upload_csv(2)" accept=".csv">
             </form>
           </button>
         </div>
@@ -77,8 +84,11 @@
                 </div>
               </div>
               <div class="row mb-2">
-                <div class="col-sm-3 offset-sm-6">
-                  <button type="button" class="btn btn-secondary btn-block" onclick="export_terminals('terminalsTable')"><i class="fas fa-download"></i> Export</button>
+                <div class="col-sm-3 offset-sm-3">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="export_terminals_shown('terminalsTable')"><i class="fas fa-download"></i> Export Shown</button>
+                </div>
+                <div class="col-sm-3">
+                  <button type="button" class="btn btn-secondary btn-block" onclick="export_terminals()"><i class="fas fa-download"></i> Export On Template</button>
                 </div>
                 <div class="col-sm-3">
                   <button type="button" class="btn btn-primary btn-block" onclick="get_terminals()"><i class="fas fa-search"></i> Search</button>
