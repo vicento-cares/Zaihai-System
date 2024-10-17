@@ -1,7 +1,7 @@
 // IDLE TIME DETECT INACTIVITY
 var idleTime = 0;
 document.addEventListener("DOMContentLoaded", () => {
-  var idleInterval = setInterval(timerIncrement, 60000); //PER 1 MINUTE
+  var idleInterval = setInterval(timerIncrement, 120000); //PER 2 MINUTE
   document.addEventListener("mousemove", e => {idleTime = 0});
   document.addEventListener("keypress", e => {idleTime = 0});
   document.addEventListener("mousedown", e => {idleTime = 0});
@@ -37,7 +37,7 @@ const timerIncrement = () => {
             // Applicator In Interval
             clearInterval(realtime_get_recent_applicator_in);
             break;
-        case "/zaihai/inspector/applicator_checksheet.php":
+        case "/zaihai/shop/applicator_checksheet.php":
             // Applicator Checksheet Interval
             clearInterval(realtime_get_recent_applicator_in_pending);
             break;

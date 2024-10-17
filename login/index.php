@@ -45,7 +45,7 @@ if (isset($_SESSION['emp_no'])) {
             <select class="form-control" id="role" name="role" required>
               <option disabled selected value="">Select Account Type</option>
               <option value="Shop">Shop</option>
-              <option value="Inspector">Inspector</option>
+              <!-- <option value="Inspector">Inspector</option> -->
               <option value="BM">BM</option>
               <option value="ME">ME</option>
             </select>
