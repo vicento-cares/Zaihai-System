@@ -7,8 +7,23 @@ $method = $_GET['method'];
 if ($method == 'get_applicator_history') {
     $date_time_in_from = $_GET['date_time_in_from'];
     $date_time_in_to = $_GET['date_time_in_to'];
-    $car_maker = addslashes($_GET['car_maker']);
-    $car_model = addslashes($_GET['car_model']);
+
+    $car_maker = '';
+    $car_model = '';
+
+    if (isset($_GET['page']) && $_GET['page'] == 'shop') {
+        if (isset($_SESSION['car_maker'])) {
+            $car_maker = $_SESSION['car_maker'];
+        }
+    
+        if (isset($_SESSION['car_model'])) {
+            $car_model = $_SESSION['car_model'];
+        }
+    } else {
+        $car_maker = addslashes($_GET['car_maker']);
+        $car_model = addslashes($_GET['car_model']);
+    }
+
     $applicator_no = addslashes($_GET['applicator_no']);
     $terminal_name = addslashes($_GET['terminal_name']);
     $trd_no = addslashes($_GET['trd_no']);
@@ -25,9 +40,15 @@ if ($method == 'get_applicator_history') {
                 ac.ac1, ac.ac2, ac.ac3, ac.ac4, ac.ac5, ac.ac6, ac.ac7, ac.ac8, ac.ac9, ac.ac10, 
                 ac.ac1_s, ac.ac2_s, ac.ac3_s, ac.ac4_s, ac.ac5_s, ac.ac6_s, ac.ac7_s, ac.ac8_s, ac.ac9_s, ac.ac10_s, 
                 ac.ac1_r, ac.ac2_r, ac.ac3_r, ac.ac4_r, ac.ac5_r, ac.ac6_r, ac.ac7_r, ac.ac8_r, ac.ac9_r, ac.ac10_r 
-            FROM t_applicator_in_out_history aioh
-            LEFT JOIN m_applicator a ON aioh.applicator_no = a.applicator_no
-            LEFT JOIN t_applicator_c ac ON aioh.serial_no = ac.serial_no
+            FROM t_applicator_in_out_history aioh";
+    
+    if (isset($_GET['page']) && $_GET['page'] == 'shop') {
+        $sql .= " JOIN m_applicator a ON aioh.applicator_no = a.applicator_no";
+    } else {
+        $sql .= " LEFT JOIN m_applicator a ON aioh.applicator_no = a.applicator_no";
+    }
+
+    $sql .= " LEFT JOIN t_applicator_c ac ON aioh.serial_no = ac.serial_no 
             WHERE aioh.zaihai_stock_address IS NOT NULL AND aioh.date_time_in IS NOT NULL";
     
     if (!empty($date_time_in_from) && !empty($date_time_in_to)) {

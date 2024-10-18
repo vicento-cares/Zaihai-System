@@ -2,42 +2,42 @@
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
 		// get_applicator_history();
-		get_car_maker_dropdown_search();
-		get_car_model_dropdown_search();
+		// get_car_maker_dropdown_search();
+		// get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
 	});
 
-	const get_car_maker_dropdown_search = () => {
-		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_maker_dropdown_search'
-			},  
-			success: response => {
-				document.getElementById("aioh_car_maker_search").innerHTML = response;
-			}
-		});
-	}
+	// const get_car_maker_dropdown_search = () => {
+	// 	$.ajax({
+	// 		url: '../process/me/car_maker/cm_g_p.php',
+	// 		type: 'GET',
+	// 		cache: false,
+	// 		data: {
+	// 			method: 'get_car_maker_dropdown_search'
+	// 		},  
+	// 		success: response => {
+	// 			document.getElementById("aioh_car_maker_search").innerHTML = response;
+	// 		}
+	// 	});
+	// }
 
-	const get_car_model_dropdown_search = () => {
-		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_model_dropdown_search'
-			},  
-			success: response => {
-				document.getElementById("aioh_car_model_search").innerHTML = response;
-			}
-		});
-	}
+	// const get_car_model_dropdown_search = () => {
+	// 	$.ajax({
+	// 		url: '../process/me/car_maker/cm_g_p.php',
+	// 		type: 'GET',
+	// 		cache: false,
+	// 		data: {
+	// 			method: 'get_car_model_dropdown_search'
+	// 		},  
+	// 		success: response => {
+	// 			document.getElementById("aioh_car_model_search").innerHTML = response;
+	// 		}
+	// 	});
+	// }
 
 	const get_applicator_no_datalist_search = () => {
 		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
+			url: '../process/me/applicator/a_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -86,7 +86,8 @@
 				applicator_no: applicator_no,
 				terminal_name: terminal_name,
 				trd_no: trd_no,
-				zaihai_stock_address: zaihai_stock_address
+				zaihai_stock_address: zaihai_stock_address,
+				page: 'shop'
 			},
 			success: (response) => {
                 $('#applicatorHistoryData').html(response);

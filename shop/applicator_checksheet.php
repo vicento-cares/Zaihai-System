@@ -39,36 +39,26 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <div class="col-sm-2">
-                  <label>Car Maker</label>
-                  <select id="ai_car_maker_search" class="form-control" onchange="get_recent_applicator_in_pending()">
-                      <option selected value="">All</option>
-                  </select>
-                </div>
-                <div class="col-sm-2">
-                  <label>Car Model</label>
-                  <select id="ai_car_model_search" class="form-control" onchange="get_recent_applicator_in_pending()">
-                      <option selected value="">All</option>
-                  </select>
-                </div>
-                <div class="col-sm-2">
+                <input type="hidden" id="ai_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
+                <input type="hidden" id="ai_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
+                <div class="col-sm-3">
                   <label>Location</label>
                   <input list="ai_location_search_list" class="form-control" id="ai_location_search">
                   <datalist id="ai_location_search_list"></datalist>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <label>Applicator No.</label>
                   <input list="ai_applicator_no_search_list" class="form-control" id="ai_applicator_no_search">
                   <datalist id="ai_applicator_no_search_list"></datalist>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-5">
                   <label>Terminal Name</label>
                   <input list="ai_terminal_name_search_list" class="form-control" id="ai_terminal_name_search">
                   <datalist id="ai_terminal_name_search_list"></datalist>
                 </div>
               </div>
               <div class="row mb-2">
-                <div class="col-sm-3 offset-sm-6">
+                <div class="col-sm-2 offset-sm-7">
                   <button type="button" class="btn btn-secondary btn-block" onclick="export_recent_applicator_in_pending('recentApplicatorInTable')"><i class="fas fa-download"></i> Export</button>
                 </div>
                 <div class="col-sm-3">

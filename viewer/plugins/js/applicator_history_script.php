@@ -5,11 +5,12 @@
 		get_car_maker_dropdown_search();
 		get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
+		get_terminal_name_datalist_search();
 	});
 
 	const get_car_maker_dropdown_search = () => {
 		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
+			url: '../process/me/car_maker/cm_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -23,7 +24,7 @@
 
 	const get_car_model_dropdown_search = () => {
 		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
+			url: '../process/me/car_maker/cm_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -37,7 +38,7 @@
 
 	const get_applicator_no_datalist_search = () => {
 		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
+			url: '../process/me/applicator/a_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
@@ -45,6 +46,20 @@
 			},  
 			success: response => {
 				document.getElementById("aioh_applicator_no_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	const get_terminal_name_datalist_search = () => {
+		$.ajax({
+			url: '../process/me/terminal/term_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_terminal_name_datalist_search'
+			},  
+			success: response => {
+				document.getElementById("aioh_terminal_name_search_list").innerHTML = response;
 			}
 		});
 	}

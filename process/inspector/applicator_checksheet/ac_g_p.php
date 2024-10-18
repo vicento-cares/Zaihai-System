@@ -8,8 +8,22 @@ require '../../conn.php';
 $method = $_GET['method'];
 
 if ($method == 'get_recent_applicator_in_pending') {
-    $car_maker = $_GET['car_maker'];
-    $car_model = $_GET['car_model'];
+    $car_maker = '';
+    $car_model = '';
+
+    if (isset($_GET['page']) && $_GET['page'] == 'shop') {
+        if (isset($_SESSION['car_maker'])) {
+            $car_maker = $_SESSION['car_maker'];
+        }
+    
+        if (isset($_SESSION['car_model'])) {
+            $car_model = $_SESSION['car_model'];
+        }
+    } else {
+        $car_maker = addslashes($_GET['car_maker']);
+        $car_model = addslashes($_GET['car_model']);
+    }
+
     $applicator_no = $_GET['applicator_no'];
     $terminal_name = $_GET['terminal_name'];
     $location = $_GET['location'];
@@ -36,10 +50,10 @@ if ($method == 'get_recent_applicator_in_pending') {
             WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL";
 
     if (!empty($car_maker)) {
-        $sql .= " AND t1.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker='$car_maker'";
     }
     if (!empty($car_model)) {
-        $sql .= " AND t1.car_model='$car_model'";
+        $sql .= " AND a.car_model='$car_model'";
     }
     if (!empty($applicator_no)) {
         $sql .= " AND t1.applicator_no LIKE '%$applicator_no%'";

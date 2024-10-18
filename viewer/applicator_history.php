@@ -57,7 +57,8 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                             <div class="col-sm-3">
                                                 <label>Terminal Name</label>
-                                                <input type="text" class="form-control" id="aioh_terminal_name_search" autocomplete="off" maxlength="255">
+                                                <input list="aioh_terminal_name_search_list" class="form-control" id="aioh_terminal_name_search">
+                                                <datalist id="aioh_terminal_name_search_list"></datalist>
                                             </div>
                                         </div>
                                         <div class="row mb-2">

@@ -5,7 +5,9 @@ $method = $_GET['method'];
 
 // Get Car Maker Dropdown
 if ($method == 'get_car_maker_dropdown_search') {
-	$sql = "SELECT car_maker FROM m_applicator GROUP BY car_maker ORDER BY car_maker ASC";
+	$sql = "SELECT a.car_maker FROM t_applicator_list al
+			LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no 
+			GROUP BY a.car_maker ORDER BY a.car_maker ASC";
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -20,7 +22,9 @@ if ($method == 'get_car_maker_dropdown_search') {
 
 // Get Car Model Dropdown
 if ($method == 'get_car_model_dropdown_search') {
-	$sql = "SELECT car_model FROM m_applicator GROUP BY car_model ORDER BY car_model ASC";
+	$sql = "SELECT a.car_model FROM t_applicator_list al
+			LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no 
+			GROUP BY a.car_model ORDER BY a.car_model ASC";
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
