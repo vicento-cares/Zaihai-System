@@ -38,11 +38,11 @@
     const get_accounts = () => {
 		let emp_no = document.getElementById('acct_emp_no_search').value;
 		let full_name = document.getElementById('acct_full_name_search').value;
-		let role = document.getElementById('ai_role_search').value;
+		let role = document.getElementById('acct_role_search').value;
 
 		sessionStorage.setItem('zs_acct_emp_no_search', emp_no);
 		sessionStorage.setItem('zs_acct_full_name_search', full_name);
-		sessionStorage.setItem('zs_ai_role_search', role);
+		sessionStorage.setItem('zs_acct_role_search', role);
 
 		$.ajax({
 			type: "GET",
@@ -65,7 +65,7 @@
 	const export_accounts = (table_id, separator = ',') => {
 		let emp_no = sessionStorage.getItem('zs_acct_emp_no_search');
 		let full_name = sessionStorage.getItem('zs_acct_full_name_search');
-		let role = sessionStorage.getItem('zs_ai_role_search');
+		let role = sessionStorage.getItem('zs_acct_role_search');
 
         // Select rows from table_id
         var rows = document.querySelectorAll('table#' + table_id + ' tr');
