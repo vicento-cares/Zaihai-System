@@ -23,7 +23,7 @@ function check_csv ($file, $conn) {
     $row_valid_arr = array(0, 0);
 
     $notExistsApplicatorArr = array();
-    // $readyToUseOnlyArr = array();
+    $readyToUseOnlyArr = array();
 
     $message = "";
     $check_csv_row = 0;
@@ -228,11 +228,11 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                                 WHERE car_maker = '$car_maker' AND car_model = '$car_model' 
                                 AND applicator_no = '$applicator_no' AND location = '$zaihai_stock_address'";
 
-                    $stmt = $conn->prepare($sql);
+                    $stmt = $conn->prepare($query);
                     if ($stmt->execute()) {
                         $stmt = NULL;
 
-                        $sql = "UPDATE m_applicator 
+                        $query = "UPDATE m_applicator 
                                 SET car_maker = '$car_maker_new', car_model = '$car_model_new', 
                                 applicator_no = '$applicator_no_new', zaihai_stock_address = '$zaihai_stock_address_new' 
                                 WHERE zaihai_stock_address = '$zaihai_stock_address'";

@@ -46,7 +46,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_applicator_no_datalist_search'
+				method: 'get_applicator_no_datalist_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("al_applicator_no_search_list").innerHTML = response;
@@ -60,7 +61,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_location_datalist_search'
+				method: 'get_location_datalist_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("al_location_search_list").innerHTML = response;

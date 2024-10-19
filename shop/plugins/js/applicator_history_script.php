@@ -5,6 +5,7 @@
 		// get_car_maker_dropdown_search();
 		// get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
+		get_terminal_name_datalist_search();
 	});
 
 	// const get_car_maker_dropdown_search = () => {
@@ -41,10 +42,26 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_applicator_no_datalist_search'
+				method: 'get_applicator_no_datalist_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("aioh_applicator_no_search_list").innerHTML = response;
+			}
+		});
+	}
+
+	const get_terminal_name_datalist_search = () => {
+		$.ajax({
+			url: '../process/me/terminal/term_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_terminal_name_datalist_search',
+				page: 'shop'
+			},  
+			success: response => {
+				document.getElementById("aioh_terminal_name_search_list").innerHTML = response;
 			}
 		});
 	}

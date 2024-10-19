@@ -1,4 +1,8 @@
 <?php
+session_set_cookie_params(0, "/zaihai");
+session_name("zaihai");
+session_start();
+
 require '../../conn.php';
 
 $method = $_GET['method'];
@@ -35,8 +39,30 @@ if ($method == 'get_car_model_dropdown_search') {
 
 // Get Terminal Name Datalist
 if ($method == 'get_terminal_name_datalist_search') {
-	$sql = "SELECT terminal_name FROM m_terminal 
-            GROUP BY terminal_name ORDER BY terminal_name ASC";
+	$car_maker = '';
+    $car_model = '';
+
+    if (isset($_GET['page']) && $_GET['page'] == 'shop') {
+        if (isset($_SESSION['car_maker'])) {
+            $car_maker = $_SESSION['car_maker'];
+        }
+    
+        if (isset($_SESSION['car_model'])) {
+            $car_model = $_SESSION['car_model'];
+        }
+    }
+
+	$sql = "SELECT terminal_name FROM m_terminal WHERE 1=1";
+
+	if (!empty($car_maker)) {
+		$sql .= " AND car_maker='$car_maker'";
+	}
+	if (!empty($car_model)) {
+		$sql .= " AND car_model='$car_model'";
+	}
+
+	$sql .= " GROUP BY terminal_name ORDER BY terminal_name ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {

@@ -23,7 +23,7 @@ function check_csv ($file, $conn) {
     $row_valid_arr = array(0, 0);
 
     $notExistsApplicatorArr = array();
-    // $readyToUseOnlyArr = array();
+    $readyToUseOnlyArr = array();
 
     $message = "";
     $check_csv_row = 0;

@@ -94,7 +94,7 @@ if ($method == 'update_applicator') {
 								applicator_no = '$applicator_no'";
 
 					if ($zaihai_stock_address_old != $zaihai_stock_address) {
-						$query .= ", zaihai_stock_address = '$zaihai_stock_address'";
+						$query .= ", location = '$zaihai_stock_address'";
 					}
 
 					$query .= "WHERE id = '$id_al'";
