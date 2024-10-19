@@ -44,36 +44,26 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <div class="col-sm-2">
-                  <label>Car Maker</label>
-                  <select id="ao_car_maker_search" class="form-control" onchange="get_recent_applicator_out()">
-                    <option selected value="">All</option>
-                  </select>
-                </div>
-                <div class="col-sm-2">
-                  <label>Car Model</label>
-                  <select id="ao_car_model_search" class="form-control" onchange="get_recent_applicator_out()">
-                    <option selected value="">All</option>
-                  </select>
-                </div>
-                <div class="col-sm-2">
+                <input type="hidden" id="ao_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
+                <input type="hidden" id="ao_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
+                <div class="col-sm-3">
                     <label>Location</label>
                     <input list="ao_location_search_list" class="form-control" id="ao_location_search">
                     <datalist id="ao_location_search_list"></datalist>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <label>Applicator No.</label>
                   <input list="ao_applicator_no_search_list" class="form-control" id="ao_applicator_no_search">
                   <datalist id="ao_applicator_no_search_list"></datalist>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-5">
                   <label>Terminal Name</label>
                   <input list="ao_terminal_name_search_list" class="form-control" id="ao_terminal_name_search">
                   <datalist id="ao_terminal_name_search_list"></datalist>
                 </div>
               </div>
               <div class="row mb-2">
-                <div class="col-sm-3 offset-sm-6">
+                <div class="col-sm-2 offset-sm-7">
                   <button type="button" class="btn btn-secondary btn-block" onclick="export_recent_applicator_out('recentApplicatorOutTable')"><i class="fas fa-download"></i> Export</button>
                 </div>
                 <div class="col-sm-3">

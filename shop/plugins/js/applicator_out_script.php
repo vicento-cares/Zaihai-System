@@ -4,8 +4,8 @@
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
-		get_car_maker_dropdown_out_search();
-		get_car_model_dropdown_out_search();
+		// get_car_maker_dropdown_out_search();
+		// get_car_model_dropdown_out_search();
 		get_applicator_no_datalist_out_search();
 		get_terminal_name_datalist_out_search();
 		get_location_datalist_out_search();
@@ -13,33 +13,33 @@
 		realtime_get_recent_applicator_out = setInterval(get_recent_applicator_out, 10000);
 	});
 
-	const get_car_maker_dropdown_out_search = () => {
-		$.ajax({
-			url: '../process/shop/applicator_in_out/aio_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_maker_dropdown_out_search'
-			},  
-			success: response => {
-				document.getElementById("ao_car_maker_search").innerHTML = response;
-			}
-		});
-	}
+	// const get_car_maker_dropdown_out_search = () => {
+	// 	$.ajax({
+	// 		url: '../process/shop/applicator_in_out/aio_g_p.php',
+	// 		type: 'GET',
+	// 		cache: false,
+	// 		data: {
+	// 			method: 'get_car_maker_dropdown_out_search'
+	// 		},  
+	// 		success: response => {
+	// 			document.getElementById("ao_car_maker_search").innerHTML = response;
+	// 		}
+	// 	});
+	// }
 
-	const get_car_model_dropdown_out_search = () => {
-		$.ajax({
-			url: '../process/shop/applicator_in_out/aio_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_model_dropdown_out_search'
-			},  
-			success: response => {
-				document.getElementById("ao_car_model_search").innerHTML = response;
-			}
-		});
-	}
+	// const get_car_model_dropdown_out_search = () => {
+	// 	$.ajax({
+	// 		url: '../process/shop/applicator_in_out/aio_g_p.php',
+	// 		type: 'GET',
+	// 		cache: false,
+	// 		data: {
+	// 			method: 'get_car_model_dropdown_out_search'
+	// 		},  
+	// 		success: response => {
+	// 			document.getElementById("ao_car_model_search").innerHTML = response;
+	// 		}
+	// 	});
+	// }
 
 	const get_applicator_no_datalist_out_search = () => {
 		$.ajax({
@@ -47,7 +47,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_applicator_no_datalist_out_search'
+				method: 'get_applicator_no_datalist_out_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("ao_applicator_no_search_list").innerHTML = response;
@@ -61,7 +62,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_terminal_name_datalist_out_search'
+				method: 'get_terminal_name_datalist_out_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("ao_terminal_name_search_list").innerHTML = response;
@@ -75,7 +77,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_location_datalist_out_search'
+				method: 'get_location_datalist_out_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("ao_location_search_list").innerHTML = response;
@@ -149,7 +152,8 @@
 				car_model: car_model,
 				applicator_no: applicator_no,
 				terminal_name: terminal_name,
-				location: location
+				location: location,
+				page: 'shop'
 			},
 			success: (response) => {
                 $('#recentApplicatorOutData').html(response);

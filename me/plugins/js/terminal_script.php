@@ -158,7 +158,15 @@
 		});
 	}
 
-	const export_terminals = (table_id, separator = ',') => {
+    const export_terminals = () => {
+        let car_maker = sessionStorage.getItem('zs_term_car_maker_search');
+        let car_model = sessionStorage.getItem('zs_term_car_model_search');
+		let terminal_name = sessionStorage.getItem('zs_term_terminal_name_search');
+		let line_address = sessionStorage.getItem('zs_term_line_address_search');
+        window.open('../process/export/exp_terminal.php?car_maker=' + car_maker + "&car_model=" + car_model + "&terminal_name=" + terminal_name + "&line_address=" + line_address, '_blank');
+    }
+
+	const export_terminals_shown = (table_id, separator = ',') => {
         let car_maker = sessionStorage.getItem('zs_term_car_maker_search');
         let car_model = sessionStorage.getItem('zs_term_car_model_search');
 		let terminal_name = sessionStorage.getItem('zs_term_terminal_name_search');
@@ -397,11 +405,22 @@
         });
     }
 
-    const upload_csv = () => {
-        var file_form = document.getElementById('file_form');
-        var form_data = new FormData(file_form);
+    const upload_csv = opt => {
+        let file_form;
+        let url;
+
+        if (opt == 1) {
+            file_form = document.getElementById('file_form');
+            url = '../process/import/imp_terminal.php';
+        } else if (opt == 2) {
+            file_form = document.getElementById('file_form2');
+            url = '../process/import/imp_terminal_update.php';
+        }
+
+        let form_data = new FormData(file_form);
+
         $.ajax({
-            url: '../process/import/imp_terminal.php',
+            url: url,
             type: 'POST',
             dataType: 'text',
             cache: false,
@@ -443,6 +462,7 @@
                         get_terminals();
                     }
                     document.getElementById("file").value = '';
+                    document.getElementById("file2").value = '';
                 }, 500);
             }
         })

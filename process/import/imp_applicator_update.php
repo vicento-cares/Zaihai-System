@@ -45,6 +45,23 @@ function check_csv ($file, $conn) {
             $car_model = addslashes($line[1]);
             $applicator_no = addslashes($line[2]);
             $zaihai_stock_address = addslashes($line[3]);
+            $car_maker_new = addslashes($line[4]);
+            $car_model_new = addslashes($line[5]);
+            $applicator_no_new = addslashes($line[6]);
+            $zaihai_stock_address_new = addslashes($line[7]);
+
+            if (empty($car_maker_new) && empty($car_model_new) 
+                && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
+                continue; // Skip blank lines
+            } else if (empty($car_maker_new)) {
+                $car_maker_new = $car_maker;
+            } else if (empty($car_model_new)) {
+                $car_model_new = $car_model;
+            } else if (empty($applicator_no_new)) {
+                $applicator_no_new = $applicator_no;
+            } else if (empty($zaihai_stock_address_new)) {
+                $zaihai_stock_address_new = $zaihai_stock_address;
+            }
 
             if ($car_maker == '' || $car_model == '' || 
                 $applicator_no == '' || $zaihai_stock_address == '') {
@@ -57,7 +74,7 @@ function check_csv ($file, $conn) {
             // CHECK ROW VALIDATION
             // 0
             $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE applicator_no = '$applicator_no'";
+                    WHERE applicator_no = '$applicator_no_new'";
             $stmt = $conn -> prepare($sql);
             $stmt -> execute();
 
@@ -100,15 +117,15 @@ function check_csv ($file, $conn) {
             }
 
             // CHECK ROWS IF EXISTS
-            $sql = "SELECT id FROM m_applicator 
-                    WHERE zaihai_stock_address = '$zaihai_stock_address'";
-            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt -> execute();
-            if ($stmt -> rowCount() > 0) {
-                $isExistsOnDb = 1;
-                $hasError = 1;
-                array_push($isExistsOnDbArr, $check_csv_row);
-            }
+            // $sql = "SELECT id FROM m_applicator 
+            //         WHERE zaihai_stock_address = '$zaihai_stock_address'";
+            // $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+            // $stmt -> execute();
+            // if ($stmt -> rowCount() > 0) {
+            //     $isExistsOnDb = 1;
+            //     $hasError = 1;
+            //     array_push($isExistsOnDbArr, $check_csv_row);
+            // }
         }
     } else {
         //$message = $first_line;
@@ -125,9 +142,9 @@ function check_csv ($file, $conn) {
             $message = $message . 'Ready to use status only on Applicator List to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
         }
 
-        if ($isExistsOnDb == 1) {
-            $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
-        }
+        // if ($isExistsOnDb == 1) {
+        //     $message = $message . 'Record Already Exist on row/s ' . implode(", ", $isExistsOnDbArr) . '. ';
+        // }
         if ($hasBlankError >= 1) {
             $message = $message . 'Blank Cell Exists on row/s ' . implode(", ", $hasBlankErrorArr) . '. ';
         }
@@ -170,7 +187,6 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
             $error = 0;
 
             $isTransactionActive = false;
-            $chunkSize = 250; // Set your desired chunk size
 
             try {
                 if (!$isTransactionActive) {
@@ -178,117 +194,54 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     $isTransactionActive = true;
                 }
 
-                $sql_insert_applicator = "INSERT INTO m_applicator 
-                                            (car_maker, car_model, applicator_no, zaihai_stock_address) 
-                                            VALUES ";
-                $values = [];
-                $placeholders = [];
-
-                $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
-                                            (car_maker, car_model, applicator_no, location, status) 
-                                            VALUES ";
-                $values2 = [];
-                $placeholders2 = [];
-
                 while (($line = fgetcsv($csvFile)) !== false) {
                     // Check if the row is blank or consists only of whitespace
                     if (empty(implode('', $line))) {
                         continue; // Skip blank lines
                     }
 
-                    $car_maker = $line[0];
-                    $car_model = $line[1];
-                    $applicator_no = $line[2];
-                    $zaihai_stock_address = $line[3];
+                    $car_maker = addslashes($line[0]);
+                    $car_model = addslashes($line[1]);
+                    $applicator_no = addslashes($line[2]);
+                    $zaihai_stock_address = addslashes($line[3]);
+                    $car_maker_new = addslashes($line[4]);
+                    $car_model_new = addslashes($line[5]);
+                    $applicator_no_new = addslashes($line[6]);
+                    $zaihai_stock_address_new = addslashes($line[7]);
 
-                    // Create a temporary array for the current row
-                    $currentValues = [
-                        $car_maker,
-                        $car_model,
-                        $applicator_no,
-                        $zaihai_stock_address
-                    ];
+                    if (empty($car_maker_new) && empty($car_model_new) 
+                        && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
+                        continue; // Skip blank lines
+                    } else if (empty($car_maker_new)) {
+                        $car_maker_new = $car_maker;
+                    } else if (empty($car_model_new)) {
+                        $car_model_new = $car_model;
+                    } else if (empty($applicator_no_new)) {
+                        $applicator_no_new = $applicator_no;
+                    } else if (empty($zaihai_stock_address_new)) {
+                        $zaihai_stock_address_new = $zaihai_stock_address;
+                    }
 
-                    // Create a temporary array for the current row
-                    $currentValues2 = [
-                        $car_maker,
-                        $car_model,
-                        $applicator_no,
-                        $zaihai_stock_address,
-                        'Ready To Use'
-                    ];
+                    $query = "UPDATE t_applicator_list 
+                                SET car_maker = '$car_maker_new', car_model = '$car_model_new', 
+                                applicator_no = '$applicator_no_new', location = '$zaihai_stock_address_new'
+                                WHERE car_maker = '$car_maker' AND car_model = '$car_model' 
+                                AND applicator_no = '$applicator_no' AND location = '$zaihai_stock_address'";
 
-                    // Create placeholders for each row
-                    $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
-                    $placeholders[] = "($generated_placeholders)";
+                    $stmt = $conn->prepare($query);
+                    if ($stmt->execute()) {
+                        $stmt = NULL;
 
-                    // Create placeholders for each row
-                    $generated_placeholders2 = implode(',', array_fill(0, count($currentValues2), '?'));
-                    $placeholders2[] = "($generated_placeholders2)";
+                        $query = "UPDATE m_applicator 
+                                SET car_maker = '$car_maker_new', car_model = '$car_model_new', 
+                                applicator_no = '$applicator_no_new', zaihai_stock_address = '$zaihai_stock_address_new' 
+                                WHERE zaihai_stock_address = '$zaihai_stock_address'";
 
-                    // Add current values to the main values array
-                    $values = array_merge($values, $currentValues);
-
-                    // Add current values to the main values array
-                    $values2 = array_merge($values2, $currentValues2);
-
-                    // Check if we reached the chunk size
-                    if (count($placeholders) === $chunkSize) {
-                        // Combine the SQL statement with the placeholders
-                        $sql_insert_applicator .= implode(', ', $placeholders);
-                        
-                        // Prepare the statement
-                        $stmt = $conn->prepare($sql_insert_applicator);
-                        
-                        // Execute the statement with the values
-                        if (!$stmt->execute($values)) {
+                        $stmt = $conn->prepare($query);
+                        if (!$stmt->execute()) {
                             $error++;
                         }
-
-                        // Reset for the next chunk
-                        $placeholders = [];
-                        $values = [];
-                        $sql_insert_applicator = "INSERT INTO m_applicator 
-                                        (car_maker, car_model, applicator_no, zaihai_stock_address) 
-                                        VALUES ";
-                    }
-
-                    // Check if we reached the chunk size
-                    if (count($placeholders2) === $chunkSize) {
-                        // Combine the SQL statement with the placeholders
-                        $sql_insert_applicator_list .= implode(', ', $placeholders2);
-                        
-                        // Prepare the statement
-                        $stmt = $conn->prepare($sql_insert_applicator_list);
-                        
-                        // Execute the statement with the values
-                        if (!$stmt->execute($values2)) {
-                            $error++;
-                        }
-
-                        // Reset for the next chunk
-                        $placeholders2 = [];
-                        $values2 = [];
-                        $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
-                                        (car_maker, car_model, applicator_no, location, status) 
-                                        VALUES ";
-                    }
-                }
-
-                // Insert any remaining rows that didn't fill a complete chunk
-                if (!empty($placeholders)) {
-                    $sql_insert_applicator .= implode(', ', $placeholders);
-                    $stmt = $conn->prepare($sql_insert_applicator);
-                    if (!$stmt->execute($values)) {
-                        $error++;
-                    }
-                }
-
-                // Insert any remaining rows that didn't fill a complete chunk
-                if (!empty($placeholders2)) {
-                    $sql_insert_applicator_list .= implode(', ', $placeholders2);
-                    $stmt = $conn->prepare($sql_insert_applicator_list);
-                    if (!$stmt->execute($values2)) {
+                    } else {
                         $error++;
                     }
                 }

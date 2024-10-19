@@ -1,11 +1,17 @@
 <?php
+session_set_cookie_params(0, "/zaihai");
+session_name("zaihai");
+session_start();
+
 require '../../conn.php';
 
 $method = $_GET['method'];
 
 // Get Car Maker Dropdown
 if ($method == 'get_car_maker_dropdown_search') {
-	$sql = "SELECT car_maker FROM m_applicator GROUP BY car_maker ORDER BY car_maker ASC";
+	$sql = "SELECT a.car_maker FROM t_applicator_list al
+			LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no 
+			GROUP BY a.car_maker ORDER BY a.car_maker ASC";
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -20,7 +26,9 @@ if ($method == 'get_car_maker_dropdown_search') {
 
 // Get Car Model Dropdown
 if ($method == 'get_car_model_dropdown_search') {
-	$sql = "SELECT car_model FROM m_applicator GROUP BY car_model ORDER BY car_model ASC";
+	$sql = "SELECT a.car_model FROM t_applicator_list al
+			LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no 
+			GROUP BY a.car_model ORDER BY a.car_model ASC";
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -35,7 +43,30 @@ if ($method == 'get_car_model_dropdown_search') {
 
 // Get Applicator No. Datalist
 if ($method == 'get_applicator_no_datalist_search') {
-	$sql = "SELECT applicator_no FROM t_applicator_list GROUP BY applicator_no ORDER BY applicator_no ASC";
+	$car_maker = '';
+    $car_model = '';
+
+    if (isset($_GET['page']) && $_GET['page'] == 'shop') {
+        if (isset($_SESSION['car_maker'])) {
+            $car_maker = $_SESSION['car_maker'];
+        }
+    
+        if (isset($_SESSION['car_model'])) {
+            $car_model = $_SESSION['car_model'];
+        }
+    }
+
+	$sql = "SELECT applicator_no FROM t_applicator_list WHERE 1=1";
+
+	if (!empty($car_maker)) {
+		$sql .= " AND car_maker='$car_maker'";
+	}
+	if (!empty($car_model)) {
+		$sql .= " AND car_model='$car_model'";
+	}
+
+	$sql .= " GROUP BY applicator_no ORDER BY applicator_no ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
@@ -47,7 +78,30 @@ if ($method == 'get_applicator_no_datalist_search') {
 
 // Get Location Datalist
 if ($method == 'get_location_datalist_search') {
-	$sql = "SELECT location FROM t_applicator_list GROUP BY location ORDER BY location ASC";
+	$car_maker = '';
+    $car_model = '';
+
+    if (isset($_GET['page']) && $_GET['page'] == 'shop') {
+        if (isset($_SESSION['car_maker'])) {
+            $car_maker = $_SESSION['car_maker'];
+        }
+    
+        if (isset($_SESSION['car_model'])) {
+            $car_model = $_SESSION['car_model'];
+        }
+    }
+
+	$sql = "SELECT location FROM t_applicator_list WHERE 1=1";
+
+	if (!empty($car_maker)) {
+		$sql .= " AND car_maker='$car_maker'";
+	}
+	if (!empty($car_model)) {
+		$sql .= " AND car_model='$car_model'";
+	}
+
+	$sql .= " GROUP BY location ORDER BY location ASC";
+
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {

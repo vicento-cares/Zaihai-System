@@ -7,11 +7,11 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Accounts</h1>
+          <h1 class="m-0">Access Locations</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="accounts.php">Accounts</a></li>
+            <li class="breadcrumb-item"><a href="access_locations.php">Access Locations</a></li>
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -23,15 +23,15 @@
   <section class="content">
     <div class="container-fluid">
       <div class="row mb-4">
-        <div class="col-sm-3">
-          <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#new_account"><i class="fas fa-plus-circle"></i> Add Account</button>
+        <div class="col-sm-2">
+          <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#new_access_location"><i class="fas fa-plus-circle"></i> Add Location</button>
         </div>
       </div>
       <div class="row">
         <div class="col-sm-12">
           <div class="card card-gray-dark card-outline">
             <div class="card-header">
-              <h3 class="card-title"><i class="fas fa-user-cog"></i> Accounts Table</h3>
+              <h3 class="card-title"><i class="fas fa-shield-alt"></i> Access Locations Table</h3>
               <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                   <i class="fas fa-minus"></i>
@@ -45,49 +45,38 @@
             <div class="card-body">
               <div class="row mb-4">
                 <div class="col-sm-3">
-                  <label>Employee No.</label>
-                  <input type="text" id="acct_emp_no_search" class="form-control" maxlength="255" autocomplete="off">
-                </div>
-                <div class="col-sm-6">
-                  <label>Full Name</label>
-                  <input type="text" id="acct_full_name_search" class="form-control" maxlength="255" autocomplete="off">
-                </div>
-                <div class="col-sm-3">
-                  <label>Role</label>
-                  <select id="acct_role_search" class="form-control" onchange="get_accounts()">
-                    <option selected value="">Select Account Type</option>
-                    <option value="Shop">Shop</option>
-                    <option value="Inspector">Inspector</option>
-                    <option value="BM">BM</option>
-                    <option value="ME">ME</option>
+                  <label>Car Maker</label>
+                  <select id="al_car_maker_search" class="form-control" onchange="load_access_locations(1)">
+                    <option selected value="">All</option>
                   </select>
                 </div>
-              </div>
-              <div class="row mb-2">
-                <div class="col-sm-3 offset-sm-6">
-                  <button type="button" class="btn btn-secondary btn-block" onclick="export_accounts('accountsTable')"><i class="fas fa-download"></i> Export</button>
+                <div class="col-sm-3">
+                  <label>Car Model</label>
+                  <select id="al_car_model_search" class="form-control" onchange="load_access_locations(1)">
+                    <option selected value="">All</option>
+                  </select>
                 </div>
                 <div class="col-sm-3">
-                  <button type="button" class="btn btn-primary btn-block" onclick="get_accounts()"><i class="fas fa-search"></i> Search</button>
+                  <label>IP</label>
+                  <input type="text" class="form-control" id="al_ip_search" placeholder="Search" autocomplete="off" maxlength="255">
+                </div>
+                <div class="col-sm-3">
+                  <label>&nbsp;</label>
+                  <button type="button" class="btn bg-gray-dark btn-block" onclick="load_access_locations(1)"><i class="fas fa-search"></i> Search</button>
                 </div>
               </div>
-              <div class="row mb-2">
-                <div class="col-sm-2">
-                  <span id="count_view"></span>
-                </div>
-              </div>
-              <div class="table-responsive" style="max-height: 500px; overflow: auto; display:inline-block;">
-                <table id="accountsTable" class="table table-sm table-head-fixed text-nowrap table-hover">
+              <div id="list_of_access_locations_res" class="table-responsive" style="max-height: 500px; overflow: auto; display:inline-block;">
+                <table id="list_of_access_locations_table" class="table table-sm table-head-fixed text-nowrap table-hover">
                   <thead style="text-align: center;">
                     <tr>
                       <th>#</th>
-                      <th>Employee No.</th>
-                      <th>Full Name</th>
-                      <th>Role</th>
+                      <th>Car Maker</th>
+                      <th>Car Model</th>
+                      <th>IP</th>
                       <th>Date Updated</th>
                     </tr>
                   </thead>
-                  <tbody id="accountsData" style="text-align: center;">
+                  <tbody id="list_of_access_locations" style="text-align: center;">
                     <tr>
                       <td colspan="5" style="text-align:center;">
                         <div class="spinner-border text-dark" role="status">
@@ -97,6 +86,12 @@
                     </tr>
                   </tbody>
                 </table>
+              </div>
+              <div class="d-flex justify-content-sm-end">
+                <div class="dataTables_info" id="list_of_access_locations_info" role="status" aria-live="polite"></div>
+              </div>
+              <div class="d-flex justify-content-sm-center">
+                <button type="button" class="btn bg-gray-dark" id="btnNextPage" style="display:none;" onclick="get_next_page()">Load more</button>
               </div>
             </div>
             <!-- /.card-body -->
@@ -111,4 +106,4 @@
 </div>
 
 <?php include 'plugins/footer.php';?>
-<?php include 'plugins/js/accounts_script.php';?>
+<?php include 'plugins/js/access_locations_script.php';?>

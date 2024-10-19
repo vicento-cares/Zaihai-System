@@ -4,41 +4,41 @@
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
-		get_car_maker_dropdown_search();
-		get_car_model_dropdown_search();
+		// get_car_maker_dropdown_search();
+		// get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
 		get_location_datalist_search();
 		get_recent_applicator_list();
 		realtime_get_recent_applicator_list = setInterval(get_recent_applicator_list, 10000);
 	});
 
-	const get_car_maker_dropdown_search = () => {
-		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_maker_dropdown_search'
-			},  
-			success: response => {
-				document.getElementById("al_car_maker_search").innerHTML = response;
-			}
-		});
-	}
+	// const get_car_maker_dropdown_search = () => {
+	// 	$.ajax({
+	// 		url: '../process/shop/applicator_list/al_g_p.php',
+	// 		type: 'GET',
+	// 		cache: false,
+	// 		data: {
+	// 			method: 'get_car_maker_dropdown_search'
+	// 		},  
+	// 		success: response => {
+	// 			document.getElementById("al_car_maker_search").innerHTML = response;
+	// 		}
+	// 	});
+	// }
 
-	const get_car_model_dropdown_search = () => {
-		$.ajax({
-			url: '../process/shop/applicator_list/al_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_model_dropdown_search'
-			},  
-			success: response => {
-				document.getElementById("al_car_model_search").innerHTML = response;
-			}
-		});
-	}
+	// const get_car_model_dropdown_search = () => {
+	// 	$.ajax({
+	// 		url: '../process/shop/applicator_list/al_g_p.php',
+	// 		type: 'GET',
+	// 		cache: false,
+	// 		data: {
+	// 			method: 'get_car_model_dropdown_search'
+	// 		},  
+	// 		success: response => {
+	// 			document.getElementById("al_car_model_search").innerHTML = response;
+	// 		}
+	// 	});
+	// }
 
 	const get_applicator_no_datalist_search = () => {
 		$.ajax({
@@ -46,7 +46,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_applicator_no_datalist_search'
+				method: 'get_applicator_no_datalist_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("al_applicator_no_search_list").innerHTML = response;
@@ -60,7 +61,8 @@
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_location_datalist_search'
+				method: 'get_location_datalist_search',
+				page: 'shop'
 			},  
 			success: response => {
 				document.getElementById("al_location_search_list").innerHTML = response;

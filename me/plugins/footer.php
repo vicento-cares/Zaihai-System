@@ -16,6 +16,8 @@ include '../modals/new_applicator.php';
 include '../modals/update_applicator.php';
 include '../modals/new_terminal.php';
 include '../modals/update_terminal.php';
+include '../modals/new_access_location.php';
+include '../modals/update_access_location.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>

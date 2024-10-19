@@ -1,5 +1,5 @@
 <?php include 'plugins/navbar.php'; ?>
-<?php include 'plugins/sidebar/bm_bar.php'; ?>
+<?php include 'plugins/sidebar/shop_bar.php'; ?>
 
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
@@ -60,18 +60,8 @@
                   </div>
                 </div>
                 <div class="row mb-2">
-                  <div class="col-sm-3">
-                    <label>Car Maker</label>
-                    <select id="aioh_car_maker_search" class="form-control">
-                      <option selected value="">All</option>
-                    </select>
-                  </div>
-                  <div class="col-sm-3">
-                    <label>Car Model</label>
-                    <select id="aioh_car_model_search" class="form-control">
-                      <option selected value="">All</option>
-                    </select>
-                  </div>
+                  <input type="hidden" id="aioh_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
+                  <input type="hidden" id="aioh_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
                   <div class="col-sm-3">
                     <label>TRD No. Location</label>
                     <input type="text" class="form-control" id="aioh_trd_no_search" autocomplete="off" maxlength="255">
@@ -81,14 +71,14 @@
                     <input type="text" class="form-control" id="aioh_zaihai_stock_address_search" autocomplete="off"
                       maxlength="255">
                   </div>
-                </div>
-                <div class="row mb-2">
-                  <div class="col-sm-3 offset-sm-6">
+                  <div class="col-sm-3">
+                    <label>&nbsp;</label>
                     <button type="button" class="btn btn-secondary btn-block"
                       onclick="export_applicator_history('applicatorHistoryTable')"><i class="fas fa-download"></i>
                       Export</button>
                   </div>
                   <div class="col-sm-3">
+                    <label>&nbsp;</label>
                     <button type="submit" class="btn btn-success btn-block"><i class="fas fa-search"></i>
                       Search</button>
                   </div>
