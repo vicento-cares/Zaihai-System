@@ -1,4 +1,8 @@
 <?php
+session_set_cookie_params(0, "/zaihai");
+session_name("zaihai");
+session_start();
+
 require '../../conn.php';
 include '../../lib/main.php';
 
