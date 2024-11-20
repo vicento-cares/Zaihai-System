@@ -8,8 +8,8 @@ switch (true) {
         exit();
 }
 
-$applicator_no = addslashes(trim($_GET['applicator_no']));
-$terminal_name = addslashes(trim($_GET['terminal_name']));
+$applicator_no = trim($_GET['applicator_no']);
+$terminal_name = trim($_GET['terminal_name']);
 
 $delimiter = ","; 
 
@@ -32,21 +32,25 @@ fputs($f, "\xEF\xBB\xBF");
 $fields = array('Applicator No.', 'Terminal Name', 'Applicator No. New', 'Terminal Name New'); 
 fputcsv($f, $fields, $delimiter); 
 
-$sql = "SELECT id, applicator_no, terminal_name, date_updated FROM m_applicator_terminal";
+$sql = "SELECT id, applicator_no, terminal_name, date_updated 
+        FROM m_applicator_terminal 
+        WHERE applicator_no != ''";
+$params = [];
 
 if (!empty($applicator_no)) {
-    $sql .= " WHERE applicator_no LIKE '$applicator_no%'";
-} else {
-    $sql .= " WHERE applicator_no != ''";
+    $sql .= " AND applicator_no LIKE ?";
+    $params[] = $applicator_no . '%';
 }
+
 if (!empty($terminal_name)) {
-    $sql .= " AND terminal_name LIKE '$terminal_name%'";
+    $sql .= " AND terminal_name LIKE ?";
+    $params[] = $terminal_name . '%';
 }
 
 $sql .= " ORDER BY date_updated DESC";
 
 $stmt = $conn->prepare($sql);
-$stmt->execute();
+$stmt->execute($params);
 
 // Output each row of the data, format line as csv and write to file pointer 
 while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 

@@ -10,10 +10,10 @@ switch (true) {
         exit();
 }
 
-$car_maker = addslashes(trim($_GET['car_maker']));
-$car_model = addslashes(trim($_GET['car_model']));
-$terminal_name = addslashes(trim($_GET['terminal_name']));
-$line_address = addslashes(trim($_GET['line_address']));
+$car_maker = trim($_GET['car_maker']);
+$car_model = trim($_GET['car_model']);
+$terminal_name = trim($_GET['terminal_name']);
+$line_address = trim($_GET['line_address']);
 
 $delimiter = ","; 
 
@@ -42,27 +42,35 @@ fputs($f, "\xEF\xBB\xBF");
 $fields = array('Car Maker', 'Car Model', 'Terminal Name', 'Line Address', 'Car Maker New', 'Car Model New', 'Terminal Name New', 'Line Address New'); 
 fputcsv($f, $fields, $delimiter); 
 
-$sql = "SELECT id, car_maker, car_model, terminal_name, line_address, date_updated FROM m_terminal";
+$sql = "SELECT id, car_maker, car_model, terminal_name, line_address, date_updated 
+        FROM m_terminal 
+        WHERE terminal_name != ''";
+$params = [];
 
 if (!empty($terminal_name)) {
-    $sql .= " WHERE terminal_name LIKE '$terminal_name%'";
-} else {
-    $sql .= " WHERE terminal_name != ''";
+    $sql .= " AND terminal_name LIKE '$terminal_name%'";
+    $params[] = $terminal_name . '%';
 }
+
 if (!empty($car_maker)) {
     $sql .= " AND car_maker LIKE '$car_maker%'";
+    $params[] = $car_maker . '%';
 }
+
 if (!empty($car_model)) {
     $sql .= " AND car_model LIKE '$car_model%'";
+    $params[] = $car_model . '%';
 }
+
 if (!empty($line_address)) {
     $sql .= " AND line_address LIKE '$line_address%'";
+    $params[] = $line_address . '%';
 }
 
 $sql .= " ORDER BY date_updated DESC";
 
 $stmt = $conn->prepare($sql);
-$stmt->execute();
+$stmt->execute($params);
 
 // Output each row of the data, format line as csv and write to file pointer 
 while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 

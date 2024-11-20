@@ -41,10 +41,10 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $car_maker = addslashes($line[0]);
-            $car_model = addslashes($line[1]);
-            $applicator_no = addslashes($line[2]);
-            $zaihai_stock_address = addslashes($line[3]);
+            $car_maker = $line[0];
+            $car_model = $line[1];
+            $applicator_no = $line[2];
+            $zaihai_stock_address = $line[3];
 
             if ($car_maker == '' || $car_model == '' || 
                 $applicator_no == '' || $zaihai_stock_address == '') {
@@ -57,9 +57,10 @@ function check_csv ($file, $conn) {
             // CHECK ROW VALIDATION
             // 0
             $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE applicator_no = '$applicator_no'";
+                    WHERE applicator_no = ?";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
+            $params = array($applicator_no);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -71,9 +72,10 @@ function check_csv ($file, $conn) {
 
             // 1
             $sql = "SELECT status FROM t_applicator_list 
-                    WHERE applicator_no = '$applicator_no'";
+                    WHERE applicator_no = ?";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
+            $params = array($applicator_no);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -101,9 +103,10 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM m_applicator 
-                    WHERE zaihai_stock_address = '$zaihai_stock_address'";
-            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt -> execute();
+                    WHERE zaihai_stock_address = ?";
+            $stmt = $conn -> prepare($sql);
+            $params = array($zaihai_stock_address);
+            $stmt -> execute($params);
             if ($stmt -> rowCount() > 0) {
                 $isExistsOnDb = 1;
                 $hasError = 1;

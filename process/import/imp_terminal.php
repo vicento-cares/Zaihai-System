@@ -40,10 +40,10 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $car_maker = addslashes($line[0]);
-            $car_model = addslashes($line[1]);
-            $terminal_name = addslashes($line[2]);
-            $line_address = addslashes($line[3]);
+            $car_maker = $line[0];
+            $car_model = $line[1];
+            $terminal_name = $line[2];
+            $line_address = $line[3];
 
             if ($car_maker == '' || $car_model == '' || 
                 $terminal_name == '' || $line_address == '') {
@@ -56,9 +56,10 @@ function check_csv ($file, $conn) {
             // CHECK ROW VALIDATION
             // 0
             $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE terminal_name = '$terminal_name'";
-            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt -> execute();
+                    WHERE terminal_name = ?";
+            $stmt = $conn -> prepare($sql);
+            $params = array($terminal_name);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -82,9 +83,10 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM m_terminal 
-                    WHERE line_address = '$line_address'";
+                    WHERE line_address = ?";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
+            $params = array($line_address);
+            $stmt -> execute($params);
             if ($stmt -> rowCount() > 0) {
                 $isExistsOnDb = 1;
                 $hasError = 1;

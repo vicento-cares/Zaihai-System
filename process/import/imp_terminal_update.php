@@ -40,14 +40,14 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $car_maker = addslashes($line[0]);
-            $car_model = addslashes($line[1]);
-            $terminal_name = addslashes($line[2]);
-            $line_address = addslashes($line[3]);
-            $car_maker_new = addslashes($line[4]);
-            $car_model_new = addslashes($line[5]);
-            $terminal_name_new = addslashes($line[6]);
-            $line_address_new = addslashes($line[7]);
+            $car_maker = $line[0];
+            $car_model = $line[1];
+            $terminal_name = $line[2];
+            $line_address = $line[3];
+            $car_maker_new = $line[4];
+            $car_model_new = $line[5];
+            $terminal_name_new = $line[6];
+            $line_address_new = $line[7];
 
             if (empty($car_maker_new) && empty($car_model_new) 
                 && empty($terminal_name_new) && empty($line_address_new)) {
@@ -77,9 +77,10 @@ function check_csv ($file, $conn) {
             // CHECK ROW VALIDATION
             // 0
             $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE terminal_name = '$terminal_name_new'";
-            $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt -> execute();
+                    WHERE terminal_name = ?";
+            $stmt = $conn -> prepare($sql);
+            $params = array($terminal_name_new);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -103,9 +104,10 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             // $sql = "SELECT id FROM m_terminal 
-            //         WHERE line_address = '$line_address'";
+            //         WHERE line_address = ?";
             // $stmt = $conn -> prepare($sql);
-            // $stmt -> execute();
+            // $params = array($line_address);
+            // $stmt -> execute($params);
             // if ($stmt -> rowCount() > 0) {
             //     $isExistsOnDb = 1;
             //     $hasError = 1;
@@ -182,14 +184,14 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                         continue; // Skip blank lines
                     }
 
-                    $car_maker = addslashes($line[0]);
-                    $car_model = addslashes($line[1]);
-                    $terminal_name = addslashes($line[2]);
-                    $line_address = addslashes($line[3]);
-                    $car_maker_new = addslashes($line[4]);
-                    $car_model_new = addslashes($line[5]);
-                    $terminal_name_new = addslashes($line[6]);
-                    $line_address_new = addslashes($line[7]);
+                    $car_maker = $line[0];
+                    $car_model = $line[1];
+                    $terminal_name = $line[2];
+                    $line_address = $line[3];
+                    $car_maker_new = $line[4];
+                    $car_model_new = $line[5];
+                    $terminal_name_new = $line[6];
+                    $line_address_new = $line[7];
 
                     if (empty($car_maker_new) && empty($car_model_new) 
                         && empty($terminal_name_new) && empty($line_address_new)) {
@@ -209,12 +211,14 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     }
 
                     $sql = "UPDATE m_terminal 
-                            SET car_maker = '$car_maker_new', car_model = '$car_model_new', 
-                            terminal_name = '$terminal_name_new', line_address = '$line_address_new'
-                            WHERE line_address = '$line_address'";
+                            SET car_maker = ?, car_model = ?, 
+                            terminal_name = ?, line_address = ?
+                            WHERE line_address = ?";
 
                     $stmt = $conn->prepare($sql);
-                    if (!$stmt->execute()) {
+                    $params = array($car_maker_new, $car_model_new, 
+                                    $terminal_name_new, $line_address_new, $line_address);
+                    if (!$stmt->execute($params)) {
                         $error++;
                     }
                 }
