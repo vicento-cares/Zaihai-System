@@ -40,7 +40,10 @@ const timerIncrement = () => {
         default:
     }
 
-    if (url_path != "/zaihai/viewer/applicator_history.php") {
+    if (
+      url_path != "/zaihai/viewer/dashboard.php" || 
+      url_path != "/zaihai/viewer/applicator_history.php"
+    ) {
         window.location.href = '../index.php';
     }
   }

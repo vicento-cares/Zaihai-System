@@ -20,6 +20,12 @@
                     <li class="nav-item dropdown">
                         <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle active"><i class="fas fa-bars"></i> Menu</a>
                         <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                            <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/dashboard.php") { ?>
+                            <li><a href="dashboard.php" class="dropdown-item active">Dashboard</a></li>
+                            <?php } else { ?>
+                            <li><a href="dashboard.php" class="dropdown-item">Dashboard</a></li>
+                            <?php } ?>
+
                             <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/applicator_list.php") { ?>
                             <li><a href="applicator_list.php" class="dropdown-item active">Applicator List</a></li>
                             <?php } else { ?>

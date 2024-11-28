@@ -21,6 +21,8 @@
     <script src="../plugins/sweetalert2/dist/sweetalert2.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../dist/js/adminlte.min.js"></script>
+    <!-- ApexCharts -->
+    <script src="../plugins/apexcharts/3.22.2/js/apexcharts.min.js"></script>
 
     <!-- Idletime Script -->
     <script src="../dist/js/idletime_viewer.js"></script>
