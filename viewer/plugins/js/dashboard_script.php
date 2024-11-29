@@ -1,23 +1,26 @@
 <script type="text/javascript">
-	let applicator_adj_cnt_chart;
+	let month_a_adj_cnt_chart;
+	let month_term_usage_chart;
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
-		get_applicator_adj_cnt_chart_year_dropdown();
+		get_month_a_adj_cnt_chart_year_dropdown();
 		get_car_maker_dropdown();
 		get_car_model_dropdown();
+		get_month_term_usage_chart_year_dropdown();
+		get_terminal_name_dropdown();
 	});
 
-	const get_applicator_adj_cnt_chart_year_dropdown = () => {
+	const get_month_a_adj_cnt_chart_year_dropdown = () => {
 		$.ajax({
 			url: '../process/dashboard/dash_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_applicator_adj_cnt_chart_year_dropdown'
+				method: 'get_month_a_adj_cnt_chart_year_dropdown'
 			},  
 			success: response => {
-				document.getElementById("applicator_adj_cnt_year_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt_year_search").innerHTML = response;
 			}
 		});
 	}
@@ -31,7 +34,8 @@
 				method: 'get_car_maker_dropdown'
 			},  
 			success: response => {
-				document.getElementById("applicator_adj_cnt_car_maker_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt_car_maker_search").innerHTML = response;
+				document.getElementById("month_term_usage_car_maker_search").innerHTML = response;
 			}
 		});
 	}
@@ -45,14 +49,15 @@
 				method: 'get_car_model_dropdown'
 			},  
 			success: response => {
-				document.getElementById("applicator_adj_cnt_car_model_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt_car_model_search").innerHTML = response;
+				document.getElementById("month_term_usage_car_model_search").innerHTML = response;
 			}
 		});
 	}
 
 	const get_applicator_no_dropdown = () => {
-		let car_maker = document.getElementById("applicator_adj_cnt_car_maker_search").value;
-		let car_model = document.getElementById("applicator_adj_cnt_car_model_search").value;
+		let car_maker = document.getElementById("month_a_adj_cnt_car_maker_search").value;
+		let car_model = document.getElementById("month_a_adj_cnt_car_model_search").value;
 		$.ajax({
 			url: '../process/dashboard/dash_g_p.php',
 			type: 'GET',
@@ -63,29 +68,35 @@
 				car_model: car_model
 			},  
 			success: response => {
-				document.getElementById("applicator_adj_cnt_applicator_no_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt_applicator_no_search").innerHTML = response;
 			}
 		});
 	}
 
-	document.getElementById("applicator_adj_cnt_car_model_search").addEventListener("change", e => {
+	document.getElementById("month_a_adj_cnt_car_model_search").addEventListener("change", e => {
 		get_applicator_no_dropdown();
 	});
 
-	const get_applicator_adj_cnt_chart = () => {
-		let year = document.getElementById("applicator_adj_cnt_year_search").value;
-		let month = document.getElementById("applicator_adj_cnt_month_search").value;
-		let car_maker = document.getElementById("applicator_adj_cnt_car_maker_search").value;
-		let car_model = document.getElementById("applicator_adj_cnt_car_model_search").value;
-		let applicator_no = document.getElementById("applicator_adj_cnt_applicator_no_search").value;
-		let adjustment_content = document.getElementById("applicator_adj_cnt_adjustment_content_search").value;
+	document.getElementById("month_a_adj_cnt_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_a_adj_cnt_chart();
+	});
+
+	const get_month_a_adj_cnt_chart = () => {
+		let year = document.getElementById("month_a_adj_cnt_year_search").value;
+		let month = document.getElementById("month_a_adj_cnt_month_search").value;
+		let car_maker = document.getElementById("month_a_adj_cnt_car_maker_search").value;
+		let car_model = document.getElementById("month_a_adj_cnt_car_model_search").value;
+		let applicator_no = document.getElementById("month_a_adj_cnt_applicator_no_search").value;
+		let adjustment_content = document.getElementById("month_a_adj_cnt_adjustment_content_search").value;
+
 		$.ajax({
 			url: '../process/dashboard/dash_g_p.php',
 			type: 'GET',
 			cache: false,
 			dataType: 'json',
 			data: {
-				method: 'get_applicator_adj_cnt_chart',
+				method: 'get_month_a_adj_cnt_chart',
 				year: year,
 				month: month,
 				car_maker: car_maker,
@@ -97,6 +108,12 @@
 				console.log(response.categories);
 				console.log(response.data);
 
+				let concat_label = car_maker + ' ';
+
+				if (car_maker != car_model) {
+					concat_label += car_model;
+				}
+
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
 					return {
@@ -105,7 +122,7 @@
 					};
 				});
 
-				let ctx = document.querySelector("#applicator_adj_cnt_chart");
+				let ctx = document.querySelector("#month_a_adj_cnt_chart");
 
 				var options = {
 					chart: {
@@ -117,7 +134,7 @@
 						categories: response.categories
 					},
 					title: {
-						text: 'Applicator Adjustment Content Data',
+					text: `Monthly Applicator Adjustment Content Data of ${applicator_no} at ${concat_label} Zaihai Shop (${adjustment_content})`,
 						align: 'left'
 					},
 					stroke: {
@@ -133,12 +150,121 @@
 				};
 
 				// Destroy previous chart instance before creating a new one
-				if (applicator_adj_cnt_chart) {
-					applicator_adj_cnt_chart.destroy();
+				if (month_a_adj_cnt_chart) {
+					month_a_adj_cnt_chart.destroy();
 				}
 
-				applicator_adj_cnt_chart = new ApexCharts(ctx, options);
-				applicator_adj_cnt_chart.render();
+				month_a_adj_cnt_chart = new ApexCharts(ctx, options);
+				month_a_adj_cnt_chart.render();
+			}
+		});
+	}
+
+	const get_month_term_usage_chart_year_dropdown = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_month_term_usage_chart_year_dropdown'
+			},  
+			success: response => {
+				document.getElementById("month_term_usage_year_search").innerHTML = response;
+			}
+		});
+	}
+
+	const get_terminal_name_dropdown = () => {
+		$.ajax({
+			url: '../process/me/terminal/term_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_terminal_name_dropdown'
+			},  
+			success: response => {
+				document.getElementById("month_term_usage_terminal_name_search").innerHTML = response;
+			}
+		});
+	}
+
+	document.getElementById("month_term_usage_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_term_usage_chart();
+	});
+
+	const get_month_term_usage_chart = () => {
+		let year = document.getElementById("month_term_usage_year_search").value;
+		let month = document.getElementById("month_term_usage_month_search").value;
+		let car_maker = document.getElementById("month_term_usage_car_maker_search").value;
+		let car_model = document.getElementById("month_term_usage_car_model_search").value;
+		let terminal_name = document.getElementById("month_term_usage_terminal_name_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_term_usage_chart',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model,
+				terminal_name: terminal_name
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				let concat_label = car_maker + ' ';
+
+				if (car_maker != car_model) {
+					concat_label += car_model;
+				}
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data) // Convert the data object to an array
+					};
+				});
+
+				let ctx = document.querySelector("#month_term_usage_chart");
+
+				var options = {
+					chart: {
+						type: 'line',
+						height: 350
+					},
+					series: seriesData,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+					text: `Monthly Terminal Usage Data of ${terminal_name} on all TRD Machines at ${concat_label} Initial`,
+						align: 'left'
+					},
+					stroke: {
+						curve: 'smooth'
+					},
+					markers: {
+						size: 5
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_term_usage_chart) {
+					month_term_usage_chart.destroy();
+				}
+
+				month_term_usage_chart = new ApexCharts(ctx, options);
+				month_term_usage_chart.render();
 			}
 		});
 	}

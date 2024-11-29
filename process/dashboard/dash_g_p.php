@@ -4,9 +4,9 @@ require '../conn.php';
 
 $method = $_GET['method'];
 
-if ($method == 'get_applicator_adj_cnt_chart_year_dropdown') {
-    $sql = "SELECT DISTINCT YEAR(date_time_out) AS Year
-            FROM t_applicator_in_out_history
+if ($method == 'get_month_a_adj_cnt_chart_year_dropdown') {
+    $sql = "SELECT DISTINCT YEAR(inspection_date_time) AS Year
+            FROM t_applicator_c
             ORDER BY Year";
     $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
@@ -47,7 +47,7 @@ if ($method == 'get_applicator_no_dropdown') {
 	}
 }
 
-if ($method == 'get_applicator_adj_cnt_chart') {
+if ($method == 'get_month_a_adj_cnt_chart') {
     $year = addslashes($_GET['year']);
     $month = addslashes($_GET['month']);
     $car_maker = addslashes($_GET['car_maker']);
@@ -144,6 +144,122 @@ if ($method == 'get_applicator_adj_cnt_chart') {
 
     // Convert the associative array to a simple indexed array
     $data = array_values($applicatorData);
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data]);
+}
+
+if ($method == 'get_month_term_usage_chart_year_dropdown') {
+    $sql = "SELECT DISTINCT YEAR(date_time_out) AS Year
+            FROM t_applicator_in_out_history
+            ORDER BY Year";
+    $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt -> execute();
+	if ($stmt -> rowCount() > 0) {
+        echo '<option selected value="">Select Year</option>';
+		foreach($stmt -> fetchAll() as $row) {
+			echo '<option value="'.htmlspecialchars($row['Year']).'">'.htmlspecialchars($row['Year']).'</option>';
+		}
+	} else {
+		echo '<option selected value="">Select Year</option>';
+	}
+}
+
+if ($method == 'get_month_term_usage_chart') {
+    $year = addslashes($_GET['year']);
+    $month = addslashes($_GET['month']);
+    $car_maker = addslashes($_GET['car_maker']);
+    $car_model = addslashes($_GET['car_model']);
+    $terminal_name = addslashes($_GET['terminal_name']);
+
+    $data = [];
+    $categories = [];
+    $terminalData = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            WITH DateRange AS (
+                SELECT 
+                    DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+                FROM 
+                    master.dbo.spt_values
+                WHERE 
+                    type = 'P' AND 
+                    number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+            ),
+            FilteredApplicatorHistory AS (
+                SELECT 
+                    aioh.applicator_no,
+                    SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) AS terminal_name,
+                    CAST(aioh.date_time_out AS DATETIME2(2)) AS date_out
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE 
+                    aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
+                    AND a.car_maker = ? AND a.car_model = ? AND SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) = ?
+            )
+
+            SELECT 
+                CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+                fah.terminal_name,
+                COUNT(fah.terminal_name) AS total_terminal_usage
+            FROM 
+                DateRange dr
+            LEFT JOIN 
+                FilteredApplicatorHistory fah ON 
+                    fah.date_out >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+                    fah.date_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+            GROUP BY 
+                dr.report_date, fah.terminal_name
+            ORDER BY 
+                dr.report_date, fah.terminal_name";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $car_maker, $car_model, $terminal_name);
+    $stmt->execute($params);
+
+    // Fetch results and populate the terminalData array
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Add unique report_date to categories
+        if (!in_array($row['report_date'], $categories)) {
+            $categories[] = $row['report_date'];
+        }
+
+        if (!empty($row['terminal_name'])) {
+            // Initialize the terminal_name in the terminalData array if not already set
+            if (!isset($terminalData[$row['terminal_name']])) {
+                $terminalData[$row['terminal_name']] = [
+                    'name' => $row['terminal_name'],
+                    'data' => array_fill(0, count($categories), 0) // Initialize data array with zeros
+                ];
+            }
+
+            // Find the index of the current report_date in the categories array
+            $dateIndex = array_search($row['report_date'], $categories);
+            
+            // Update the total_terminal_usage count for the corresponding terminal_name and report_date
+            if ($dateIndex !== false) {
+                $terminalData[$row['terminal_name']]['data'][$dateIndex] = intval($row['total_terminal_usage']);
+            }
+        }
+    }
+
+    // Initialize all terminals with zero values for all dates
+    foreach ($terminalData as $terminalName => $terminal) {
+        // Ensure all terminals have data for all categories
+        foreach ($categories as $index => $date) {
+            if (!isset($terminalData[$terminalName]['data'][$index])) {
+                $terminalData[$terminalName]['data'][$index] = 0; // Set to zero if not already set
+            }
+        }
+    }
+
+    // Convert the associative array to a simple indexed array
+    $data = array_values($terminalData);
 
     // Encode the categories and data as JSON
     echo json_encode(['categories' => $categories, 'data' => $data]);
