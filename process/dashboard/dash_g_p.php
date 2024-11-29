@@ -265,4 +265,103 @@ if ($method == 'get_month_term_usage_chart') {
     echo json_encode(['categories' => $categories, 'data' => $data]);
 }
 
+if ($method == 'get_month_aioi_chart') {
+    $year = addslashes($_GET['year']);
+    $month = addslashes($_GET['month']);
+    $car_maker = addslashes($_GET['car_maker']);
+    $car_model = addslashes($_GET['car_model']);
+    $status = addslashes($_GET['status']);
+
+    $data = [];
+    $categories = [];
+
+    $sql = "";
+    $date_time_column = "";
+    $date_time_coumn2 = "";
+
+    if ($status == 'Out') {
+        $date_time_column = "date_time_out";
+        $date_time_coumn2 = "date_out";
+    } else if ($status == 'In') {
+        $date_time_column = "date_time_in";
+        $date_time_coumn2 = "date_in";
+    } else if ($status == 'Inspected') {
+        $date_time_column = "confirmation_date";
+        $date_time_coumn2 = "date_inspected";
+    }
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            WITH DateRange AS (
+                SELECT 
+                    DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+                FROM 
+                    master.dbo.spt_values
+                WHERE 
+                    type = 'P' AND 
+                    number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+            ),
+            FilteredApplicatorHistory AS (
+                SELECT 
+                    aioh.applicator_no,
+                    CAST(aioh.$date_time_column AS DATETIME2(2)) AS $date_time_coumn2
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE 
+                    aioh.$date_time_column >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.$date_time_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
+                    AND a.car_maker = ? AND a.car_model = ?
+            )
+
+            SELECT 
+                CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+                COUNT(fah.applicator_no) AS total
+            FROM 
+                DateRange dr
+            LEFT JOIN 
+                FilteredApplicatorHistory fah ON 
+                    fah.$date_time_coumn2 >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+                    fah.$date_time_coumn2 < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+            GROUP BY 
+                dr.report_date
+            ORDER BY 
+                dr.report_date";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $car_maker, $car_model);
+    $stmt->execute($params);
+
+    // Get the number of days in the specified month and year
+    $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+    // Initialize an array to hold the counts for the specified status
+    $statusCounts = array_fill(0, $daysInMonth, 0); // Assuming you want to initialize for 30 days
+
+    // Fetch results and populate the terminalData array
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Add unique report_date to categories
+        if (!in_array($row['report_date'], $categories)) {
+            $categories[] = $row['report_date'];
+        }
+
+        // Update the count for the specified status
+        $dateIndex = array_search($row['report_date'], $categories);
+        if ($dateIndex !== false) {
+            $statusCounts[$dateIndex] += intval($row['total']); // Use total for counts
+        }
+    }
+
+    // Create the final data structure
+    $data[] = [
+        'name' => $status,
+        'data' => $statusCounts
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data]);
+}
+
 $conn = null;

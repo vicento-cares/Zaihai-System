@@ -31,7 +31,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                 <h3 class="card-title"><i class="fas fa-cog mr-2"></i>Monthly Applicator Adjustment Content Chart</h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
+                                    <i class="fas fa-plus"></i>
                                     </button>
                                     <button type="button" class="btn btn-tool" data-card-widget="maximize">
                                     <i class="fas fa-expand"></i>
@@ -100,7 +100,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                         </div>
                                         <div class="row mb-4">
                                             <div class="col-sm-3 offset-sm-9">
-                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-search"></i> Generate</button>
+                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sync"></i> Generate</button>
                                             </div>
                                         </div>
                                     </form>
@@ -120,7 +120,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                 <h3 class="card-title"><i class="fas fa-dot-circle mr-2"></i>Monthly Terminal Usage Chart</h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
+                                    <i class="fas fa-plus"></i>
                                     </button>
                                     <button type="button" class="btn btn-tool" data-card-widget="maximize">
                                     <i class="fas fa-expand"></i>
@@ -177,11 +177,91 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                             <div class="col-sm-3">
                                                 <label>&nbsp;</label>
-                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-search"></i> Generate</button>
+                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sync"></i> Generate</button>
                                             </div>
                                         </div>
                                     </form>
                                     <div class="row" id="month_term_usage_chart"></div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline collapsed-card">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-list mr-2"></i>Monthly Applicator Out, In and Inspected Chart</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <form id="month_aioi_form">
+                                        <div class="row mb-2">
+                                            <div class="col-sm-3">
+                                                <label>Year</label>
+                                                <select id="month_aioi_year_search" class="form-control" required>
+                                                    <option selected value="">Select Year</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Month</label>
+                                                <select id="month_aioi_month_search" class="form-control" required>
+                                                    <option selected value="">Select Month</option>
+                                                    <option value="1">January</option>
+                                                    <option value="2">February</option>
+                                                    <option value="3">March</option>
+                                                    <option value="4">April</option>
+                                                    <option value="5">May</option>
+                                                    <option value="6">June</option>
+                                                    <option value="7">July</option>
+                                                    <option value="8">August</option>
+                                                    <option value="9">September</option>
+                                                    <option value="10">October</option>
+                                                    <option value="11">November</option>
+                                                    <option value="12">December</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <div class="col-sm-3">
+                                                <label>Car Maker</label>
+                                                <select id="month_aioi_car_maker_search" class="form-control" required>
+                                                    <option selected value="">Select Car Maker</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Car Model</label>
+                                                <select id="month_aioi_car_model_search" class="form-control" required>
+                                                    <option selected value="">Select Car Model</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Status</label>
+                                                <select id="month_aioi_status_search" class="form-control" required>
+                                                    <option selected value="">Select Status</option>
+                                                    <option value="Out">Out</option>
+                                                    <option value="In">In</option>
+                                                    <option value="Inspected">Inspected</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>&nbsp;</label>
+                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sync"></i> Generate</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="row" id="month_aioi_chart"></div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>

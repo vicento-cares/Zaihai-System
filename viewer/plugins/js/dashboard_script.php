@@ -1,6 +1,7 @@
 <script type="text/javascript">
 	let month_a_adj_cnt_chart;
 	let month_term_usage_chart;
+	let month_aioi_chart;
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
@@ -36,6 +37,7 @@
 			success: response => {
 				document.getElementById("month_a_adj_cnt_car_maker_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_maker_search").innerHTML = response;
+				document.getElementById("month_aioi_car_maker_search").innerHTML = response;
 			}
 		});
 	}
@@ -51,6 +53,7 @@
 			success: response => {
 				document.getElementById("month_a_adj_cnt_car_model_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_model_search").innerHTML = response;
+				document.getElementById("month_aioi_car_model_search").innerHTML = response;
 			}
 		});
 	}
@@ -170,6 +173,7 @@
 			},  
 			success: response => {
 				document.getElementById("month_term_usage_year_search").innerHTML = response;
+				document.getElementById("month_aioi_year_search").innerHTML = response;
 			}
 		});
 	}
@@ -265,6 +269,87 @@
 
 				month_term_usage_chart = new ApexCharts(ctx, options);
 				month_term_usage_chart.render();
+			}
+		});
+	}
+
+	document.getElementById("month_aioi_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_aioi_chart();
+	});
+
+	const get_month_aioi_chart = () => {
+		let year = document.getElementById("month_aioi_year_search").value;
+		let month = document.getElementById("month_aioi_month_search").value;
+		let car_maker = document.getElementById("month_aioi_car_maker_search").value;
+		let car_model = document.getElementById("month_aioi_car_model_search").value;
+		let status = document.getElementById("month_aioi_status_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_aioi_chart',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model,
+				status: status
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				let concat_label = car_maker + ' ';
+
+				if (car_maker != car_model) {
+					concat_label += car_model;
+				}
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data) // Convert the data object to an array
+					};
+				});
+
+				let ctx = document.querySelector("#month_aioi_chart");
+
+				var options = {
+					chart: {
+						type: 'line',
+						height: 350
+					},
+					series: seriesData,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+					text: `Monthly Applicator ${status} at ${concat_label} Zaihai Shop`,
+						align: 'left'
+					},
+					stroke: {
+						curve: 'smooth'
+					},
+					markers: {
+						size: 5
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_aioi_chart) {
+					month_aioi_chart.destroy();
+				}
+
+				month_aioi_chart = new ApexCharts(ctx, options);
+				month_aioi_chart.render();
 			}
 		});
 	}

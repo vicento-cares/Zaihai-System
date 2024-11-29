@@ -663,3 +663,38 @@ GROUP BY
     dr.report_date
 ORDER BY 
     dr.report_date;
+
+
+
+
+
+-- Average, Max and Standard Deviation of Delay from date_time_out to date_time_in on t_applicator_in_out_history
+SELECT 
+    b.car_maker,
+	b.car_model,
+	AVG(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS ave,
+    MAX(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS max_diff,
+	STDEV(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS std
+FROM 
+    t_applicator_in_out_history AS a 
+LEFT JOIN 
+    m_applicator AS b ON a.applicator_no = b.applicator_no
+WHERE a.date_time_out BETWEEN '2024-11-17 06:00:00' AND '2024-11-24 05:59:59'
+GROUP BY b.car_maker, b.car_model
+ORDER BY max_diff DESC;
+
+
+
+
+
+-- Elapsed Days of Delay from date_time_out to today on t_applicator_in_out
+SELECT
+	b.car_maker,
+	b.car_model,
+	a.applicator_no,
+	operator_out AS contact_person,
+	datediff(HOUR, date_time_out, GETDATE()) / 24 AS elapsed_days
+FROM t_applicator_in_out AS a
+LEFT JOIN m_applicator AS b ON a.applicator_no = b.applicator_no
+WHERE date_time_out IS NOT NULL AND date_time_in IS NULL
+ORDER BY elapsed_days DESC;
