@@ -24,6 +24,52 @@ include 'plugins/navbar/viewer_navbar.php';
             <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h4 class="pl-1">Current Applicator Status Count As of <?=date("F j, Y")?></h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="small-box bg-success">
+                                <div class="inner mb-3">
+                                    <h2 id="total_rtu"></h2>
+                                    <h4><b>Total Ready To Use</b></h4>
+                                    <h4>Applicators</h4>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-checkmark-circled"></i>
+                                </div>
+                                <div class="small-box-footer"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="small-box bg-danger">
+                                <div class="inner mb-3">
+                                    <h2 id="total_out"></h2>
+                                    <h4><b>Total Out</b></h4>
+                                    <h4>Applicators</h4>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-log-out"></i>
+                                </div>
+                                <div class="small-box-footer"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="small-box bg-warning">
+                                <div class="inner mb-3">
+                                    <h2 id="total_pending"></h2>
+                                    <h4><b>Total Pending</b></h4>
+                                    <h4>Applicators</h4>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-loop"></i>
+                                </div>
+                                <div class="small-box-footer"></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline collapsed-card">

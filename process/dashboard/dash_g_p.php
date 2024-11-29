@@ -4,6 +4,28 @@ require '../conn.php';
 
 $method = $_GET['method'];
 
+if ($method == 'get_applicator_list_status_count') {
+    $data = [];
+
+    $sql = "SELECT 
+                COUNT(CASE WHEN status = 'Ready To Use' THEN id END) AS total_rtu,
+                COUNT(CASE WHEN status = 'Out' THEN id END) AS total_out,
+                COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_pending
+            FROM t_applicator_list";
+    $stmt = $conn -> prepare($sql);
+    $stmt -> execute();
+
+    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+        $data = [
+            'total_rtu' => intval($row['total_rtu']), 
+            'total_out' => intval($row['total_out']), 
+            'total_pending' => intval($row['total_pending'])
+        ];
+    }
+
+    echo json_encode($data);
+}
+
 if ($method == 'get_month_a_adj_cnt_chart_year_dropdown') {
     $sql = "SELECT DISTINCT YEAR(inspection_date_time) AS Year
             FROM t_applicator_c
@@ -25,18 +47,22 @@ if ($method == 'get_applicator_no_dropdown') {
     $car_model = addslashes($_GET['car_model']);
 
 	$sql = "SELECT applicator_no FROM m_applicator WHERE 1=1";
+    $params = [];
 
 	if (!empty($car_maker)) {
-        $sql .= " AND car_maker='$car_maker'";
+        $sql .= " AND car_maker = ?";
+        $params[] = $car_maker;
     }
+
     if (!empty($car_model)) {
-        $sql .= " AND car_model='$car_model'";
+        $sql .= " AND car_model = ?";
+        $params[] = $car_model;
     }
 
 	$sql .= " GROUP BY applicator_no ORDER BY applicator_no ASC";
 
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt -> execute();
+	$stmt -> execute($params);
 	if ($stmt -> rowCount() > 0) {
         echo '<option selected value=""></option>';
 		foreach($stmt -> fetchAll() as $row) {
@@ -48,12 +74,12 @@ if ($method == 'get_applicator_no_dropdown') {
 }
 
 if ($method == 'get_month_a_adj_cnt_chart') {
-    $year = addslashes($_GET['year']);
-    $month = addslashes($_GET['month']);
-    $car_maker = addslashes($_GET['car_maker']);
-    $car_model = addslashes($_GET['car_model']);
-    $applicator_no = addslashes($_GET['applicator_no']);
-    $adjustment_content = addslashes($_GET['adjustment_content']);
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $applicator_no = $_GET['applicator_no'];
+    $adjustment_content = $_GET['adjustment_content'];
 
     $data = [];
     $categories = [];
@@ -166,11 +192,11 @@ if ($method == 'get_month_term_usage_chart_year_dropdown') {
 }
 
 if ($method == 'get_month_term_usage_chart') {
-    $year = addslashes($_GET['year']);
-    $month = addslashes($_GET['month']);
-    $car_maker = addslashes($_GET['car_maker']);
-    $car_model = addslashes($_GET['car_model']);
-    $terminal_name = addslashes($_GET['terminal_name']);
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $terminal_name = $_GET['terminal_name'];
 
     $data = [];
     $categories = [];
@@ -266,11 +292,11 @@ if ($method == 'get_month_term_usage_chart') {
 }
 
 if ($method == 'get_month_aioi_chart') {
-    $year = addslashes($_GET['year']);
-    $month = addslashes($_GET['month']);
-    $car_maker = addslashes($_GET['car_maker']);
-    $car_model = addslashes($_GET['car_model']);
-    $status = addslashes($_GET['status']);
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $status = $_GET['status'];
 
     $data = [];
     $categories = [];
