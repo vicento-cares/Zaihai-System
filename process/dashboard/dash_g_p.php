@@ -30,11 +30,14 @@ if ($method == 'get_month_a_adj_cnt_chart_year_dropdown') {
     $sql = "SELECT DISTINCT YEAR(inspection_date_time) AS Year
             FROM t_applicator_c
             ORDER BY Year";
-    $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    $stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
-        echo '<option selected value="">Select Year</option>';
-		foreach($stmt -> fetchAll() as $row) {
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
+		echo '<option selected value="">Select Year</option>';
+		foreach ($results as $row) {
 			echo '<option value="'.htmlspecialchars($row['Year']).'">'.htmlspecialchars($row['Year']).'</option>';
 		}
 	} else {
@@ -61,11 +64,14 @@ if ($method == 'get_applicator_no_dropdown') {
 
 	$sql .= " GROUP BY applicator_no ORDER BY applicator_no ASC";
 
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute($params);
-	if ($stmt -> rowCount() > 0) {
-        echo '<option selected value=""></option>';
-		foreach($stmt -> fetchAll() as $row) {
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
+		echo '<option selected value=""></option>';
+		foreach ($results as $row) {
 			echo '<option value="'.htmlspecialchars($row['applicator_no']).'">'.htmlspecialchars($row['applicator_no']).'</option>';
 		}
 	} else {
@@ -179,11 +185,14 @@ if ($method == 'get_month_term_usage_chart_year_dropdown') {
     $sql = "SELECT DISTINCT YEAR(date_time_out) AS Year
             FROM t_applicator_in_out_history
             ORDER BY Year";
-    $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    $stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
-        echo '<option selected value="">Select Year</option>';
-		foreach($stmt -> fetchAll() as $row) {
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
+		echo '<option selected value="">Select Year</option>';
+		foreach ($results as $row) {
 			echo '<option value="'.htmlspecialchars($row['Year']).'">'.htmlspecialchars($row['Year']).'</option>';
 		}
 	} else {

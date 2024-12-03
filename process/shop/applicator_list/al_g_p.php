@@ -9,14 +9,16 @@ $method = $_GET['method'];
 
 // Get Car Maker Dropdown
 if ($method == 'get_car_maker_dropdown_search') {
-	$sql = "SELECT a.car_maker FROM t_applicator_list al
-			LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no 
-			GROUP BY a.car_maker ORDER BY a.car_maker ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$sql = "SELECT car_maker FROM t_applicator_list
+			GROUP BY car_maker ORDER BY car_maker ASC";
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		foreach ($results as $row) {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
 		}
 	} else {
@@ -26,14 +28,16 @@ if ($method == 'get_car_maker_dropdown_search') {
 
 // Get Car Model Dropdown
 if ($method == 'get_car_model_dropdown_search') {
-	$sql = "SELECT a.car_model FROM t_applicator_list al
-			LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no 
-			GROUP BY a.car_model ORDER BY a.car_model ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$sql = "SELECT car_model FROM t_applicator_list
+			GROUP BY car_model ORDER BY car_model ASC";
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		foreach ($results as $row) {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
 		}
 	} else {
@@ -56,7 +60,7 @@ if ($method == 'get_applicator_no_datalist_search') {
         }
     }
 
-	$sql = "SELECT applicator_no FROM t_applicator_list WHERE 1=1";
+	$sql = "SELECT applicator_no FROM t_applicator_list WHERE car_maker != ''";
 
 	if (!empty($car_maker)) {
 		$sql .= " AND car_maker='$car_maker'";
@@ -67,12 +71,11 @@ if ($method == 'get_applicator_no_datalist_search') {
 
 	$sql .= " GROUP BY applicator_no ORDER BY applicator_no ASC";
 
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
-		foreach($stmt -> fetchAll() as $row) {
-			echo '<option value="'.$row['applicator_no'].'">';
-		}
+
+	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+		echo '<option value="'.$row['applicator_no'].'">';
 	}
 }
 
@@ -91,7 +94,7 @@ if ($method == 'get_location_datalist_search') {
         }
     }
 
-	$sql = "SELECT location FROM t_applicator_list WHERE 1=1";
+	$sql = "SELECT location FROM t_applicator_list WHERE car_maker != ''";
 
 	if (!empty($car_maker)) {
 		$sql .= " AND car_maker='$car_maker'";
@@ -102,12 +105,11 @@ if ($method == 'get_location_datalist_search') {
 
 	$sql .= " GROUP BY location ORDER BY location ASC";
 
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
-		foreach($stmt -> fetchAll() as $row) {
-			echo '<option value="'.$row['location'].'">';
-		}
+
+	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+		echo '<option value="'.$row['location'].'">';
 	}
 }
 
@@ -120,41 +122,78 @@ if ($method == 'get_recent_applicator_list') {
 
     $c = 0;
 
-    $sql = "SELECT a.car_maker, a.car_model, al.applicator_no, al.location, al.status, al.date_updated
-            FROM t_applicator_list al
-            LEFT JOIN m_applicator a ON al.applicator_no = a.applicator_no
-            WHERE 1=1";
+    $sql = "SELECT
+				car_maker,
+				car_model,
+				applicator_no,
+				location,
+				status,
+				-- Conditional formatting for elapsed time
+				CASE 
+					WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) < 1 THEN '< 1 min' 
+					ELSE 
+						-- Build the elapsed time string conditionally
+						LTRIM(
+							CASE 
+								WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) / 1440 > 0 THEN 
+									CAST(DATEDIFF(MINUTE, date_updated, GETDATE()) / 1440 AS VARCHAR(10)) + ' day' + 
+									CASE WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) / 1440 <> 1 THEN 's' ELSE '' END + 
+									CASE WHEN (DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 > 0 OR DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+								ELSE '' 
+							END +
+							CASE 
+								WHEN (DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 > 0 THEN 
+									CAST((DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+									CASE WHEN (DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+									CASE WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+								ELSE '' 
+							END +
+							CASE 
+								WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 > 0 THEN 
+									CAST(DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 AS VARCHAR(10)) + ' min' + 
+									CASE WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 <> 1 THEN 's' ELSE '' END 
+								ELSE '' 
+							END
+						) 
+				END AS elapsed_time,
+				date_updated
+			FROM t_applicator_list
+            WHERE car_maker != ''";
 
     if (!empty($car_maker)) {
-        $sql .= " AND a.car_maker='$car_maker'";
+        $sql .= " AND car_maker='$car_maker'";
     }
     if (!empty($car_model)) {
-        $sql .= " AND a.car_model='$car_model'";
+        $sql .= " AND car_model='$car_model'";
     }
     if (!empty($status)) {
-        $sql .= " AND al.status='$status'";
+        $sql .= " AND status='$status'";
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND al.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND applicator_no LIKE '%$applicator_no%'";
     }
     if (!empty($location)) {
-        $sql .= " AND al.location LIKE '%$location%'";
+        $sql .= " AND location LIKE '%$location%'";
     }
 
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$sql .= " ORDER BY status ASC, date_updated ASC";
+
+    $stmt = $conn->prepare($sql);
 	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
-            echo '<tr>';
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['car_maker'].'</td>';
-            echo '<td>'.$row['car_model'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['location'].'</td>';
-            echo '<td>'.$row['status'].'</td>';
-            echo '<td>'.$row['date_updated'].'</td>';
-            echo '</tr>';
-        }
+
+	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+		$c++;
+		echo '<tr>';
+		echo '<td>'.$c.'</td>';
+		echo '<td>'.$row['car_maker'].'</td>';
+		echo '<td>'.$row['car_model'].'</td>';
+		echo '<td>'.$row['applicator_no'].'</td>';
+		echo '<td>'.$row['location'].'</td>';
+		echo '<td>'.$row['status'].'</td>';
+		echo '<td>'.$row['elapsed_time'].'</td>';
+		echo '<td>'.$row['date_updated'].'</td>';
+		echo '</tr>';
     }
 }
+
+$conn = null;

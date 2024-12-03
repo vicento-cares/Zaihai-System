@@ -689,12 +689,78 @@ ORDER BY max_diff DESC;
 
 -- Elapsed Days of Delay from date_time_out to today on t_applicator_in_out
 SELECT
-	b.car_maker,
-	b.car_model,
-	a.applicator_no,
-	operator_out AS contact_person,
-	datediff(HOUR, date_time_out, GETDATE()) / 24 AS elapsed_days
+    b.car_maker,
+    b.car_model,
+    a.applicator_no,
+    operator_out AS contact_person,
+    -- Conditional formatting for elapsed time
+    CASE 
+        WHEN DATEDIFF(MINUTE, date_time_out, GETDATE()) < 1 THEN '< 1 min' 
+        ELSE 
+            -- Build the elapsed time string conditionally
+            LTRIM(
+                CASE 
+                    WHEN DATEDIFF(MINUTE, date_time_out, GETDATE()) / 1440 > 0 THEN 
+                        CAST(DATEDIFF(MINUTE, date_time_out, GETDATE()) / 1440 AS VARCHAR(10)) + ' day' + 
+                        CASE WHEN DATEDIFF(MINUTE, date_time_out, GETDATE()) / 1440 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN (DATEDIFF(MINUTE, date_time_out, GETDATE()) % 1440) / 60 > 0 OR DATEDIFF(MINUTE, date_time_out, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN (DATEDIFF(MINUTE, date_time_out, GETDATE()) % 1440) / 60 > 0 THEN 
+                        CAST((DATEDIFF(MINUTE, date_time_out, GETDATE()) % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+                        CASE WHEN (DATEDIFF(MINUTE, date_time_out, GETDATE()) % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN DATEDIFF(MINUTE, date_time_out, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN DATEDIFF(MINUTE, date_time_out, GETDATE()) % 60 > 0 THEN 
+                        CAST(DATEDIFF(MINUTE, date_time_out, GETDATE()) % 60 AS VARCHAR(10)) + ' min' + 
+                        CASE WHEN DATEDIFF(MINUTE, date_time_out, GETDATE()) % 60 <> 1 THEN 's' ELSE '' END 
+                    ELSE '' 
+                END
+            ) 
+    END AS elapsed_time
 FROM t_applicator_in_out AS a
 LEFT JOIN m_applicator AS b ON a.applicator_no = b.applicator_no
 WHERE date_time_out IS NOT NULL AND date_time_in IS NULL
-ORDER BY elapsed_days DESC;
+ORDER BY date_time_out ASC;
+
+-- Elapsed Days of Delay from date_updated to today on t_applicator_list
+SELECT
+    car_maker,
+    car_model,
+    applicator_no,
+	location,
+	status,
+    -- Conditional formatting for elapsed time
+    CASE 
+        WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) < 1 THEN '< 1 min' 
+        ELSE 
+            -- Build the elapsed time string conditionally
+            LTRIM(
+                CASE 
+                    WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) / 1440 > 0 THEN 
+                        CAST(DATEDIFF(MINUTE, date_updated, GETDATE()) / 1440 AS VARCHAR(10)) + ' day' + 
+                        CASE WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) / 1440 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN (DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 > 0 OR DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN (DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 > 0 THEN 
+                        CAST((DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+                        CASE WHEN (DATEDIFF(MINUTE, date_updated, GETDATE()) % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 > 0 THEN 
+                        CAST(DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 AS VARCHAR(10)) + ' min' + 
+                        CASE WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) % 60 <> 1 THEN 's' ELSE '' END 
+                    ELSE '' 
+                END
+            ) 
+    END AS elapsed_time,
+	date_updated
+FROM t_applicator_list
+ORDER BY status ASC, date_updated ASC;
