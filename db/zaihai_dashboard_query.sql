@@ -668,7 +668,8 @@ ORDER BY
 
 
 
--- Average, Max and Standard Deviation of Delay from date_time_out to date_time_in on t_applicator_in_out_history
+-- Average, Max and Standard Deviation of Delay from date_time_out to date_time_in on t_applicator_in_out_history 
+-- (1 Month - DS & NS) Specific Range
 SELECT 
     b.car_maker,
 	b.car_model,
@@ -679,9 +680,121 @@ FROM
     t_applicator_in_out_history AS a 
 LEFT JOIN 
     m_applicator AS b ON a.applicator_no = b.applicator_no
-WHERE a.date_time_out BETWEEN '2024-11-17 06:00:00' AND '2024-11-24 05:59:59'
+WHERE
+    a.date_time_out >= '2024-12-01 06:00:00' AND 
+    a.date_time_out < '2025-01-01 06:00:00'
 GROUP BY b.car_maker, b.car_model
 ORDER BY max_diff DESC;
+
+-- Average, Max and Standard Deviation of Delay from date_time_out to date_time_in on t_applicator_in_out_history 
+-- (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 11;   -- Specify the month (November)
+
+SELECT 
+    b.car_maker,
+	b.car_model,
+	AVG(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS ave,
+    MAX(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS max_diff,
+	STDEV(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS std
+FROM 
+    t_applicator_in_out_history AS a 
+LEFT JOIN 
+    m_applicator AS b ON a.applicator_no = b.applicator_no
+WHERE
+    a.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+    a.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))
+GROUP BY b.car_maker, b.car_model
+ORDER BY max_diff DESC;
+
+-- Average, Max and Standard Deviation of Delay from date_time_out to date_time_in on t_applicator_in_out_history 
+-- Per Applicator (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 12;   -- Specify the month (November)
+
+WITH AverageData AS (
+    SELECT 
+        b.car_maker,
+        b.car_model,
+		b.applicator_no,
+        AVG(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS ave,
+        MAX(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS max_diff,
+        STDEV(DATEDIFF(MINUTE, date_time_out, date_time_in)) AS std
+    FROM 
+        t_applicator_in_out_history AS a 
+    LEFT JOIN 
+        m_applicator AS b ON a.applicator_no = b.applicator_no
+    WHERE
+        a.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+        a.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))
+    GROUP BY b.car_maker, b.car_model, b.applicator_no
+)
+
+SELECT 
+    car_maker,
+    car_model,
+	applicator_no,
+    ave,
+    -- Use the ave column for ave_elapsed_time
+    CASE 
+        WHEN ave < 1 THEN '< 1 min' 
+        ELSE 
+            LTRIM(
+                CASE 
+                    WHEN ave / 1440 > 0 THEN 
+                        CAST(ave / 1440 AS VARCHAR(10)) + ' day' + 
+                        CASE WHEN ave / 1440 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN (ave % 1440) / 60 > 0 OR ave % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN (ave % 1440) / 60 > 0 THEN 
+                        CAST((ave % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+                        CASE WHEN (ave % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN ave % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN ave % 60 > 0 THEN 
+                        CAST(ave % 60 AS VARCHAR(10)) + ' min' + 
+                        CASE WHEN ave % 60 <> 1 THEN 's' ELSE '' END 
+                    ELSE '' 
+                END
+            ) 
+    END AS ave_elapsed_time,
+    max_diff,
+	-- Use the ave column for ave_elapsed_time
+    CASE 
+        WHEN max_diff < 1 THEN '< 1 min' 
+        ELSE 
+            LTRIM(
+                CASE 
+                    WHEN max_diff / 1440 > 0 THEN 
+                        CAST(max_diff / 1440 AS VARCHAR(10)) + ' day' + 
+                        CASE WHEN max_diff / 1440 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN (max_diff % 1440) / 60 > 0 OR ave % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN (max_diff % 1440) / 60 > 0 THEN 
+                        CAST((max_diff % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+                        CASE WHEN (max_diff % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+                        CASE WHEN max_diff % 60 > 0 THEN ', ' ELSE '' END
+                    ELSE '' 
+                END +
+                CASE 
+                    WHEN max_diff % 60 > 0 THEN 
+                        CAST(max_diff % 60 AS VARCHAR(10)) + ' min' + 
+                        CASE WHEN max_diff % 60 <> 1 THEN 's' ELSE '' END 
+                    ELSE '' 
+                END
+            ) 
+    END AS max_diff_elapsed_time,
+    std
+FROM 
+    AverageData
+ORDER BY max_diff DESC;
+
 
 
 

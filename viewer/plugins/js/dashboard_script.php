@@ -2,6 +2,7 @@
 	let month_a_adj_cnt_chart;
 	let month_term_usage_chart;
 	let month_aioi_chart;
+	let month_amd_chart;
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
@@ -155,7 +156,7 @@
 						categories: response.categories
 					},
 					title: {
-					text: `Monthly Applicator Adjustment Content Data of ${applicator_no} at ${concat_label} Zaihai Shop (${adjustment_content})`,
+						text: `Monthly Applicator Adjustment Content Data of ${applicator_no} at ${concat_label} Zaihai Shop (${adjustment_content})`,
 						align: 'left'
 					},
 					stroke: {
@@ -192,6 +193,7 @@
 			success: response => {
 				document.getElementById("month_term_usage_year_search").innerHTML = response;
 				document.getElementById("month_aioi_year_search").innerHTML = response;
+				document.getElementById("month_amd_year_search").innerHTML = response;
 			}
 		});
 	}
@@ -265,7 +267,7 @@
 						categories: response.categories
 					},
 					title: {
-					text: `Monthly Terminal Usage Data of ${terminal_name} on all TRD Machines at ${concat_label} Initial`,
+						text: `Monthly Terminal Usage Data of ${terminal_name} on all TRD Machines at ${concat_label} Initial`,
 						align: 'left'
 					},
 					stroke: {
@@ -346,7 +348,7 @@
 						categories: response.categories
 					},
 					title: {
-					text: `Monthly Applicator ${status} at ${concat_label} Zaihai Shop`,
+						text: `Monthly Applicator ${status} at ${concat_label} Zaihai Shop`,
 						align: 'left'
 					},
 					stroke: {
@@ -368,6 +370,108 @@
 
 				month_aioi_chart = new ApexCharts(ctx, options);
 				month_aioi_chart.render();
+			}
+		});
+	}
+
+	document.getElementById("month_amd_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_amd_chart();
+	});
+
+	const get_month_amd_chart = () => {
+		let year = document.getElementById("month_amd_year_search").value;
+		let month = document.getElementById("month_amd_month_search").value;
+		let between_element = document.getElementById("month_amd_between_search");
+		let between = between_element.value;
+		let between_label = '';
+
+		// Loop through the options in the select element
+		for (let i = 0; i < between_element.options.length; i++) {
+			if (between_element.options[i].value === between) {
+				between_label = between_element.options[i].innerHTML; // Get the inner HTML
+				break; // Exit the loop once found
+			}
+		}
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_amd_chart',
+				year: year,
+				month: month,
+				between: between
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data), // Convert the data object to an array
+						elapsed_time: Object.values(item.elapsed_time) // Include elapsed time
+					};
+				});
+
+				let ctx = document.querySelector("#month_amd_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%',
+							endingShape: 'rounded'
+						},
+					},
+					dataLabels: {
+						enabled: false
+					},
+					series: seriesData,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Monthly Average and Max Delay between ${between_label}`,
+						align: 'left'
+					},
+					tooltip: {
+						shared: true,
+						intersect: false,
+						followCursor: true, // Ensure this is set to true
+						custom: function({ series, seriesIndex, dataPointIndex, w }) {
+							dataPointIndex = parseInt(dataPointIndex);
+							// Access elapsed time for average and max
+							const averageElapsedTime = seriesData[0]['elapsed_time'][dataPointIndex];
+							const maxElapsedTime = seriesData[1]['elapsed_time'][dataPointIndex];
+							return `
+								<div>
+									<strong>${w.globals.labels[dataPointIndex]}</strong><br>
+									Average: ${series[0][dataPointIndex]}<br>
+									Elapsed Time: ${averageElapsedTime}<br>
+									Max: ${series[1][dataPointIndex]}<br>
+									Elapsed Time: ${maxElapsedTime}
+								</div>
+							`;
+						}
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_amd_chart) {
+					month_amd_chart.destroy();
+				}
+
+				month_amd_chart = new ApexCharts(ctx, options);
+				month_amd_chart.render();
 			}
 		});
 	}

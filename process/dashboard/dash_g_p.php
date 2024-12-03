@@ -399,4 +399,157 @@ if ($method == 'get_month_aioi_chart') {
     echo json_encode(['categories' => $categories, 'data' => $data]);
 }
 
+if ($method == 'get_month_amd_chart') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $between = $_GET['between'];
+
+    $data = [];
+    $categories = [];
+    $averageElapsedTimes = [];
+    $maxElapsedTimes = [];
+
+    $sql = "";
+    $date_time_column = "";
+    $date_time_coumn2 = "";
+
+    if ($between == 1) {
+        $date_time_column = "date_time_out";
+        $date_time_coumn2 = "date_time_in";
+    } else if ($between == 2) {
+        $date_time_column = "date_time_in";
+        $date_time_coumn2 = "confirmation_date";
+    }
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            WITH AverageData AS (
+                SELECT 
+                    b.car_maker,
+                    b.car_model,
+                    AVG(DATEDIFF(MINUTE, $date_time_column, $date_time_coumn2)) AS ave,
+                    MAX(DATEDIFF(MINUTE, $date_time_column, $date_time_coumn2)) AS max_diff,
+                    STDEV(DATEDIFF(MINUTE, $date_time_column, $date_time_coumn2)) AS std
+                FROM 
+                    t_applicator_in_out_history AS a 
+                LEFT JOIN 
+                    m_applicator AS b ON a.applicator_no = b.applicator_no
+                WHERE
+                    a.$date_time_column >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    a.$date_time_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))
+                GROUP BY b.car_maker, b.car_model
+            )
+
+            SELECT 
+                car_maker,
+                car_model,
+                ave,
+                -- Use the ave column for ave_elapsed_time
+                CASE 
+                    WHEN ave < 1 THEN '< 1 min' 
+                    ELSE 
+                        LTRIM(
+                            CASE 
+                                WHEN ave / 1440 > 0 THEN 
+                                    CAST(ave / 1440 AS VARCHAR(10)) + ' day' + 
+                                    CASE WHEN ave / 1440 <> 1 THEN 's' ELSE '' END + 
+                                    CASE WHEN (ave % 1440) / 60 > 0 OR ave % 60 > 0 THEN ', ' ELSE '' END
+                                ELSE '' 
+                            END +
+                            CASE 
+                                WHEN (ave % 1440) / 60 > 0 THEN 
+                                    CAST((ave % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+                                    CASE WHEN (ave % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+                                    CASE WHEN ave % 60 > 0 THEN ', ' ELSE '' END
+                                ELSE '' 
+                            END +
+                            CASE 
+                                WHEN ave % 60 > 0 THEN 
+                                    CAST(ave % 60 AS VARCHAR(10)) + ' min' + 
+                                    CASE WHEN ave % 60 <> 1 THEN 's' ELSE '' END 
+                                ELSE '' 
+                            END
+                        ) 
+                END AS ave_elapsed_time,
+                max_diff,
+                -- Use the ave column for ave_elapsed_time
+                CASE 
+                    WHEN max_diff < 1 THEN '< 1 min' 
+                    ELSE 
+                        LTRIM(
+                            CASE 
+                                WHEN max_diff / 1440 > 0 THEN 
+                                    CAST(max_diff / 1440 AS VARCHAR(10)) + ' day' + 
+                                    CASE WHEN max_diff / 1440 <> 1 THEN 's' ELSE '' END + 
+                                    CASE WHEN (max_diff % 1440) / 60 > 0 OR ave % 60 > 0 THEN ', ' ELSE '' END
+                                ELSE '' 
+                            END +
+                            CASE 
+                                WHEN (max_diff % 1440) / 60 > 0 THEN 
+                                    CAST((max_diff % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+                                    CASE WHEN (max_diff % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+                                    CASE WHEN max_diff % 60 > 0 THEN ', ' ELSE '' END
+                                ELSE '' 
+                            END +
+                            CASE 
+                                WHEN max_diff % 60 > 0 THEN 
+                                    CAST(max_diff % 60 AS VARCHAR(10)) + ' min' + 
+                                    CASE WHEN max_diff % 60 <> 1 THEN 's' ELSE '' END 
+                                ELSE '' 
+                            END
+                        ) 
+                END AS max_diff_elapsed_time,
+                std
+            FROM 
+                AverageData
+            ORDER BY max_diff DESC";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month);
+    $stmt->execute($params);
+
+    // Fetch results and populate the terminalData array
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add average and max values to data
+        $data['Average'][] = (float)$row['ave'];
+        $data['Max'][] = (float)$row['max_diff'];
+        $averageElapsedTimes[] = $row['ave_elapsed_time'];
+        $maxElapsedTimes[] = $row['max_diff_elapsed_time'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => [
+            [
+                'name' => 'Average',
+                'data' => $data['Average'],
+                'elapsed_time' => $averageElapsedTimes // Add elapsed time for average
+            ],
+            [
+                'name' => 'Max',
+                'data' => $data['Max'],
+                'elapsed_time' => $maxElapsedTimes // Add elapsed time for max
+            ]
+        ]
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
 $conn = null;

@@ -316,6 +316,71 @@ include 'plugins/navbar/viewer_navbar.php';
                         <!-- /.col -->
                     </div>
                     <!-- /.row -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline collapsed-card">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-clock mr-2"></i>Monthly Average and Max Delay Chart</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <form id="month_amd_form">
+                                        <div class="row mb-2">
+                                            <div class="col-sm-3">
+                                                <label>Year</label>
+                                                <select id="month_amd_year_search" class="form-control" required>
+                                                    <option selected value="">Select Year</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Month</label>
+                                                <select id="month_amd_month_search" class="form-control" required>
+                                                    <option selected value="">Select Month</option>
+                                                    <option value="1">January</option>
+                                                    <option value="2">February</option>
+                                                    <option value="3">March</option>
+                                                    <option value="4">April</option>
+                                                    <option value="5">May</option>
+                                                    <option value="6">June</option>
+                                                    <option value="7">July</option>
+                                                    <option value="8">August</option>
+                                                    <option value="9">September</option>
+                                                    <option value="10">October</option>
+                                                    <option value="11">November</option>
+                                                    <option value="12">December</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Between</label>
+                                                <select id="month_amd_between_search" class="form-control" required>
+                                                    <option selected value="">Select Between Dates</option>
+                                                    <option value="1">Applicator Out - Applicator In</option>
+                                                    <option value="2">Applicator In - Inspected</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>&nbsp;</label>
+                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sync"></i> Generate</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="row" id="month_amd_chart"></div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
                 </div>
             </div>
             <!-- /.content -->
