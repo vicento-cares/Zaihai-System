@@ -1,4 +1,6 @@
 <script type="text/javascript">
+	let current_applicator_list_status_count_chart;
+	let current_applicators_terminals_count_chart;
 	let month_a_adj_cnt_chart;
 	let month_term_usage_chart;
 	let month_aioi_chart;
@@ -7,7 +9,9 @@
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_list_status_count();
+		get_current_applicator_list_status_count_chart();
 		get_total_applicator_terminal_count();
+		get_current_applicators_terminals_count_chart();
 		get_month_a_adj_cnt_chart_year_dropdown();
 		get_car_maker_dropdown();
 		get_car_model_dropdown();
@@ -32,6 +36,69 @@
 		});
 	}
 
+	const get_current_applicator_list_status_count_chart = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_applicator_list_status_count_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#28a745', '#dc3545', '#ffc107'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#current_applicator_list_status_count_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%',
+							endingShape: 'rounded'
+						},
+					},
+					dataLabels: {
+						enabled: false
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Current Applicator Status Count`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_applicator_list_status_count_chart) {
+					current_applicator_list_status_count_chart.destroy();
+				}
+
+				current_applicator_list_status_count_chart = new ApexCharts(ctx, options);
+				current_applicator_list_status_count_chart.render();
+			}
+		});
+	}
+
 	const get_total_applicator_terminal_count = () => {
 		$.ajax({
 			url: '../process/dashboard/dash_g_p.php',
@@ -45,6 +112,69 @@
 				document.getElementById("total_applicator").innerHTML = `<b>${response.total_applicator}</b>`;
 				document.getElementById("total_terminal").innerHTML = `<b>${response.total_terminal}</b>`;
 				document.getElementById("total_applicator_terminal").innerHTML = `<b>${response.total_applicator_terminal}</b>`;
+			}
+		});
+	}
+
+	const get_current_applicators_terminals_count_chart = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_applicators_terminals_count_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#current_applicators_terminals_count_chart");
+
+				// Define colors
+				const colors = ['#3c8dbc', '#20c997'];
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%',
+							endingShape: 'rounded'
+						},
+					},
+					dataLabels: {
+						enabled: false
+					},
+					series: seriesData,
+					colors: colors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Current Applicator and Terminal Count`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_applicators_terminals_count_chart) {
+					current_applicators_terminals_count_chart.destroy();
+				}
+
+				current_applicators_terminals_count_chart = new ApexCharts(ctx, options);
+				current_applicators_terminals_count_chart.render();
 			}
 		});
 	}

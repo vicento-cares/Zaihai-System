@@ -72,6 +72,41 @@ FROM m_terminal
 
 
 
+-- Combine applicator_counts and terminal_counts Group by Car Maker and Car Model
+WITH 
+    applicator_counts AS (
+        SELECT 
+            car_maker,
+            car_model,
+            COUNT(id) AS total_applicator
+        FROM m_applicator
+        GROUP BY car_maker, car_model
+    ),
+    terminal_counts AS (
+        SELECT 
+            car_maker,
+            car_model,
+            COUNT(id) AS total_terminal
+        FROM m_terminal
+        GROUP BY car_maker, car_model
+    )
+
+SELECT 
+    COALESCE(a.car_maker, t.car_maker) AS car_maker,
+    COALESCE(a.car_model, t.car_model) AS car_model,
+    COALESCE(a.total_applicator, 0) AS total_applicator,
+    COALESCE(t.total_terminal, 0) AS total_terminal
+FROM 
+    applicator_counts a
+FULL OUTER JOIN 
+    terminal_counts t ON a.car_maker = t.car_maker AND a.car_model = t.car_model
+ORDER BY
+	total_applicator DESC, total_terminal DESC;
+
+
+
+
+
 -- Count total applicator with terminal on m_applicator_terminal
 
 -- All applicator with terminal

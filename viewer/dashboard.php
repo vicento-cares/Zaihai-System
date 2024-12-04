@@ -24,98 +24,138 @@ include 'plugins/navbar/viewer_navbar.php';
             <!-- Main content -->
             <div class="content">
                 <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-12">
-                            <h4 class="pl-1">Current Applicator Status Count As of <?=date("F j, Y")?></h4>
-                        </div>
-                    </div>
                     <div class="row">
-                        <div class="col-sm-4">
-                            <div class="small-box bg-success">
-                                <div class="inner mb-3">
-                                    <h2 id="total_rtu"></h2>
-                                    <h4><b>Total Ready To Use</b></h4>
-                                    <h4>Applicators</h4>
-                                </div>
-                                <div class="icon">
-                                    <i class="ion ion-checkmark-circled"></i>
-                                </div>
-                                <div class="small-box-footer"></div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="small-box bg-danger">
-                                <div class="inner mb-3">
-                                    <h2 id="total_out"></h2>
-                                    <h4><b>Total Out</b></h4>
-                                    <h4>Applicators</h4>
-                                </div>
-                                <div class="icon">
-                                    <i class="ion ion-log-out"></i>
-                                </div>
-                                <div class="small-box-footer"></div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="small-box bg-warning">
-                                <div class="inner mb-3">
-                                    <h2 id="total_pending"></h2>
-                                    <h4><b>Total Pending</b></h4>
-                                    <h4>Applicators</h4>
-                                </div>
-                                <div class="icon">
-                                    <i class="ion ion-loop"></i>
-                                </div>
-                                <div class="small-box-footer"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
                         <div class="col-sm-12">
-                            <h4 class="pl-1">Current Registered Applicators & Terminals Count As of <?=date("F j, Y")?></h4>
+                            <div class="card card-gray-dark card-outline">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Registered Applicators & Terminals Count as of <?=date("F j, Y")?></h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-success">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_rtu"></h2>
+                                                    <h4><b>Total Ready To Use</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-checkmark-circled"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-danger">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_out"></h2>
+                                                    <h4><b>Total Out</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-log-out"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-warning">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_pending"></h2>
+                                                    <h4><b>Total Pending</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-loop"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="current_applicator_list_status_count_chart"></div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
                         </div>
+                        <!-- /.col -->
                     </div>
+                    <!-- /.row -->
                     <div class="row">
-                        <div class="col-sm-4">
-                            <div class="small-box bg-dark-gray">
-                                <div class="inner mb-3">
-                                    <h2 id="total_applicator_terminal"></h2>
-                                    <h4><b>Total</b></h4>
-                                    <h4>Applicator Terminal</h4>
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Registered Applicators & Terminals Count as of <?=date("F j, Y")?></h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
                                 </div>
-                                <div class="icon">
-                                    <i class="ion ion-gear-a"></i>
                                 </div>
-                                <div class="small-box-footer"></div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-secondary">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_applicator_terminal"></h2>
+                                                    <h4><b>Total</b></h4>
+                                                    <h4>Applicator Terminal</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-gear-a"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-lightblue">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_applicator"></h2>
+                                                    <h4><b>Total</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-gear-b"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-teal">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_terminal"></h2>
+                                                    <h4><b>Total</b></h4>
+                                                    <h4>Terminals</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-record"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="current_applicators_terminals_count_chart"></div>
+                                </div>
+                                <!-- /.card-body -->
                             </div>
+                            <!-- /.card -->
                         </div>
-                        <div class="col-sm-4">
-                            <div class="small-box bg-secondary">
-                                <div class="inner mb-3">
-                                    <h2 id="total_applicator"></h2>
-                                    <h4><b>Total</b></h4>
-                                    <h4>Applicators</h4>
-                                </div>
-                                <div class="icon">
-                                    <i class="ion ion-gear-b"></i>
-                                </div>
-                                <div class="small-box-footer"></div>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="small-box bg-white">
-                                <div class="inner mb-3">
-                                    <h2 id="total_terminal"></h2>
-                                    <h4><b>Total</b></h4>
-                                    <h4>Terminals</h4>
-                                </div>
-                                <div class="icon">
-                                    <i class="ion ion-record"></i>
-                                </div>
-                                <div class="small-box-footer"></div>
-                            </div>
-                        </div>
+                        <!-- /.col -->
                     </div>
+                    <!-- /.row -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline collapsed-card">
