@@ -26,6 +26,36 @@ if ($method == 'get_applicator_list_status_count') {
     echo json_encode($data);
 }
 
+if ($method == 'get_total_applicator_terminal_count') {
+    $data = [];
+
+    $sql = "WITH 
+                applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator),
+                terminal_count AS (SELECT COUNT(id) AS total_terminal FROM m_terminal),
+                applicator_terminal_count AS (SELECT COUNT(id) AS total_applicator_terminal FROM m_applicator_terminal)
+
+            SELECT 
+                a.total_applicator,
+                t.total_terminal,
+                at.total_applicator_terminal
+            FROM 
+                applicator_count a,
+                terminal_count t,
+                applicator_terminal_count at";
+    $stmt = $conn -> prepare($sql);
+    $stmt -> execute();
+
+    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+        $data = [
+            'total_applicator' => intval($row['total_applicator']), 
+            'total_terminal' => intval($row['total_terminal']), 
+            'total_applicator_terminal' => intval($row['total_applicator_terminal'])
+        ];
+    }
+
+    echo json_encode($data);
+}
+
 if ($method == 'get_month_a_adj_cnt_chart_year_dropdown') {
     $sql = "SELECT DISTINCT YEAR(inspection_date_time) AS Year
             FROM t_applicator_c

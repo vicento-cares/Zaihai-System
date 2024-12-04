@@ -79,6 +79,29 @@ SELECT
 	COUNT(id) AS total_applicator_terminal
 FROM m_applicator_terminal;
 
+
+
+
+
+-- Combined Query for applicator_count, terminal_count and applicator_terminal_count
+WITH 
+    applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator),
+    terminal_count AS (SELECT COUNT(id) AS total_terminal FROM m_terminal),
+    applicator_terminal_count AS (SELECT COUNT(id) AS total_applicator_terminal FROM m_applicator_terminal)
+
+SELECT 
+    a.total_applicator,
+    t.total_terminal,
+    at.total_applicator_terminal
+FROM 
+    applicator_count a,
+    terminal_count t,
+    applicator_terminal_count at;
+
+
+
+
+
 -- Count total clean, adjust, replace, repair and beyond the limit on t_applicator_c
 
 -- All results

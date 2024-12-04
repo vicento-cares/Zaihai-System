@@ -70,6 +70,52 @@ include 'plugins/navbar/viewer_navbar.php';
                             </div>
                         </div>
                     </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h4 class="pl-1">Current Registered Applicators & Terminals Count As of <?=date("F j, Y")?></h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="small-box bg-dark-gray">
+                                <div class="inner mb-3">
+                                    <h2 id="total_applicator_terminal"></h2>
+                                    <h4><b>Total</b></h4>
+                                    <h4>Applicator Terminal</h4>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-gear-a"></i>
+                                </div>
+                                <div class="small-box-footer"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="small-box bg-secondary">
+                                <div class="inner mb-3">
+                                    <h2 id="total_applicator"></h2>
+                                    <h4><b>Total</b></h4>
+                                    <h4>Applicators</h4>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-gear-b"></i>
+                                </div>
+                                <div class="small-box-footer"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="small-box bg-white">
+                                <div class="inner mb-3">
+                                    <h2 id="total_terminal"></h2>
+                                    <h4><b>Total</b></h4>
+                                    <h4>Terminals</h4>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-record"></i>
+                                </div>
+                                <div class="small-box-footer"></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline collapsed-card">

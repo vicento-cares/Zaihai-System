@@ -7,6 +7,7 @@
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_list_status_count();
+		get_total_applicator_terminal_count();
 		get_month_a_adj_cnt_chart_year_dropdown();
 		get_car_maker_dropdown();
 		get_car_model_dropdown();
@@ -27,6 +28,23 @@
 				document.getElementById("total_rtu").innerHTML = `<b>${response.total_rtu}</b>`;
 				document.getElementById("total_out").innerHTML = `<b>${response.total_out}</b>`;
 				document.getElementById("total_pending").innerHTML = `<b>${response.total_pending}</b>`;
+			}
+		});
+	}
+
+	const get_total_applicator_terminal_count = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_total_applicator_terminal_count'
+			},  
+			success: response => {
+				document.getElementById("total_applicator").innerHTML = `<b>${response.total_applicator}</b>`;
+				document.getElementById("total_terminal").innerHTML = `<b>${response.total_terminal}</b>`;
+				document.getElementById("total_applicator_terminal").innerHTML = `<b>${response.total_applicator_terminal}</b>`;
 			}
 		});
 	}
