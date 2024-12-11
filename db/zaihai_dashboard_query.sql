@@ -143,8 +143,8 @@ FROM
 SELECT 
     COUNT(CASE WHEN adjustment_content = 'Clean' THEN id END) AS total_clean,
     COUNT(CASE WHEN adjustment_content = 'Adjust' THEN id END) AS total_adjust,
-	COUNT(CASE WHEN adjustment_content = 'Repair' THEN id END) AS total_replace,
-	COUNT(CASE WHEN adjustment_content = 'Replace' THEN id END) AS total_repair,
+	COUNT(CASE WHEN adjustment_content = 'Repair' THEN id END) AS total_repair,
+	COUNT(CASE WHEN adjustment_content = 'Replace' THEN id END) AS total_replace,
     COUNT(CASE WHEN adjustment_content = 'Beyond The Limit' THEN id END) AS total_btl
   FROM t_applicator_c;
 
@@ -152,8 +152,8 @@ SELECT
 SELECT 
     COUNT(CASE WHEN adjustment_content = 'Clean' THEN id END) AS total_clean,
     COUNT(CASE WHEN adjustment_content = 'Adjust' THEN id END) AS total_adjust,
-	COUNT(CASE WHEN adjustment_content = 'Repair' THEN id END) AS total_replace,
-	COUNT(CASE WHEN adjustment_content = 'Replace' THEN id END) AS total_repair,
+	COUNT(CASE WHEN adjustment_content = 'Repair' THEN id END) AS total_repair,
+	COUNT(CASE WHEN adjustment_content = 'Replace' THEN id END) AS total_replace,
     COUNT(CASE WHEN adjustment_content = 'Beyond The Limit' THEN id END) AS total_btl
   FROM t_applicator_c
   WHERE inspection_date_time LIKE '2024-11-03%';
@@ -164,8 +164,8 @@ SELECT
 	a.car_model,
     COUNT(CASE WHEN ac.adjustment_content = 'Clean' THEN ac.id END) AS total_clean,
     COUNT(CASE WHEN ac.adjustment_content = 'Adjust' THEN ac.id END) AS total_adjust,
-	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_replace,
-	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_replace,
     COUNT(CASE WHEN ac.adjustment_content = 'Beyond The Limit' THEN ac.id END) AS total_btl
   FROM t_applicator_c ac
   LEFT JOIN 
@@ -182,8 +182,8 @@ SELECT
 	a.applicator_no,
     COUNT(CASE WHEN ac.adjustment_content = 'Clean' THEN ac.id END) AS total_clean,
     COUNT(CASE WHEN ac.adjustment_content = 'Adjust' THEN ac.id END) AS total_adjust,
-	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_replace,
-	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_replace,
     COUNT(CASE WHEN ac.adjustment_content = 'Beyond The Limit' THEN ac.id END) AS total_btl
   FROM t_applicator_c ac
   LEFT JOIN 
@@ -200,8 +200,8 @@ SELECT
 	a.applicator_no,
     COUNT(CASE WHEN ac.adjustment_content = 'Clean' THEN ac.id END) AS total_clean,
     COUNT(CASE WHEN ac.adjustment_content = 'Adjust' THEN ac.id END) AS total_adjust,
-	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_replace,
-	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_replace,
     COUNT(CASE WHEN ac.adjustment_content = 'Beyond The Limit' THEN ac.id END) AS total_btl
   FROM t_applicator_c ac
   LEFT JOIN 
@@ -218,8 +218,8 @@ SELECT
 	a.applicator_no,
     COUNT(CASE WHEN ac.adjustment_content = 'Clean' THEN ac.id END) AS total_clean,
     COUNT(CASE WHEN ac.adjustment_content = 'Adjust' THEN ac.id END) AS total_adjust,
-	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_replace,
-	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_replace,
     COUNT(CASE WHEN ac.adjustment_content = 'Beyond The Limit' THEN ac.id END) AS total_btl
   FROM t_applicator_c ac
   LEFT JOIN 
@@ -273,6 +273,78 @@ GROUP BY
 ORDER BY 
     dr.report_date, fah.applicator_no;
 
+-- Daily Count per Car Maker, Car Model of (Adjust, Replace, Repair, Beyond The Limit) Applicator 
+-- based on t_applicator_c 1 Month (DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 11;   -- Specify the month (November)
+
+SELECT 
+	a.car_maker,
+	a.car_model,
+    COUNT(CASE WHEN ac.adjustment_content = 'Adjust' THEN ac.id END) AS total_adjust,
+	COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_repair,
+	COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_replace,
+    COUNT(CASE WHEN ac.adjustment_content = 'Beyond The Limit' THEN ac.id END) AS total_btl
+  FROM t_applicator_c ac
+  LEFT JOIN 
+    m_applicator a ON 
+         ac.equipment_no = SUBSTRING(a.applicator_no, 1, CHARINDEX('/', a.applicator_no) - 1) AND
+         ac.machine_no = SUBSTRING(a.applicator_no, CHARINDEX('/', a.applicator_no) + 1, LEN(a.applicator_no))
+  WHERE 
+	ac.inspection_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+	ac.inspection_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))
+  GROUP BY a.car_maker, a.car_model;
+
+-- Daily Count of Car Maker, Car Model (Adjust, Replace, Repair, Beyond The Limit) Applicator 
+-- based on t_applicator_c 1 Month (DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 11;   -- Specify the month (November)
+
+WITH DateRange AS (
+    SELECT 
+        DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+    FROM 
+        master.dbo.spt_values
+    WHERE 
+        type = 'P' AND 
+        number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+),
+FilteredApplicatorHistory AS (
+    SELECT 
+		ac.id,
+		a.car_maker,
+		a.car_model,
+		ac.adjustment_content,
+		CAST(ac.inspection_date_time AS DATETIME2(2)) AS date_inspected
+	FROM t_applicator_c ac
+	LEFT JOIN 
+		m_applicator a ON 
+		ac.equipment_no = SUBSTRING(a.applicator_no, 1, CHARINDEX('/', a.applicator_no) - 1) AND
+		ac.machine_no = SUBSTRING(a.applicator_no, CHARINDEX('/', a.applicator_no) + 1, LEN(a.applicator_no))
+	WHERE 
+		ac.inspection_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		ac.inspection_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+        a.car_maker = 'Suzuki' AND a.car_model = 'YV7'
+)
+
+SELECT 
+    CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+	fah.car_maker,
+	fah.car_model,
+	COUNT(CASE WHEN fah.adjustment_content = 'Adjust' THEN fah.id END) AS total_adjust,
+	COUNT(CASE WHEN fah.adjustment_content = 'Repair' THEN fah.id END) AS total_repair,
+	COUNT(CASE WHEN fah.adjustment_content = 'Replace' THEN fah.id END) AS total_replace,
+	COUNT(CASE WHEN fah.adjustment_content = 'Beyond The Limit' THEN fah.id END) AS total_btl
+FROM 
+    DateRange dr
+LEFT JOIN 
+    FilteredApplicatorHistory fah ON 
+        fah.date_inspected >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+        fah.date_inspected < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+GROUP BY 
+    dr.report_date, fah.car_maker, fah.car_model
+ORDER BY 
+    dr.report_date, fah.car_maker, fah.car_model;
 
 
 

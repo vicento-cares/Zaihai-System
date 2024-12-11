@@ -2,6 +2,8 @@
 	let current_applicator_list_status_count_chart;
 	let current_applicators_terminals_count_chart;
 	let month_a_adj_cnt_chart;
+	let month_a_adj_cnt2_chart;
+	let month_a_adj_cnt3_chart;
 	let month_term_usage_chart;
 	let month_aioi_chart;
 	let month_amd_chart;
@@ -189,6 +191,8 @@
 			},  
 			success: response => {
 				document.getElementById("month_a_adj_cnt_year_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt2_year_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt3_year_search").innerHTML = response;
 			}
 		});
 	}
@@ -203,6 +207,7 @@
 			},  
 			success: response => {
 				document.getElementById("month_a_adj_cnt_car_maker_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt3_car_maker_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_maker_search").innerHTML = response;
 				document.getElementById("month_aioi_car_maker_search").innerHTML = response;
 			}
@@ -219,6 +224,7 @@
 			},  
 			success: response => {
 				document.getElementById("month_a_adj_cnt_car_model_search").innerHTML = response;
+				document.getElementById("month_a_adj_cnt3_car_model_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_model_search").innerHTML = response;
 				document.getElementById("month_aioi_car_model_search").innerHTML = response;
 			}
@@ -326,6 +332,166 @@
 
 				month_a_adj_cnt_chart = new ApexCharts(ctx, options);
 				month_a_adj_cnt_chart.render();
+			}
+		});
+	}
+
+	document.getElementById("month_a_adj_cnt2_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_a_adj_cnt2_chart();
+	});
+
+	const get_month_a_adj_cnt2_chart = () => {
+		let year = document.getElementById("month_a_adj_cnt2_year_search").value;
+		let month = document.getElementById("month_a_adj_cnt2_month_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_a_adj_cnt2_chart',
+				year: year,
+				month: month
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data) // Convert the data object to an array
+					};
+				});
+
+				let ctx = document.querySelector("#month_a_adj_cnt2_chart");
+
+				// Define colors
+				const colors = ['#f39c12', '#fd7e14', '#e74c3c', '#e83e8c'];
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%',
+							endingShape: 'rounded'
+						},
+					},
+					dataLabels: {
+						enabled: false
+					},
+					series: seriesData,
+					colors: colors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Monthly Applicator Adjustment Content Data (Adjust, Repair, Replace, Beyond The Limit)`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_a_adj_cnt2_chart) {
+					month_a_adj_cnt2_chart.destroy();
+				}
+
+				month_a_adj_cnt2_chart = new ApexCharts(ctx, options);
+				month_a_adj_cnt2_chart.render();
+			}
+		});
+	}
+
+	document.getElementById("month_a_adj_cnt3_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_a_adj_cnt3_chart();
+	});
+
+	const get_month_a_adj_cnt3_chart = () => {
+		let year = document.getElementById("month_a_adj_cnt3_year_search").value;
+		let month = document.getElementById("month_a_adj_cnt3_month_search").value;
+		let car_maker = document.getElementById("month_a_adj_cnt3_car_maker_search").value;
+		let car_model = document.getElementById("month_a_adj_cnt3_car_model_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_a_adj_cnt3_chart',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				let concat_label = car_maker + ' ';
+				if (car_maker != car_model) {
+					concat_label += car_model;
+				}
+
+				let concat_label_whole = `Monthly Applicator Adjustment Content Data (Adjust Repair, Replace, Beyond The Limit)`;
+				if (car_maker != '' && car_maker != '') {
+					concat_label_whole += ` at ${concat_label} Zaihai Shop`;
+				}
+				
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data) // Convert the data object to an array
+					};
+				});
+
+				let ctx = document.querySelector("#month_a_adj_cnt3_chart");
+
+				// Define colors
+				const colors = ['#f39c12', '#fd7e14', '#e74c3c', '#e83e8c'];
+
+				var options = {
+					chart: {
+						type: 'line',
+						height: 350
+					},
+					series: seriesData,
+					colors: colors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: concat_label_whole,
+						align: 'left'
+					},
+					stroke: {
+						curve: 'smooth'
+					},
+					markers: {
+						size: 5
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_a_adj_cnt3_chart) {
+					month_a_adj_cnt3_chart.destroy();
+				}
+
+				month_a_adj_cnt3_chart = new ApexCharts(ctx, options);
+				month_a_adj_cnt3_chart.render();
 			}
 		});
 	}

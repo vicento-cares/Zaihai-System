@@ -348,6 +348,205 @@ if ($method == 'get_month_a_adj_cnt_chart') {
     echo json_encode(['categories' => $categories, 'data' => $data]);
 }
 
+if ($method == 'get_month_a_adj_cnt2_chart') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+   
+    $data = [];
+    $categories = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            SELECT 
+                a.car_maker,
+                a.car_model,
+                COUNT(CASE WHEN ac.adjustment_content = 'Adjust' THEN ac.id END) AS total_adjust,
+                COUNT(CASE WHEN ac.adjustment_content = 'Repair' THEN ac.id END) AS total_repair,
+                COUNT(CASE WHEN ac.adjustment_content = 'Replace' THEN ac.id END) AS total_replace,
+                COUNT(CASE WHEN ac.adjustment_content = 'Beyond The Limit' THEN ac.id END) AS total_btl
+            FROM t_applicator_c ac
+            LEFT JOIN 
+                m_applicator a ON 
+                    ac.equipment_no = SUBSTRING(a.applicator_no, 1, CHARINDEX('/', a.applicator_no) - 1) AND
+                    ac.machine_no = SUBSTRING(a.applicator_no, CHARINDEX('/', a.applicator_no) + 1, LEN(a.applicator_no))
+            WHERE 
+                ac.inspection_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                ac.inspection_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))
+            GROUP BY a.car_maker, a.car_model";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month);
+    $stmt->execute($params);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Add unique maker_model_label to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add values to data
+        $data['Adjust'][] = (int)$row['total_adjust'];
+        $data['Repair'][] = (int)$row['total_repair'];
+        $data['Replace'][] = (int)$row['total_replace'];
+        $data['BeyondTheLimit'][] = (int)$row['total_btl'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => [
+            [
+                'name' => 'Adjust',
+                'data' => $data['Adjust']
+            ],
+            [
+                'name' => 'Repair',
+                'data' => $data['Repair']
+            ],
+            [
+                'name' => 'Replace',
+                'data' => $data['Replace']
+            ],
+            [
+                'name' => 'Beyond The Limit',
+                'data' => $data['BeyondTheLimit']
+            ]
+        ]
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
+if ($method == 'get_month_a_adj_cnt3_chart') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+
+    $categories = [];
+    $applicatorData = [
+        'total_adjust' => [],
+        'total_repair' => [],
+        'total_replace' => [],
+        'total_btl' => []
+    ];
+
+    $maker_model_sql = "";
+    if (!empty($car_maker) AND !empty($car_model)) {
+        $maker_model_sql = " AND a.car_maker = ? AND a.car_model = ?";
+    }
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            WITH DateRange AS (
+                SELECT 
+                    DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+                FROM 
+                    master.dbo.spt_values
+                WHERE 
+                    type = 'P' AND 
+                    number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+            ),
+            FilteredApplicatorHistory AS (
+                SELECT 
+                    ac.id,
+                    a.car_maker,
+                    a.car_model,
+                    ac.adjustment_content,
+                    CAST(ac.inspection_date_time AS DATETIME2(2)) AS date_inspected
+                FROM t_applicator_c ac
+                LEFT JOIN 
+                    m_applicator a ON 
+                    ac.equipment_no = SUBSTRING(a.applicator_no, 1, CHARINDEX('/', a.applicator_no) - 1) AND
+                    ac.machine_no = SUBSTRING(a.applicator_no, CHARINDEX('/', a.applicator_no) + 1, LEN(a.applicator_no))
+                WHERE 
+                    ac.inspection_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    ac.inspection_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))$maker_model_sql
+            )
+
+            SELECT 
+                CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+                fah.car_maker,
+                fah.car_model,
+                COUNT(CASE WHEN fah.adjustment_content = 'Adjust' THEN fah.id END) AS total_adjust,
+                COUNT(CASE WHEN fah.adjustment_content = 'Repair' THEN fah.id END) AS total_repair,
+                COUNT(CASE WHEN fah.adjustment_content = 'Replace' THEN fah.id END) AS total_replace,
+                COUNT(CASE WHEN fah.adjustment_content = 'Beyond The Limit' THEN fah.id END) AS total_btl
+            FROM 
+                DateRange dr
+            LEFT JOIN 
+                FilteredApplicatorHistory fah ON 
+                    fah.date_inspected >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+                    fah.date_inspected < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+            GROUP BY 
+                dr.report_date, fah.car_maker, fah.car_model
+            ORDER BY 
+                dr.report_date, fah.car_maker, fah.car_model";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month);
+
+    if (!empty($car_maker) AND !empty($car_model)) {
+        $params[] = $car_maker;
+        $params[] = $car_model;
+    }
+
+    $stmt->execute($params);
+
+    // Fetch results and populate the makerModelData array
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Add unique report_date to categories
+        if (!in_array($row['report_date'], $categories)) {
+            $categories[] = $row['report_date'];
+        }
+
+        // Initialize the data arrays for each total if they don't exist
+        if (!isset($applicatorData['total_adjust'][$row['report_date']])) {
+            $applicatorData['total_adjust'][$row['report_date']] = 0;
+        }
+        if (!isset($applicatorData['total_repair'][$row['report_date']])) {
+            $applicatorData['total_repair'][$row['report_date']] = 0;
+        }
+        if (!isset($applicatorData['total_replace'][$row['report_date']])) {
+            $applicatorData['total_replace'][$row['report_date']] = 0;
+        }
+        if (!isset($applicatorData['total_btl'][$row['report_date']])) {
+            $applicatorData['total_btl'][$row['report_date']] = 0;
+        }
+
+        // Aggregate the totals for each report_date
+        $applicatorData['total_adjust'][$row['report_date']] += $row['total_adjust'];
+        $applicatorData['total_repair'][$row['report_date']] += $row['total_repair'];
+        $applicatorData['total_replace'][$row['report_date']] += $row['total_replace'];
+        $applicatorData['total_btl'][$row['report_date']] += $row['total_btl'];
+    }
+
+    // Prepare the series data for the chart
+    $data = [];
+    foreach (['total_adjust', 'total_repair', 'total_replace', 'total_btl'] as $totalType) {
+        $data[] = [
+            'name' => ucfirst(str_replace('_', ' ', $totalType)), // Capitalize the name for display
+            'data' => array_values(array_map(function($date) use ($applicatorData, $totalType) {
+                return $applicatorData[$totalType][$date];
+            }, $categories))
+        ];
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data]);
+}
+
 if ($method == 'get_month_term_usage_chart_year_dropdown') {
     $sql = "SELECT DISTINCT YEAR(date_time_out) AS Year
             FROM t_applicator_in_out_history
