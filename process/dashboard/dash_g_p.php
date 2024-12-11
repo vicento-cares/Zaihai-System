@@ -193,6 +193,71 @@ if ($method == 'get_current_applicators_terminals_count_chart') {
     echo json_encode($finalData);
 }
 
+if ($method == 'get_current_applicators_terminals_count_chart2') {
+    $data = [];
+    $categories = [];
+
+    $sql = "WITH 
+                applicator_counts AS (
+                    SELECT 
+                        car_maker,
+                        car_model,
+                        COUNT(id) AS total_applicator
+                    FROM m_applicator
+                    GROUP BY car_maker, car_model
+                ),
+                terminal_counts AS (
+                    SELECT 
+                        car_maker,
+                        car_model,
+                        COUNT(id) AS total_terminal
+                    FROM m_terminal
+                    GROUP BY car_maker, car_model
+                )
+
+            SELECT 
+                COALESCE(a.car_maker, t.car_maker) AS car_maker,
+                COALESCE(a.car_model, t.car_model) AS car_model,
+                COALESCE(a.total_applicator, 0) AS total_applicator,
+                COALESCE(t.total_terminal, 0) AS total_terminal
+            FROM 
+                applicator_counts a
+            FULL OUTER JOIN 
+                terminal_counts t ON a.car_maker = t.car_maker AND a.car_model = t.car_model
+            ORDER BY
+                total_applicator DESC, total_terminal DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add total_applicator and total_terminal values to data
+        $data[] = (int)$row['total_applicator'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => $data
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
 if ($method == 'get_month_a_adj_cnt_chart_year_dropdown') {
     $sql = "SELECT DISTINCT YEAR(inspection_date_time) AS Year
             FROM t_applicator_c

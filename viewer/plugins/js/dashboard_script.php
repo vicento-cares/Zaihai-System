@@ -1,6 +1,7 @@
 <script type="text/javascript">
 	let current_applicator_list_status_count_chart;
 	let current_applicators_terminals_count_chart;
+	let current_applicators_terminals_count_chart2;
 	let month_a_adj_cnt_chart;
 	let month_a_adj_cnt2_chart;
 	let month_a_adj_cnt3_chart;
@@ -14,6 +15,7 @@
 		get_current_applicator_list_status_count_chart();
 		get_total_applicator_terminal_count();
 		get_current_applicators_terminals_count_chart();
+		get_current_applicators_terminals_count_chart2();
 		get_month_a_adj_cnt_chart_year_dropdown();
 		get_car_maker_dropdown();
 		get_car_model_dropdown();
@@ -177,6 +179,57 @@
 
 				current_applicators_terminals_count_chart = new ApexCharts(ctx, options);
 				current_applicators_terminals_count_chart.render();
+			}
+		});
+	}
+
+	const get_current_applicators_terminals_count_chart2 = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_applicators_terminals_count_chart2'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				let ctx = document.querySelector("#current_applicators_terminals_count_chart2");
+
+				const colors = [
+					'#007bff', // Primary
+					'#6c757d', // Secondary
+					'#28a745', // Success
+					'#dc3545', // Danger
+					'#ffc107', // Warning
+					'#17a2b8', // Info
+					'#343a40', // Dark
+					'#e83e8c', // Pink
+					'#fd7e14', // orange
+					'#20c997' // teal
+				]
+
+				var options = {
+					chart: {
+						type: 'pie'
+					},
+					series: response.data,
+					labels: response.categories,
+					colors: colors,
+					title: {
+						text: 'Total Applicators'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_applicators_terminals_count_chart2) {
+					current_applicators_terminals_count_chart2.destroy();
+				}
+
+				current_applicators_terminals_count_chart2 = new ApexCharts(ctx, options);
+				current_applicators_terminals_count_chart2.render();
 			}
 		});
 	}

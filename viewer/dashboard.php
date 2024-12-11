@@ -147,7 +147,10 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row" id="current_applicators_terminals_count_chart"></div>
+                                    <div class="row">
+                                        <div class="col-8" id="current_applicators_terminals_count_chart"></div>
+                                        <div class="col-4" id="current_applicators_terminals_count_chart2"></div>
+                                    </div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>
