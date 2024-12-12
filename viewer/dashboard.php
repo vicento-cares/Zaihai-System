@@ -82,6 +82,10 @@ include 'plugins/navbar/viewer_navbar.php';
                                         </div>
                                     </div>
                                     <div class="row" id="current_applicator_list_status_count_chart"></div>
+                                    <div class="row mb-2">
+                                        <h5>Total Applicator Out by TRD Cart Positions</h5>
+                                    </div>
+                                    <div class="row" id="current_applicator_out_charts"></div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>

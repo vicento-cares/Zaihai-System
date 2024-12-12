@@ -13,6 +13,7 @@
 	document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_list_status_count();
 		get_current_applicator_list_status_count_chart();
+		get_current_applicator_out_charts();
 		get_total_applicator_terminal_count();
 		get_current_applicators_terminals_count_chart();
 		get_current_applicators_terminals_count_chart2();
@@ -99,6 +100,61 @@
 
 				current_applicator_list_status_count_chart = new ApexCharts(ctx, options);
 				current_applicator_list_status_count_chart.render();
+			}
+		});
+	}
+
+	const get_current_applicator_out_charts = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_applicator_out_charts'
+			},  
+			success: response => {
+				console.log(response); // Log the entire response to check its structure
+
+				// Clear previous charts
+				const parentDiv = document.querySelector("#current_applicator_out_charts");
+				parentDiv.innerHTML = ''; // Clear existing charts
+
+				const colors = [
+					'#007bff', // Primary
+					'#28a745', // Success
+					'#dc3545', // Danger
+					'#fd7e14' // orange
+				];
+
+				response.forEach(item => {
+					// Create a new div for each pie chart
+					const chartDiv = document.createElement('div');
+					chartDiv.className = 'col-4'; // Set class name for styling
+					parentDiv.appendChild(chartDiv); // Append to parent div
+
+					// Create chart options
+					var options = {
+						chart: {
+							type: 'pie'
+						},
+						series: item.data, // Use the data for the current item
+						labels: item.categories, // Use the categories for the current item
+						colors: colors,
+						title: {
+							text: `${item.name} Zaihai Shop`,
+							align: 'center'
+						},
+						legend: {
+							position: 'bottom',
+							horizontalAlign: 'center',
+						}
+					};
+
+					// Create and render the chart
+					const chart = new ApexCharts(chartDiv, options);
+					chart.render();
+				});
 			}
 		});
 	}

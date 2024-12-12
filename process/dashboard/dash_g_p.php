@@ -118,6 +118,59 @@ if ($method == 'get_current_applicator_list_status_count_chart') {
     echo json_encode($finalData);
 }
 
+if ($method == 'get_current_applicator_out_charts') {
+    $finalData = [];
+
+    $sql = "SELECT
+                a.car_maker,
+                a.car_model,
+                SUM(CASE WHEN aio.trd_no LIKE '%_R1%' THEN 1 ELSE 0 END) AS total_r1,
+                SUM(CASE WHEN aio.trd_no LIKE '%_R2%' THEN 1 ELSE 0 END) AS total_r2,
+                SUM(CASE WHEN aio.trd_no LIKE '%_F1%' THEN 1 ELSE 0 END) AS total_f1,
+                SUM(CASE WHEN aio.trd_no LIKE '%_F2%' THEN 1 ELSE 0 END) AS total_f2
+            FROM 
+                t_applicator_in_out aio
+            LEFT JOIN
+                m_applicator AS a ON aio.applicator_no = a.applicator_no
+            WHERE
+                aio.date_time_in IS NULL AND 
+                aio.zaihai_stock_address IS NULL
+            GROUP BY
+                a.car_maker, a.car_model";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Populate the data array with total values
+        $data = [
+            (int)$row['total_r1'],
+            (int)$row['total_r2'],
+            (int)$row['total_f1'],
+            (int)$row['total_f2']
+        ];
+
+        $maker_model_data = [
+            'name' => $maker_model_label,
+            'categories' => ['R1', 'R2', 'F1', 'F2'],
+            'data' => $data
+        ];
+
+        $finalData[] = $maker_model_data;
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
 if ($method == 'get_current_applicators_terminals_count_chart') {
     $data = [];
     $categories = [];

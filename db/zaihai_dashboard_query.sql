@@ -30,6 +30,24 @@ FROM
     t_applicator_list
 	WHERE car_maker = ? AND car_model = ?;
 
+-- Applicator Out Count by Car Maker, Car Model and TRD CART Positions on t_applicator_in_out
+SELECT
+	a.car_maker,
+	a.car_model,
+    SUM(CASE WHEN aio.trd_no LIKE '%_R1%' THEN 1 ELSE 0 END) AS total_r1,
+    SUM(CASE WHEN aio.trd_no LIKE '%_R2%' THEN 1 ELSE 0 END) AS total_r2,
+    SUM(CASE WHEN aio.trd_no LIKE '%_F1%' THEN 1 ELSE 0 END) AS total_f1,
+    SUM(CASE WHEN aio.trd_no LIKE '%_F2%' THEN 1 ELSE 0 END) AS total_f2
+FROM 
+	t_applicator_in_out aio
+LEFT JOIN
+	m_applicator AS a ON aio.applicator_no = a.applicator_no
+WHERE
+	aio.date_time_in IS NULL AND 
+	aio.zaihai_stock_address IS NULL
+GROUP BY
+	a.car_maker, a.car_model;
+
 
 
 
