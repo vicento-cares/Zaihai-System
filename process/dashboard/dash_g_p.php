@@ -4,6 +4,18 @@ require '../conn.php';
 
 $method = $_GET['method'];
 
+$color_map = array(
+    'Suzuki YV7' => '#007bff', // Primary
+    'Mazda J12' => '#6c757d', // Secondary
+    'Mazda Merge' => '#28a745', // Success
+    'Toyota' => '#dc3545', // Danger
+    'Subaru' => '#ffc107', // Warning
+    'Honda T20' => '#17a2b8', // Info
+    'Honda Old' => '#343a40', // Dark
+    'Honda TKRA' => '#e83e8c', // Pink
+    'Daihatsu D01L' => '#fd7e14' // orange
+);
+
 if ($method == 'get_applicator_list_status_count') {
     $data = [];
 
@@ -212,36 +224,6 @@ if ($method == 'get_current_trd_carts_reuse_count_chart') {
     echo json_encode($finalData);
 }
 
-if ($method == 'get_total_applicator_terminal_count') {
-    $data = [];
-
-    $sql = "WITH 
-                applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator),
-                terminal_count AS (SELECT COUNT(id) AS total_terminal FROM m_terminal),
-                applicator_terminal_count AS (SELECT COUNT(id) AS total_applicator_terminal FROM m_applicator_terminal)
-
-            SELECT 
-                a.total_applicator,
-                t.total_terminal,
-                at.total_applicator_terminal
-            FROM 
-                applicator_count a,
-                terminal_count t,
-                applicator_terminal_count at";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute();
-
-    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
-        $data = [
-            'total_applicator' => intval($row['total_applicator']), 
-            'total_terminal' => intval($row['total_terminal']), 
-            'total_applicator_terminal' => intval($row['total_applicator_terminal'])
-        ];
-    }
-
-    echo json_encode($data);
-}
-
 if ($method == 'get_current_active_trd_count_chart') {
     $data = [];
     $categories = [];
@@ -309,11 +291,42 @@ if ($method == 'get_current_active_trd_count_chart') {
     // Create the final data structure
     $finalData = [
         'categories' => $categories,
-        'data' => $data
+        'data' => $data,
+        'colorMap' => $color_map
     ];
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);
+}
+
+if ($method == 'get_total_applicator_terminal_count') {
+    $data = [];
+
+    $sql = "WITH 
+                applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator),
+                terminal_count AS (SELECT COUNT(id) AS total_terminal FROM m_terminal),
+                applicator_terminal_count AS (SELECT COUNT(id) AS total_applicator_terminal FROM m_applicator_terminal)
+
+            SELECT 
+                a.total_applicator,
+                t.total_terminal,
+                at.total_applicator_terminal
+            FROM 
+                applicator_count a,
+                terminal_count t,
+                applicator_terminal_count at";
+    $stmt = $conn -> prepare($sql);
+    $stmt -> execute();
+
+    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+        $data = [
+            'total_applicator' => intval($row['total_applicator']), 
+            'total_terminal' => intval($row['total_terminal']), 
+            'total_applicator_terminal' => intval($row['total_applicator_terminal'])
+        ];
+    }
+
+    echo json_encode($data);
 }
 
 if ($method == 'get_current_applicators_terminals_count_chart') {
@@ -449,7 +462,8 @@ if ($method == 'get_current_applicators_terminals_count_chart2') {
     // Create the final data structure
     $finalData = [
         'categories' => $categories,
-        'data' => $data
+        'data' => $data,
+        'colorMap' => $color_map
     ];
 
     // Encode the categories and data as JSON
@@ -840,6 +854,12 @@ if ($method == 'get_month_term_usage_chart') {
     $categories = [];
     $terminalData = [];
 
+    $maker_model_sql = "";
+
+    if (!empty($car_maker) && !empty($car_model)) {
+        $maker_model_sql = " AND a.car_maker = ? AND a.car_model = ?";
+    }
+
     $sql = "DECLARE @Year INT = ?;  -- Specify the year
             DECLARE @Month INT = ?;   -- Specify the month (November)
 
@@ -855,6 +875,8 @@ if ($method == 'get_month_term_usage_chart') {
             FilteredApplicatorHistory AS (
                 SELECT 
                     aioh.applicator_no,
+                    a.car_maker,
+	                a.car_model,
                     SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) AS terminal_name,
                     CAST(aioh.date_time_out AS DATETIME2(2)) AS date_out
                 FROM 
@@ -864,12 +886,14 @@ if ($method == 'get_month_term_usage_chart') {
                 WHERE 
                     aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
                     aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
-                    AND a.car_maker = ? AND a.car_model = ? AND SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) = ?
+                    AND SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) = ?$maker_model_sql
             )
 
             SELECT 
                 CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
                 fah.terminal_name,
+                fah.car_maker,
+	            fah.car_model,
                 COUNT(fah.terminal_name) AS total_terminal_usage
             FROM 
                 DateRange dr
@@ -878,12 +902,18 @@ if ($method == 'get_month_term_usage_chart') {
                     fah.date_out >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
                     fah.date_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
             GROUP BY 
-                dr.report_date, fah.terminal_name
+                dr.report_date, fah.car_maker, fah.car_model, fah.terminal_name
             ORDER BY 
                 dr.report_date, fah.terminal_name";
 
     $stmt = $conn->prepare($sql);
-    $params = array($year, $month, $car_maker, $car_model, $terminal_name);
+    $params = array($year, $month, $terminal_name);
+
+    if (!empty($car_maker) && !empty($car_model)) {
+        $params[] = $car_maker;
+        $params[] = $car_model;
+    }
+
     $stmt->execute($params);
 
     // Fetch results and populate the terminalData array
@@ -893,11 +923,17 @@ if ($method == 'get_month_term_usage_chart') {
             $categories[] = $row['report_date'];
         }
 
-        if (!empty($row['terminal_name'])) {
-            // Initialize the terminal_name in the terminalData array if not already set
-            if (!isset($terminalData[$row['terminal_name']])) {
-                $terminalData[$row['terminal_name']] = [
-                    'name' => $row['terminal_name'],
+        if (!empty($row['car_maker']) && !empty($row['car_model']) && !empty($row['terminal_name'])) {
+            // Create a unique key for each car_maker + car_model combination
+            $uniqueKey = $row['car_maker'];
+            if ($row['car_maker'] != $row['car_model']) {
+                $uniqueKey .= ' ' . $row['car_model'];
+            }
+
+            // Initialize the unique key in the terminalData array if not already set
+            if (!isset($terminalData[$uniqueKey])) {
+                $terminalData[$uniqueKey] = [
+                    'name' => $uniqueKey,
                     'data' => array_fill(0, count($categories), 0) // Initialize data array with zeros
                 ];
             }
@@ -905,19 +941,19 @@ if ($method == 'get_month_term_usage_chart') {
             // Find the index of the current report_date in the categories array
             $dateIndex = array_search($row['report_date'], $categories);
             
-            // Update the total_terminal_usage count for the corresponding terminal_name and report_date
+            // Update the total_terminal_usage count for the corresponding unique key and report_date
             if ($dateIndex !== false) {
-                $terminalData[$row['terminal_name']]['data'][$dateIndex] = intval($row['total_terminal_usage']);
+                $terminalData[$uniqueKey]['data'][$dateIndex] = intval($row['total_terminal_usage']);
             }
         }
     }
 
     // Initialize all terminals with zero values for all dates
-    foreach ($terminalData as $terminalName => $terminal) {
+    foreach ($terminalData as $uniqueKey => $terminal) {
         // Ensure all terminals have data for all categories
         foreach ($categories as $index => $date) {
-            if (!isset($terminalData[$terminalName]['data'][$index])) {
-                $terminalData[$terminalName]['data'][$index] = 0; // Set to zero if not already set
+            if (!isset($terminalData[$uniqueKey]['data'][$index])) {
+                $terminalData[$uniqueKey]['data'][$index] = 0; // Set to zero if not already set
             }
         }
     }
@@ -926,7 +962,80 @@ if ($method == 'get_month_term_usage_chart') {
     $data = array_values($terminalData);
 
     // Encode the categories and data as JSON
-    echo json_encode(['categories' => $categories, 'data' => $data]);
+    echo json_encode(['categories' => $categories, 'data' => $data, 'colorMap' => $color_map]);
+}
+
+if ($method == 'get_month_term_usage_chart2') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $terminal_name = $_GET['terminal_name'];
+
+    $data = [];
+    $categories = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            WITH FilteredApplicatorHistory AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) AS terminal_name,
+                    CAST(aioh.date_time_out AS DATETIME2(2)) AS date_out
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE 
+                    aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
+                    AND SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) = ?
+            )
+
+            SELECT 
+                car_maker,
+                car_model,
+                terminal_name,
+                COUNT(terminal_name) AS total_terminal_usage
+            FROM 
+                FilteredApplicatorHistory
+            GROUP BY 
+                car_maker, car_model, terminal_name
+            ORDER BY 
+                total_terminal_usage DESC";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $terminal_name);
+    $stmt->execute($params);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add total_applicator and total_terminal values to data
+        $data[] = (int)$row['total_terminal_usage'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => $data,
+        'colorMap' => $color_map
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
 }
 
 if ($method == 'get_month_aioi_chart') {
@@ -953,6 +1062,11 @@ if ($method == 'get_month_aioi_chart') {
         $date_time_coumn2 = "date_inspected";
     }
 
+    $maker_model_sql = "";
+    if (!empty($car_maker) && !empty($car_model)) {
+        $maker_model_sql = " AND a.car_maker = ? AND a.car_model = ?";
+    }
+
     $sql = "DECLARE @Year INT = ?;  -- Specify the year
             DECLARE @Month INT = ?;   -- Specify the month (November)
 
@@ -968,6 +1082,8 @@ if ($method == 'get_month_aioi_chart') {
             FilteredApplicatorHistory AS (
                 SELECT 
                     aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
                     CAST(aioh.$date_time_column AS DATETIME2(2)) AS $date_time_coumn2
                 FROM 
                     t_applicator_in_out_history aioh
@@ -975,12 +1091,13 @@ if ($method == 'get_month_aioi_chart') {
                     m_applicator a ON aioh.applicator_no = a.applicator_no 
                 WHERE 
                     aioh.$date_time_column >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
-                    aioh.$date_time_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
-                    AND a.car_maker = ? AND a.car_model = ?
+                    aioh.$date_time_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))$maker_model_sql -- Adjusted to include the entire month
             )
 
             SELECT 
                 CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+                fah.car_maker,
+                fah.car_model,
                 COUNT(fah.applicator_no) AS total
             FROM 
                 DateRange dr
@@ -989,19 +1106,25 @@ if ($method == 'get_month_aioi_chart') {
                     fah.$date_time_coumn2 >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
                     fah.$date_time_coumn2 < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
             GROUP BY 
-                dr.report_date
+                dr.report_date, fah.car_maker, fah.car_model 
             ORDER BY 
                 dr.report_date";
 
     $stmt = $conn->prepare($sql);
-    $params = array($year, $month, $car_maker, $car_model);
+    $params = array($year, $month);
+
+    if (!empty($car_maker) && !empty($car_model)) {
+        $params[] = $car_maker;
+        $params[] = $car_model;
+    }
+
     $stmt->execute($params);
 
     // Get the number of days in the specified month and year
     $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-    // Initialize an array to hold the counts for the specified status
-    $statusCounts = array_fill(0, $daysInMonth, 0); // Assuming you want to initialize for 30 days
+    // Initialize an array to hold the counts for each car maker and model
+    $statusCounts = [];
 
     // Fetch results and populate the terminalData array
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -1010,21 +1133,120 @@ if ($method == 'get_month_aioi_chart') {
             $categories[] = $row['report_date'];
         }
 
-        // Update the count for the specified status
-        $dateIndex = array_search($row['report_date'], $categories);
-        if ($dateIndex !== false) {
-            $statusCounts[$dateIndex] += intval($row['total']); // Use total for counts
+        if (!empty($row['car_maker']) && !empty($row['car_model'])) {
+            // Create a unique key for car maker and model
+            $carKey = '';
+            if ($row['car_maker'] != $row['car_model']) {
+                $carKey = $row['car_maker'] . " " . $row['car_model'];
+            } else {
+                $carKey = $row['car_maker'];
+            }
+
+            // Initialize the statusCounts for this carKey if it doesn't exist
+            if (!isset($statusCounts[$carKey])) {
+                $statusCounts[$carKey] = array_fill(0, $daysInMonth, 0);
+            }
+
+            // Update the count for the specified status
+            $dateIndex = array_search($row['report_date'], $categories);
+            if ($dateIndex !== false) {
+                $statusCounts[$carKey][$dateIndex] += intval($row['total']); // Use total for counts
+            }
         }
     }
 
     // Create the final data structure
-    $data[] = [
-        'name' => $status,
-        'data' => $statusCounts
+    foreach ($statusCounts as $carKey => $counts) {
+        $data[] = [
+            'name' => $carKey,
+            'data' => $counts
+        ];
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data, 'colorMap' => $color_map]);
+}
+
+if ($method == 'get_month_aioi_chart2') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $status = $_GET['status'];
+
+    $data = [];
+    $categories = [];
+
+    $date_time_column = "";
+    $date_time_coumn2 = "";
+
+    if ($status == 'Out') {
+        $date_time_column = "date_time_out";
+        $date_time_coumn2 = "date_out";
+    } else if ($status == 'In') {
+        $date_time_column = "date_time_in";
+        $date_time_coumn2 = "date_in";
+    } else if ($status == 'Inspected') {
+        $date_time_column = "confirmation_date";
+        $date_time_coumn2 = "date_inspected";
+    }
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+
+            WITH FilteredApplicatorHistory AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.$date_time_column AS DATETIME2(2)) AS $date_time_coumn2
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE 
+                    aioh.$date_time_column >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.$date_time_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) -- Adjusted to include the entire month
+            )
+
+            SELECT 
+                car_maker,
+                car_model,
+                COUNT(applicator_no) AS total
+            FROM 
+                FilteredApplicatorHistory
+            GROUP BY 
+                car_maker, car_model";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month);
+    $stmt->execute($params);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add values to data
+        $data[] = (int)$row['total'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => $data,
+        'colorMap' => $color_map
     ];
 
     // Encode the categories and data as JSON
-    echo json_encode(['categories' => $categories, 'data' => $data]);
+    echo json_encode($finalData);
 }
 
 if ($method == 'get_month_amd_chart') {

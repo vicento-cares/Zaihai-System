@@ -429,13 +429,13 @@ include 'plugins/navbar/viewer_navbar.php';
                                         <div class="row mb-4">
                                             <div class="col-sm-3">
                                                 <label>Car Maker</label>
-                                                <select id="month_term_usage_car_maker_search" class="form-control" required>
+                                                <select id="month_term_usage_car_maker_search" class="form-control">
                                                     <option selected value="">Select Car Maker</option>
                                                 </select>
                                             </div>
                                             <div class="col-sm-3">
                                                 <label>Car Model</label>
-                                                <select id="month_term_usage_car_model_search" class="form-control" required>
+                                                <select id="month_term_usage_car_model_search" class="form-control">
                                                     <option selected value="">Select Car Model</option>
                                                 </select>
                                             </div>
@@ -451,7 +451,10 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                         </div>
                                     </form>
-                                    <div class="row" id="month_term_usage_chart"></div>
+                                    <div class="row">
+                                        <div class="col-8" id="month_term_usage_chart"></div>
+                                        <div class="col-4" id="month_term_usage_chart2"></div>
+                                    </div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>
@@ -506,13 +509,13 @@ include 'plugins/navbar/viewer_navbar.php';
                                         <div class="row mb-4">
                                             <div class="col-sm-3">
                                                 <label>Car Maker</label>
-                                                <select id="month_aioi_car_maker_search" class="form-control" required>
+                                                <select id="month_aioi_car_maker_search" class="form-control">
                                                     <option selected value="">Select Car Maker</option>
                                                 </select>
                                             </div>
                                             <div class="col-sm-3">
                                                 <label>Car Model</label>
-                                                <select id="month_aioi_car_model_search" class="form-control" required>
+                                                <select id="month_aioi_car_model_search" class="form-control">
                                                     <option selected value="">Select Car Model</option>
                                                 </select>
                                             </div>
@@ -531,7 +534,10 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                         </div>
                                     </form>
-                                    <div class="row" id="month_aioi_chart"></div>
+                                    <div class="row">
+                                        <div class="col-8" id="month_aioi_chart"></div>
+                                        <div class="col-4" id="month_aioi_chart2"></div>
+                                    </div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>

@@ -494,6 +494,8 @@ WITH DateRange AS (
 FilteredApplicatorHistory AS (
     SELECT 
         aioh.applicator_no,
+        a.car_maker,
+		a.car_model,
 		SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) AS terminal_name,
         CAST(aioh.date_time_out AS DATETIME2(2)) AS date_out
     FROM 
@@ -503,12 +505,14 @@ FilteredApplicatorHistory AS (
     WHERE 
         aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
         aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
-        AND a.car_maker = 'Mazda' AND a.car_model = 'J12'
+        AND SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) = 'ABD-F' AND a.car_maker = 'Mazda' AND a.car_model = 'J12' 
 )
 
 SELECT 
     CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
 	fah.terminal_name,
+    fah.car_maker,
+	fah.car_model,
     COUNT(fah.terminal_name) AS total_terminal_usage
 FROM 
     DateRange dr
@@ -517,9 +521,40 @@ LEFT JOIN
         fah.date_out >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
         fah.date_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
 GROUP BY 
-    dr.report_date, fah.terminal_name
+    dr.report_date, fah.car_maker, fah.car_model, fah.terminal_name
 ORDER BY 
-    dr.report_date, fah.terminal_name;
+    dr.report_date;
+
+-- Daily Count terminal_name usage by All Car Maker and Car Model on t_applicator_in_out_history (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 11;   -- Specify the month (November)
+
+WITH FilteredApplicatorHistory AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+		SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) AS terminal_name,
+        CAST(aioh.date_time_out AS DATETIME2(2)) AS date_out
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+    WHERE 
+        aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+        aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
+        AND SUBSTRING(aioh.terminal_name, 1, CHARINDEX('*', aioh.terminal_name) - 1) = 'ABD-F'
+)
+
+SELECT 
+	car_maker,
+	car_model,
+	terminal_name,
+    COUNT(terminal_name) AS total_terminal_usage
+FROM 
+    FilteredApplicatorHistory
+GROUP BY 
+    car_maker, car_model, terminal_name;
 
 
 
@@ -777,6 +812,8 @@ WITH DateRange AS (
 FilteredApplicatorHistory AS (
     SELECT 
         aioh.applicator_no,
+        a.car_maker,
+        a.car_model,
         CAST(aioh.date_time_out AS DATETIME2(2)) AS date_out
     FROM 
         t_applicator_in_out_history aioh
@@ -785,11 +822,12 @@ FilteredApplicatorHistory AS (
     WHERE 
         aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
         aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
-        AND a.car_maker = 'Mazda' AND a.car_model = 'J12'
 )
 
 SELECT 
     CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+    fah.car_maker,
+    fah.car_model,
     COUNT(fah.applicator_no) AS total_inspected
 FROM 
     DateRange dr
@@ -798,7 +836,7 @@ LEFT JOIN
         fah.date_out >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
         fah.date_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
 GROUP BY 
-    dr.report_date
+    dr.report_date, fah.car_maker, fah.car_model 
 ORDER BY 
     dr.report_date;
 
@@ -818,6 +856,8 @@ WITH DateRange AS (
 FilteredApplicatorHistory AS (
     SELECT 
         aioh.applicator_no,
+        a.car_maker,
+        a.car_model,
         CAST(aioh.date_time_in AS DATETIME2(2)) AS date_in
     FROM 
         t_applicator_in_out_history aioh
@@ -831,6 +871,8 @@ FilteredApplicatorHistory AS (
 
 SELECT 
     CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+    fah.car_maker,
+    fah.car_model,
     COUNT(fah.applicator_no) AS total_inspected
 FROM 
     DateRange dr
@@ -839,7 +881,7 @@ LEFT JOIN
         fah.date_in >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
         fah.date_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
 GROUP BY 
-    dr.report_date
+    dr.report_date, fah.car_maker, fah.car_model 
 ORDER BY 
     dr.report_date;
 
@@ -859,6 +901,8 @@ WITH DateRange AS (
 FilteredApplicatorHistory AS (
     SELECT 
         aioh.applicator_no,
+        a.car_maker,
+        a.car_model,
         CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_inspected
     FROM 
         t_applicator_in_out_history aioh
@@ -872,6 +916,8 @@ FilteredApplicatorHistory AS (
 
 SELECT 
     CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+    fah.car_maker,
+    fah.car_model,
     COUNT(fah.applicator_no) AS total_inspected
 FROM 
     DateRange dr
@@ -880,9 +926,38 @@ LEFT JOIN
         fah.date_inspected >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
         fah.date_inspected < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
 GROUP BY 
-    dr.report_date
+    dr.report_date, fah.car_maker, fah.car_model 
 ORDER BY 
     dr.report_date;
+
+-- Sample Query for Daily Count of Applicator Out, In and Inspected based on t_applicator_in_out_history All Maker Models 
+-- (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 11;   -- Specify the month (November)
+
+WITH FilteredApplicatorHistory AS (
+    SELECT 
+        aioh.applicator_no,
+        a.car_maker,
+        a.car_model,
+        CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_inspected
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+    WHERE 
+        aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+        aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2)))  -- Adjusted to include the entire month
+)
+
+SELECT 
+    car_maker,
+    car_model,
+    COUNT(applicator_no) AS total
+FROM 
+    FilteredApplicatorHistory
+GROUP BY 
+    car_maker, car_model;
 
 
 

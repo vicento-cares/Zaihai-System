@@ -8,7 +8,9 @@
 	let month_a_adj_cnt2_chart;
 	let month_a_adj_cnt3_chart;
 	let month_term_usage_chart;
+	let month_term_usage_chart2;
 	let month_aioi_chart;
+	let month_aioi_chart2;
 	let month_amd_chart;
 
 	// DOMContentLoaded function
@@ -140,7 +142,8 @@
 					// Create chart options
 					var options = {
 						chart: {
-							type: 'pie'
+							type: 'pie',
+							height: 300
 						},
 						series: item.data, // Use the data for the current item
 						labels: item.categories, // Use the categories for the current item
@@ -192,13 +195,14 @@
 				var options = {
 					chart: {
 						type: 'bar',
-						height: 350
+						height: 600
 					},
 					plotOptions: {
 						bar: {
 							horizontal: true, // Set this to true for horizontal bars
-							columnWidth: '55%',
-							endingShape: 'rounded'
+							columnWidth: '100%',
+							endingShape: 'rounded',
+							barHeight: '75%',
 						},
 					},
 					dataLabels: {
@@ -208,6 +212,13 @@
 					colors: bootstrapColors,
 					xaxis: {
 						categories: response.categories
+					},
+					yaxis: {
+						labels: {
+							style: {
+								fontSize: '12px' // Adjust the font size for y-axis labels
+							}
+						}
 					},
 					title: {
 						text: `Current TRD Carts Reuse of all Car Maker & Car Model`,
@@ -238,21 +249,14 @@
 			success: response => {
 				console.log(response.categories);
 				console.log(response.data);
+				console.log(response.colorMap);
 
 				let ctx = document.querySelector("#current_active_trd_count_chart");
 
-				const colors = [
-					'#007bff', // Primary
-					'#6c757d', // Secondary
-					'#28a745', // Success
-					'#dc3545', // Danger
-					'#ffc107', // Warning
-					'#17a2b8', // Info
-					'#343a40', // Dark
-					'#e83e8c', // Pink
-					'#fd7e14', // orange
-					'#20c997' // teal
-				]
+				const categoryColorMap = response.colorMap;
+
+				// Generate the colors array based on the categories in response
+				const colors = response.categories.map(category => categoryColorMap[category] || '#343a40'); // Default color if category not found
 
 				var options = {
 					chart: {
@@ -262,7 +266,12 @@
 					labels: response.categories,
 					colors: colors,
 					title: {
-						text: 'Total Active TRD per Car Maker & Car Model'
+						text: 'Total Active TRD',
+						align: 'center'
+					},
+					legend: {
+						position: 'bottom',
+						horizontalAlign: 'center',
 					}
 				};
 
@@ -369,21 +378,14 @@
 			success: response => {
 				console.log(response.categories);
 				console.log(response.data);
+				console.log(response.colorMap);
 
 				let ctx = document.querySelector("#current_applicators_terminals_count_chart2");
 
-				const colors = [
-					'#007bff', // Primary
-					'#6c757d', // Secondary
-					'#28a745', // Success
-					'#dc3545', // Danger
-					'#ffc107', // Warning
-					'#17a2b8', // Info
-					'#343a40', // Dark
-					'#e83e8c', // Pink
-					'#fd7e14', // orange
-					'#20c997' // teal
-				]
+				const categoryColorMap = response.colorMap;
+
+				// Generate the colors array based on the categories in response
+				const colors = response.categories.map(category => categoryColorMap[category] || '#343a40'); // Default color if category not found
 
 				var options = {
 					chart: {
@@ -393,7 +395,12 @@
 					labels: response.categories,
 					colors: colors,
 					title: {
-						text: 'Total Applicators'
+						text: 'Total Applicators',
+						align: 'center'
+					},
+					legend: {
+						position: 'bottom',
+						horizontalAlign: 'center',
 					}
 				};
 
@@ -779,14 +786,19 @@
 				terminal_name: terminal_name
 			},  
 			success: response => {
+				get_month_term_usage_chart2();
+
 				console.log(response.categories);
 				console.log(response.data);
+				console.log(response.colorMap);
 
 				let concat_label = car_maker + ' ';
 
 				if (car_maker != car_model) {
 					concat_label += car_model;
 				}
+				
+				const seriesColorMap = response.colorMap;
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -796,6 +808,9 @@
 					};
 				});
 
+				// Generate the colors array based on the series names
+				const colors = seriesData.map(item => seriesColorMap[item.name] || '#343a40'); // Default color if name not found
+
 				let ctx = document.querySelector("#month_term_usage_chart");
 
 				var options = {
@@ -804,6 +819,7 @@
 						height: 350
 					},
 					series: seriesData,
+					colors: colors,
 					xaxis: {
 						categories: response.categories
 					},
@@ -830,6 +846,62 @@
 
 				month_term_usage_chart = new ApexCharts(ctx, options);
 				month_term_usage_chart.render();
+			}
+		});
+	}
+
+	const get_month_term_usage_chart2 = () => {
+		let year = document.getElementById("month_term_usage_year_search").value;
+		let month = document.getElementById("month_term_usage_month_search").value;
+		let terminal_name = document.getElementById("month_term_usage_terminal_name_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_term_usage_chart2',
+				year: year,
+				month: month,
+				terminal_name: terminal_name
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+				console.log(response.colorMap);
+
+				let ctx = document.querySelector("#month_term_usage_chart2");
+
+				const categoryColorMap = response.colorMap;
+
+				// Generate the colors array based on the categories in response
+				const colors = response.categories.map(category => categoryColorMap[category] || '#343a40'); // Default color if category not found
+
+				var options = {
+					chart: {
+						type: 'pie'
+					},
+					series: response.data,
+					labels: response.categories,
+					colors: colors,
+					title: {
+						text: `Monthly Terminal Usage Data of ${terminal_name}`,
+						align: 'center'
+					},
+					legend: {
+						position: 'bottom',
+						horizontalAlign: 'center',
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_term_usage_chart2) {
+					month_term_usage_chart2.destroy();
+				}
+
+				month_term_usage_chart2 = new ApexCharts(ctx, options);
+				month_term_usage_chart2.render();
 			}
 		});
 	}
@@ -862,12 +934,17 @@
 			success: response => {
 				console.log(response.categories);
 				console.log(response.data);
+				console.log(response.colorMap);
+
+				get_month_aioi_chart2();
 
 				let concat_label = car_maker + ' ';
 
 				if (car_maker != car_model) {
 					concat_label += car_model;
 				}
+
+				const seriesColorMap = response.colorMap;
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -877,6 +954,9 @@
 					};
 				});
 
+				// Generate the colors array based on the series names
+				const colors = seriesData.map(item => seriesColorMap[item.name] || '#343a40'); // Default color if name not found
+
 				let ctx = document.querySelector("#month_aioi_chart");
 
 				var options = {
@@ -885,6 +965,7 @@
 						height: 350
 					},
 					series: seriesData,
+					colors: colors,
 					xaxis: {
 						categories: response.categories
 					},
@@ -911,6 +992,62 @@
 
 				month_aioi_chart = new ApexCharts(ctx, options);
 				month_aioi_chart.render();
+			}
+		});
+	}
+
+	const get_month_aioi_chart2 = () => {
+		let year = document.getElementById("month_aioi_year_search").value;
+		let month = document.getElementById("month_aioi_month_search").value;
+		let status = document.getElementById("month_aioi_status_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_aioi_chart2',
+				year: year,
+				month: month,
+				status: status
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+				console.log(response.colorMap);
+
+				let ctx = document.querySelector("#month_aioi_chart2");
+
+				const categoryColorMap = response.colorMap;
+
+				// Generate the colors array based on the categories in response
+				const colors = response.categories.map(category => categoryColorMap[category] || '#343a40'); // Default color if category not found
+
+				var options = {
+					chart: {
+						type: 'pie'
+					},
+					series: response.data,
+					labels: response.categories,
+					colors: colors,
+					title: {
+						text: `Monthly Applicator ${status}`,
+						align: 'center'
+					},
+					legend: {
+						position: 'bottom',
+						horizontalAlign: 'center',
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_aioi_chart2) {
+					month_aioi_chart2.destroy();
+				}
+
+				month_aioi_chart2 = new ApexCharts(ctx, options);
+				month_aioi_chart2.render();
 			}
 		});
 	}
