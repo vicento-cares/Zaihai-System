@@ -48,6 +48,78 @@ WHERE
 GROUP BY
 	a.car_maker, a.car_model;
 
+-- Total TRD Carts Out Count by Car Maker, Car Model and TRD No. by Applicator Out on t_applicator_in_out
+SELECT
+	a.car_maker,
+	a.car_model,
+	(
+		CASE 
+		WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+		WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+		ELSE '__FAILURE__'
+		END
+	) AS trd_no_parsed,
+	COUNT(aio.trd_no) - 4 AS total_trd_carts_reuse
+FROM 
+	t_applicator_in_out aio
+LEFT JOIN
+	m_applicator AS a ON aio.applicator_no = a.applicator_no
+WHERE
+	aio.date_time_in IS NULL AND 
+	aio.zaihai_stock_address IS NULL
+GROUP BY 
+    a.car_maker, a.car_model, (
+		CASE 
+		WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+		WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+		ELSE '__FAILURE__'
+		END
+	)
+HAVING 
+    COUNT(aio.trd_no) > 4 -- Show Greater Than 4 
+ORDER BY 
+    total_trd_carts_reuse DESC;
+
+-- Total Active TRD Machines Count by Car Maker, Car Model based on t_applicator_in_out Applicator Out Only
+WITH FilteredApplicatorInOut AS (
+	SELECT
+		a.car_maker,
+		a.car_model,
+		(
+			CASE 
+			WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+			WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+			ELSE '__FAILURE__'
+			END
+		) AS trd_no_parsed
+	FROM 
+		t_applicator_in_out aio
+	LEFT JOIN
+		m_applicator AS a ON aio.applicator_no = a.applicator_no
+	WHERE
+		aio.date_time_in IS NULL AND 
+		aio.zaihai_stock_address IS NULL
+	GROUP BY
+		a.car_maker, a.car_model, (
+			CASE 
+			WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+			WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+			ELSE '__FAILURE__'
+			END
+		)
+)
+	
+SELECT
+	car_maker,
+	car_model,
+	COUNT(trd_no_parsed) AS total_active_trd
+FROM
+	FilteredApplicatorInOut
+GROUP BY
+	car_maker, car_model
+ORDER BY 
+    total_active_trd DESC;
+
 
 
 

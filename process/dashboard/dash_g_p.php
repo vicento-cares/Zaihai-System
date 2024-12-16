@@ -26,36 +26,6 @@ if ($method == 'get_applicator_list_status_count') {
     echo json_encode($data);
 }
 
-if ($method == 'get_total_applicator_terminal_count') {
-    $data = [];
-
-    $sql = "WITH 
-                applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator),
-                terminal_count AS (SELECT COUNT(id) AS total_terminal FROM m_terminal),
-                applicator_terminal_count AS (SELECT COUNT(id) AS total_applicator_terminal FROM m_applicator_terminal)
-
-            SELECT 
-                a.total_applicator,
-                t.total_terminal,
-                at.total_applicator_terminal
-            FROM 
-                applicator_count a,
-                terminal_count t,
-                applicator_terminal_count at";
-    $stmt = $conn -> prepare($sql);
-    $stmt -> execute();
-
-    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
-        $data = [
-            'total_applicator' => intval($row['total_applicator']), 
-            'total_terminal' => intval($row['total_terminal']), 
-            'total_applicator_terminal' => intval($row['total_applicator_terminal'])
-        ];
-    }
-
-    echo json_encode($data);
-}
-
 if ($method == 'get_current_applicator_list_status_count_chart') {
     $data = [];
     $categories = [];
@@ -166,6 +136,181 @@ if ($method == 'get_current_applicator_out_charts') {
 
         $finalData[] = $maker_model_data;
     }
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
+if ($method == 'get_current_trd_carts_reuse_count_chart') {
+    $data = [];
+    $categories = [];
+
+    $sql = "SELECT
+                a.car_maker,
+                a.car_model,
+                (
+                    CASE 
+                    WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+                    WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+                    ELSE '__FAILURE__'
+                    END
+                ) AS trd_no_parsed,
+                COUNT(aio.trd_no) - 4 AS total_trd_carts_reuse
+            FROM 
+                t_applicator_in_out aio
+            LEFT JOIN
+                m_applicator AS a ON aio.applicator_no = a.applicator_no
+            WHERE
+                aio.date_time_in IS NULL AND 
+                aio.zaihai_stock_address IS NULL
+            GROUP BY 
+                a.car_maker, a.car_model, (
+                    CASE 
+                    WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+                    WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+                    ELSE '__FAILURE__'
+                    END
+                )
+            HAVING 
+                COUNT(aio.trd_no) > 4 -- Show Greater Than 4 
+            ORDER BY 
+                total_trd_carts_reuse DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'] . " " . $row['trd_no_parsed'];
+        } else {
+            $maker_model_label = $row['car_maker'] . " " . $row['trd_no_parsed'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add total_applicator and total_terminal values to data
+        $data['TotalTrdCartsReuse'][] = (int)$row['total_trd_carts_reuse'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => [
+            [
+                'name' => 'TRD Carts Reuse',
+                'data' => $data['TotalTrdCartsReuse']
+            ]
+        ]
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
+if ($method == 'get_total_applicator_terminal_count') {
+    $data = [];
+
+    $sql = "WITH 
+                applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator),
+                terminal_count AS (SELECT COUNT(id) AS total_terminal FROM m_terminal),
+                applicator_terminal_count AS (SELECT COUNT(id) AS total_applicator_terminal FROM m_applicator_terminal)
+
+            SELECT 
+                a.total_applicator,
+                t.total_terminal,
+                at.total_applicator_terminal
+            FROM 
+                applicator_count a,
+                terminal_count t,
+                applicator_terminal_count at";
+    $stmt = $conn -> prepare($sql);
+    $stmt -> execute();
+
+    while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
+        $data = [
+            'total_applicator' => intval($row['total_applicator']), 
+            'total_terminal' => intval($row['total_terminal']), 
+            'total_applicator_terminal' => intval($row['total_applicator_terminal'])
+        ];
+    }
+
+    echo json_encode($data);
+}
+
+if ($method == 'get_current_active_trd_count_chart') {
+    $data = [];
+    $categories = [];
+
+    $sql = "WITH FilteredApplicatorInOut AS (
+                SELECT
+                    a.car_maker,
+                    a.car_model,
+                    (
+                        CASE 
+                        WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+                        WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+                        ELSE '__FAILURE__'
+                        END
+                    ) AS trd_no_parsed
+                FROM 
+                    t_applicator_in_out aio
+                LEFT JOIN
+                    m_applicator AS a ON aio.applicator_no = a.applicator_no
+                WHERE
+                    aio.date_time_in IS NULL AND 
+                    aio.zaihai_stock_address IS NULL
+                GROUP BY
+                    a.car_maker, a.car_model, (
+                        CASE 
+                        WHEN CHARINDEX('TRD', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TRD', trd_no), 6)),'_', '')
+                        WHEN CHARINDEX('TR', aio.trd_no) > 0 THEN REPLACE(UPPER(SUBSTRING(aio.trd_no, CHARINDEX('TR', trd_no), 5)), '_', '')
+                        ELSE '__FAILURE__'
+                        END
+                    )
+            )
+                
+            SELECT
+                car_maker,
+                car_model,
+                COUNT(trd_no_parsed) AS total_active_trd
+            FROM
+                FilteredApplicatorInOut
+            GROUP BY
+                car_maker, car_model
+            ORDER BY 
+                total_active_trd DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        // Add total_applicator and total_terminal values to data
+        $data[] = (int)$row['total_active_trd'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => $data
+    ];
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);

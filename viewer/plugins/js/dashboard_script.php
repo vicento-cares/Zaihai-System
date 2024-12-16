@@ -1,5 +1,7 @@
 <script type="text/javascript">
 	let current_applicator_list_status_count_chart;
+	let current_trd_carts_reuse_count_chart;
+	let current_active_trd_count_chart;
 	let current_applicators_terminals_count_chart;
 	let current_applicators_terminals_count_chart2;
 	let month_a_adj_cnt_chart;
@@ -13,6 +15,8 @@
 	document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_list_status_count();
 		get_current_applicator_list_status_count_chart();
+		get_current_trd_carts_reuse_count_chart();
+		get_current_active_trd_count_chart();
 		get_current_applicator_out_charts();
 		get_total_applicator_terminal_count();
 		get_current_applicators_terminals_count_chart();
@@ -155,6 +159,120 @@
 					const chart = new ApexCharts(chartDiv, options);
 					chart.render();
 				});
+			}
+		});
+	}
+
+	const get_current_trd_carts_reuse_count_chart = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_trd_carts_reuse_count_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#current_trd_carts_reuse_count_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: true, // Set this to true for horizontal bars
+							columnWidth: '55%',
+							endingShape: 'rounded'
+						},
+					},
+					dataLabels: {
+						enabled: false
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Current TRD Carts Reuse of all Car Maker & Car Model`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_trd_carts_reuse_count_chart) {
+					current_trd_carts_reuse_count_chart.destroy();
+				}
+
+				current_trd_carts_reuse_count_chart = new ApexCharts(ctx, options);
+				current_trd_carts_reuse_count_chart.render();
+			}
+		});
+	}
+
+	const get_current_active_trd_count_chart = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_active_trd_count_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				let ctx = document.querySelector("#current_active_trd_count_chart");
+
+				const colors = [
+					'#007bff', // Primary
+					'#6c757d', // Secondary
+					'#28a745', // Success
+					'#dc3545', // Danger
+					'#ffc107', // Warning
+					'#17a2b8', // Info
+					'#343a40', // Dark
+					'#e83e8c', // Pink
+					'#fd7e14', // orange
+					'#20c997' // teal
+				]
+
+				var options = {
+					chart: {
+						type: 'pie'
+					},
+					series: response.data,
+					labels: response.categories,
+					colors: colors,
+					title: {
+						text: 'Total Active TRD per Car Maker & Car Model'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_active_trd_count_chart) {
+					current_active_trd_count_chart.destroy();
+				}
+
+				current_active_trd_count_chart = new ApexCharts(ctx, options);
+				current_active_trd_count_chart.render();
 			}
 		});
 	}
