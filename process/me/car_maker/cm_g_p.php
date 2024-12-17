@@ -9,12 +9,12 @@ if ($method == 'get_car_maker_dropdown') {
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
-		echo '<option selected value=""></option>';
+		echo '<option selected value="">Select Car Maker</option>';
 		foreach($stmt -> fetchAll() as $row) {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
 		}
 	} else {
-		echo '<option selected value=""></option>';
+		echo '<option selected value="">Select Car Maker</option>';
 	}
 }
 
@@ -24,12 +24,12 @@ if ($method == 'get_car_model_dropdown') {
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
 	if ($stmt -> rowCount() > 0) {
-		echo '<option selected value=""></option>';
+		echo '<option selected value="">Select Car Model</option>';
 		foreach($stmt -> fetchAll() as $row) {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
 		}
 	} else {
-		echo '<option selected value=""></option>';
+		echo '<option selected value="">Select Car Model</option>';
 	}
 }
 

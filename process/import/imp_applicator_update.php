@@ -41,14 +41,14 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $car_maker = addslashes($line[0]);
-            $car_model = addslashes($line[1]);
-            $applicator_no = addslashes($line[2]);
-            $zaihai_stock_address = addslashes($line[3]);
-            $car_maker_new = addslashes($line[4]);
-            $car_model_new = addslashes($line[5]);
-            $applicator_no_new = addslashes($line[6]);
-            $zaihai_stock_address_new = addslashes($line[7]);
+            $car_maker = $line[0];
+            $car_model = $line[1];
+            $applicator_no = $line[2];
+            $zaihai_stock_address = $line[3];
+            $car_maker_new = $line[4];
+            $car_model_new = $line[5];
+            $applicator_no_new = $line[6];
+            $zaihai_stock_address_new = $line[7];
 
             if (empty($car_maker_new) && empty($car_model_new) 
                 && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
@@ -74,9 +74,10 @@ function check_csv ($file, $conn) {
             // CHECK ROW VALIDATION
             // 0
             $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE applicator_no = '$applicator_no_new'";
+                    WHERE applicator_no = ?";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
+            $params = array($applicator_no_new);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -88,9 +89,10 @@ function check_csv ($file, $conn) {
 
             // 1
             $sql = "SELECT status FROM t_applicator_list 
-                    WHERE applicator_no = '$applicator_no'";
+                    WHERE applicator_no = ?";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
+            $params = array($applicator_no);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -118,9 +120,10 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             // $sql = "SELECT id FROM m_applicator 
-            //         WHERE zaihai_stock_address = '$zaihai_stock_address'";
-            // $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            // $stmt -> execute();
+            //         WHERE zaihai_stock_address = ?";
+            // $stmt = $conn -> prepare($sql);
+            // $params = array($zaihai_stock_address);
+            // $stmt -> execute($params);
             // if ($stmt -> rowCount() > 0) {
             //     $isExistsOnDb = 1;
             //     $hasError = 1;
@@ -200,14 +203,14 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                         continue; // Skip blank lines
                     }
 
-                    $car_maker = addslashes($line[0]);
-                    $car_model = addslashes($line[1]);
-                    $applicator_no = addslashes($line[2]);
-                    $zaihai_stock_address = addslashes($line[3]);
-                    $car_maker_new = addslashes($line[4]);
-                    $car_model_new = addslashes($line[5]);
-                    $applicator_no_new = addslashes($line[6]);
-                    $zaihai_stock_address_new = addslashes($line[7]);
+                    $car_maker = $line[0];
+                    $car_model = $line[1];
+                    $applicator_no = $line[2];
+                    $zaihai_stock_address = $line[3];
+                    $car_maker_new = $line[4];
+                    $car_model_new = $line[5];
+                    $applicator_no_new = $line[6];
+                    $zaihai_stock_address_new = $line[7];
 
                     if (empty($car_maker_new) && empty($car_model_new) 
                         && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
@@ -223,22 +226,26 @@ if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMime
                     }
 
                     $query = "UPDATE t_applicator_list 
-                                SET car_maker = '$car_maker_new', car_model = '$car_model_new', 
-                                applicator_no = '$applicator_no_new', location = '$zaihai_stock_address_new'
-                                WHERE car_maker = '$car_maker' AND car_model = '$car_model' 
-                                AND applicator_no = '$applicator_no' AND location = '$zaihai_stock_address'";
+                                SET car_maker = ?, car_model = ?, 
+                                applicator_no = ?, location = ?
+                                WHERE car_maker = ? AND car_model = ? 
+                                AND applicator_no = ? AND location = ?";
 
                     $stmt = $conn->prepare($query);
-                    if ($stmt->execute()) {
+                    $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new,
+                                    $car_maker, $car_model, $applicator_no, $zaihai_stock_address);
+                    if ($stmt->execute($params)) {
                         $stmt = NULL;
 
                         $query = "UPDATE m_applicator 
-                                SET car_maker = '$car_maker_new', car_model = '$car_model_new', 
-                                applicator_no = '$applicator_no_new', zaihai_stock_address = '$zaihai_stock_address_new' 
-                                WHERE zaihai_stock_address = '$zaihai_stock_address'";
+                                SET car_maker = ?, car_model = ?, 
+                                applicator_no = ?, zaihai_stock_address = ? 
+                                WHERE zaihai_stock_address = ?";
 
                         $stmt = $conn->prepare($query);
-                        if (!$stmt->execute()) {
+                        $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new, 
+                                        $zaihai_stock_address);
+                        if (!$stmt->execute($params)) {
                             $error++;
                         }
                     } else {

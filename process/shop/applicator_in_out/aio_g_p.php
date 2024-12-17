@@ -448,9 +448,10 @@ if ($method == 'get_applicator_in_pending_details') {
             $applicator_no_split = split_applicator_no($applicator_no);
             $terminal_name_split = split_terminal_name($terminal_name);
     
-            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name_split'";
-            $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt->execute();
+            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ? AND terminal_name = ?";
+            $stmt = $conn->prepare($sql);
+            $params = array($applicator_no, $terminal_name_split);
+            $stmt->execute($params);
     
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
     
@@ -459,10 +460,11 @@ if ($method == 'get_applicator_in_pending_details') {
 
                 if ($status == 'Pending') {
                     $sql = "SELECT TOP 1 serial_no FROM t_applicator_in_out 
-                        WHERE applicator_no = '$applicator_no' AND terminal_name = '$terminal_name'
+                        WHERE applicator_no = ? AND terminal_name = ? 
                         ORDER BY id DESC";
-                    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-                    $stmt->execute();
+                    $stmt = $conn->prepare($sql);
+                    $params = array($applicator_no, $terminal_name);
+                    $stmt->execute($params);
 
                     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 

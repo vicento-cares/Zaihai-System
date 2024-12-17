@@ -62,9 +62,10 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM t_applicator_list 
-                    WHERE applicator_no = '$applicator_no'";
+                    WHERE applicator_no = ?";
             $stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-            $stmt -> execute();
+            $params = array($applicator_no);
+            $stmt -> execute($params);
             if ($stmt -> rowCount() > 0) {
                 $isExistsOnDb = 1;
                 $hasError = 1;

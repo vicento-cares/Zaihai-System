@@ -36,10 +36,10 @@ function check_csv ($file, $conn) {
 
             $check_csv_row++;
             
-            $applicator_no = addslashes($line[0]);
-            $terminal_name = addslashes($line[1]);
-            $applicator_no_new = addslashes($line[2]);
-            $terminal_name_new = addslashes($line[3]);
+            $applicator_no = $line[0];
+            $terminal_name = $line[1];
+            $applicator_no_new = $line[2];
+            $terminal_name_new = $line[3];
 
             if (empty($applicator_no_new) && empty($terminal_name_new)) {
                 continue; // Skip blank lines
@@ -70,9 +70,10 @@ function check_csv ($file, $conn) {
 
             // CHECK ROWS IF EXISTS
             $sql = "SELECT id FROM m_applicator_terminal 
-                    WHERE applicator_no = '$applicator_no_new' AND terminal_name = '$terminal_name_new'";
+                    WHERE applicator_no = ? AND terminal_name = ?";
             $stmt = $conn -> prepare($sql);
-            $stmt -> execute();
+            $params = array($applicator_no_new, $terminal_name_new);
+            $stmt -> execute($params);
 
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 

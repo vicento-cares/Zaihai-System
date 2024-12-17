@@ -96,12 +96,13 @@ include 'plugins/navbar/viewer_navbar.php';
                                                 <th>Applicator No.</th>
                                                 <th>Location</th>
                                                 <th>Status</th>
+                                                <th>Elapsed Time</th>
                                                 <th>Last Update</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="recentApplicatorListData" style="text-align: center;">
                                                 <tr>
-                                                <td colspan="7" style="text-align:center;">
+                                                <td colspan="8" style="text-align:center;">
                                                     <div class="spinner-border text-dark" role="status">
                                                     <span class="sr-only">Loading...</span>
                                                     </div>

@@ -75,6 +75,7 @@
                     <li class="nav-item dropdown">
                         <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle"><i class="fas fa-bars"></i> Menu</a>
                         <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
+                            <li><a href="viewer/dashboard.php" class="dropdown-item">Dashboard</a></li>
                             <li><a href="viewer/applicator_list.php" class="dropdown-item">Applicator List</a></li>
                             <li><a href="viewer/applicator_out.php" class="dropdown-item">Applicator Out</a></li>
                             <li><a href="viewer/applicator_in.php" class="dropdown-item">Applicator In</a></li>
@@ -82,7 +83,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="/zaihai/wi/" class="nav-link active"><i class="fas fa-file"></i> Work Instruction</a>
+                        <a href="/zaihai/wi/Zaihai System WI (Shop).xlsx" target="_blank" class="nav-link active"><i class="fas fa-file"></i> Work Instruction</a>
                     </li>
                     <li class="nav-item">
                         <a href="/zaihai/login/" target="_blank" class="nav-link active"><i class="fas fa-sign-in-alt"></i> Login</a>
