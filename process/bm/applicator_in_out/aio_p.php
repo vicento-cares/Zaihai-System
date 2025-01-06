@@ -34,7 +34,17 @@ if ($method == 'in_applicator') {
 
             $terminal_name_split = split_terminal_name($terminal_name);
 
-            $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ? AND terminal_name = ?";
+            $sql = "SELECT 
+                        at.id,
+                        a.car_maker,
+                        a.car_model
+                    FROM 
+                        m_applicator_terminal at 
+                    LEFT JOIN
+                        m_applicator a ON at.applicator_no = a.applicator_no
+                    WHERE 
+                        at.applicator_no = ? AND 
+                        at.terminal_name = ?";
             $stmt = $conn->prepare($sql);
             $params = array($applicator_no_new, $terminal_name_split);
             $stmt->execute($params);
@@ -42,21 +52,38 @@ if ($method == 'in_applicator') {
             $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
             if ($row) {
+                $car_maker = $row['car_maker'];
+                $car_model = $row['car_model'];
+
                 $status = get_applicator_list_status($applicator_no, $conn);
                 $status2 = get_applicator_list_status($applicator_no_new, $conn);
 
                 if ($status == 'Out' && $status2 == 'Ready To Use') {
-                    $sql = "SELECT TOP 1 id, trd_no FROM t_applicator_in_out 
-                            WHERE applicator_no = ? AND trd_no = ?
-                            AND zaihai_stock_address IS NULL AND date_time_in IS NULL
-                            ORDER BY id DESC";
+                    $sql = "SELECT TOP 1 
+                                aio.id, 
+                                aio.trd_no, 
+                                a.car_maker, 
+                                a.car_model
+                            FROM 
+                                t_applicator_in_out aio 
+                            LEFT JOIN 
+                                m_applicator a ON aio.applicator_no = a.applicator_no
+                            WHERE 
+                                aio.applicator_no = ? AND 
+                                aio.trd_no = ? AND 
+                                aio.zaihai_stock_address IS NULL 
+                                AND aio.date_time_in IS NULL
+                            ORDER BY 
+                                aio.id DESC";
                     $stmt = $conn->prepare($sql);
                     $params = array($applicator_no, $location_before);
                     $stmt->execute($params);
 
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    if ($row && $location_before == $row['trd_no']) {
+                    if ($car_maker != $row['car_maker'] && $car_model != $row['car_model']) {
+                        echo 'Unmatched Applicator New and Applicator Old on Car Maker / Car Model! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
+                    } else if ($row && $location_before == $row['trd_no']) {
                         $isTransactionActive = false;
 
                         try {
