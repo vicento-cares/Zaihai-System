@@ -216,22 +216,76 @@
         document.body.removeChild(link);
     }
 
+	var delay = (function () {
+        var timer = 0;
+        return function (callback, ms) {
+            clearTimeout(timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+	sessionStorage.setItem('zs_ao_location', '');
+	sessionStorage.setItem('zs_ao_applicator_no', '');
+	sessionStorage.setItem('zs_ao_terminal_name', '');
+
+	document.getElementById("ao_location").addEventListener("input", e => {
+		delay(function () {
+			if (document.getElementById("ao_location").value.length < 256) {
+				document.getElementById("ao_location").value = "";
+			}
+			let ao_location = sessionStorage.getItem('zs_ao_location');
+			if (ao_location != '') {
+				document.getElementById("ao_location").value = ao_location;
+				sessionStorage.setItem('zs_ao_location', '');
+			}
+		}, 100);
+	});
+
 	document.getElementById("ao_location").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ao_location', e.target.value);
 		document.getElementById("ao_location").disabled = true;
 		document.getElementById("ao_applicator_no").disabled = false;
 		document.getElementById("ao_applicator_no").focus();
 	});
 
+	document.getElementById("ao_applicator_no").addEventListener("input", e => {
+		delay(function () {
+            if (document.getElementById("ao_applicator_no").value.length < 256) {
+                document.getElementById("ao_applicator_no").value = "";
+            }
+			let ao_applicator_no = sessionStorage.getItem('zs_ao_applicator_no');
+			if (ao_applicator_no != '') {
+				document.getElementById("ao_applicator_no").value = ao_applicator_no;
+				sessionStorage.setItem('zs_ao_applicator_no', '');
+			}
+        }, 100);
+	});
+
 	document.getElementById("ao_applicator_no").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ao_applicator_no', e.target.value);
 		document.getElementById("ao_applicator_no").disabled = true;
 		document.getElementById("ao_terminal_name").disabled = false;
 		document.getElementById("ao_terminal_name").focus();
 	});
 
+	document.getElementById("ao_terminal_name").addEventListener("input", e => {
+		delay(function () {
+            if (document.getElementById("ao_terminal_name").value.length < 256) {
+                document.getElementById("ao_terminal_name").value = "";
+            }
+			let ao_terminal_name = sessionStorage.getItem('zs_ao_terminal_name');
+			if (ao_terminal_name != '') {
+				document.getElementById("ao_terminal_name").value = ao_terminal_name;
+				sessionStorage.setItem('zs_ao_terminal_name', '');
+			}
+        }, 100);
+	});
+
 	document.getElementById("ao_terminal_name").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ao_terminal_name', e.target.value);
 		document.getElementById("ao_terminal_name").disabled = true;
 		out_applicator();
 	});

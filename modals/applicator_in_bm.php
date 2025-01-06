@@ -13,7 +13,8 @@
           <input type="hidden" id="ai_bm_id_ao" class="form-control">
           <div class="row mb-2">
             <div class="col-sm-12">
-              <input type="text" class="form-control" id="ai_bm_applicator_no_new" placeholder="Applicator No. New" autocomplete="off" maxlength="255" required>
+              <input type="text" class="form-control" id="ai_bm_applicator_no_new" placeholder="Applicator No. New"
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" required>
             </div>
           </div>
           <div class="row mb-2">

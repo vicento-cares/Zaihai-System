@@ -12,17 +12,20 @@
         <div class="modal-body">
           <div class="row mb-2">
             <div class="col-sm-12">
-              <input type="text" class="form-control" id="ai_location_before" placeholder="TRD / Cart Location" autocomplete="off" maxlength="255">
+              <input type="text" class="form-control" id="ai_location_before" placeholder="TRD / Cart Location"
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255">
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-sm-12">
-              <input type="text" class="form-control" id="ai_applicator_no" placeholder="Applicator No." autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="ai_applicator_no" placeholder="Applicator No."
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-sm-12">
-              <input type="text" class="form-control" id="ai_terminal_name" placeholder="Terminal Name" autocomplete="off" maxlength="255" disabled>
+              <input type="text" class="form-control" id="ai_terminal_name" placeholder="Terminal Name"
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row mb-2">

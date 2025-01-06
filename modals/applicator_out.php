@@ -12,20 +12,20 @@
         <div class="modal-body">
           <div class="row mb-2">
             <div class="col-sm-12">
-              <input type="text" class="form-control" id="ao_location" placeholder="Location" autocomplete="off"
-                maxlength="255">
+              <input type="text" class="form-control" id="ao_location" placeholder="Location" oncopy="return false"
+                onpaste="return false" autocomplete="off" maxlength="255">
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ao_applicator_no" placeholder="Applicator No."
-                autocomplete="off" maxlength="255" disabled>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ao_terminal_name" placeholder="Terminal Name"
-                autocomplete="off" maxlength="255" disabled>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
             </div>
           </div>
           <div class="row mb-2">
