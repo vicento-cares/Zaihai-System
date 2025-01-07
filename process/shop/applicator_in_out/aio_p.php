@@ -16,7 +16,9 @@ if ($method == 'out_applicator') {
     $car_maker = $_SESSION['car_maker'];
     $car_model = $_SESSION['car_model'];
 
-    if (is_valid_applicator_no($applicator_no) == false) {
+    if (empty($location)) {
+        echo 'Please Select Borrowed By or Remarks';
+    } else if (is_valid_applicator_no($applicator_no) == false) {
         echo 'Invalid Applicator No.';
     } else if (is_valid_terminal_name($terminal_name) == false) {
         echo 'Invalid Terminal Name';
@@ -58,10 +60,18 @@ if ($method == 'out_applicator') {
 
                     if (!$row) {
                         $sql = "SELECT id FROM t_applicator_in_out 
-                                WHERE trd_no = ?
-                                AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
+                                WHERE trd_no = ?";
+                        $params[] = $location;
+
+                        // Check "Borrowed" Keyword on Location
+                        if (containsBorrowed($location)) {
+                            $sql .= " AND applicator_no = ?";
+                            $params[] = $applicator_no;
+                        }
+                        
+                        $sql .= " AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
+                        
                         $stmt = $conn->prepare($sql);
-                        $params = array($location);
                         $stmt->execute($params);
 
                         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
@@ -155,7 +165,9 @@ if ($method == 'in_applicator') {
     $car_maker = $_SESSION['car_maker'];
     $car_model = $_SESSION['car_model'];
 
-    if (is_valid_applicator_no($applicator_no) == false) {
+    if (empty($location_before)) {
+        echo 'Please Select Borrowed By or Remarks';
+    } else if (is_valid_applicator_no($applicator_no) == false) {
         echo 'Invalid Applicator No.';
     } else if (is_valid_terminal_name($terminal_name) == false) {
         echo 'Invalid Terminal Name';
