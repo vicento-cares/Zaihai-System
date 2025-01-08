@@ -45,7 +45,7 @@
               <select id="ai_borrowed_by_remarks" class="form-control" required>
                 <option disabled selected value="">Select Remarks</option>
                 <option value="Recrimp">Recrimp</option>
-                <option value="Conversion">Conversion</option>
+                <option value="Pullout">Pullout</option>
               </select>
             </div>
           </div>
