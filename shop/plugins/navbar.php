@@ -10,6 +10,8 @@ if (!isset($_SESSION['emp_no'])) {
   header('location:/zaihai/me/accounts.php');
 } else if ($_SESSION['role'] == 'BM') {
   header('location:/zaihai/bm/applicator_in.php');
+} else if ($_SESSION['role'] == 'PD') {
+  header('location:/zaihai/pd/verify_checksheet.php');
 }
 ?>  
 <!DOCTYPE html>
