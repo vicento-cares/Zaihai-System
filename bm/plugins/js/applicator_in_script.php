@@ -219,8 +219,32 @@
         document.getElementById('ai_bm_id_ao').value = id;
 	}
 
+	var delay = (function () {
+        var timer = 0;
+        return function (callback, ms) {
+            clearTimeout(timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+	sessionStorage.setItem('zs_ai_bm_applicator_no_new', '');
+
+	document.getElementById("ai_bm_applicator_no_new").addEventListener("input", e => {
+		delay(function () {
+            if (document.getElementById("ai_bm_applicator_no_new").value.length < 256) {
+                document.getElementById("ai_bm_applicator_no_new").value = "";
+            }
+			let ai_bm_applicator_no_new = sessionStorage.getItem('zs_ai_bm_applicator_no_new');
+			if (ai_bm_applicator_no_new != '') {
+				document.getElementById("ai_bm_applicator_no_new").value = ai_bm_applicator_no_new;
+				sessionStorage.setItem('zs_ai_bm_applicator_no_new', '');
+			}
+        }, 100);
+	});
+
 	document.getElementById("ai_bm_applicator_no_new").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ai_bm_applicator_no_new', e.target.value);
 		document.getElementById("ai_bm_applicator_no_new").disabled = true;
 		in_applicator();
 	});

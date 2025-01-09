@@ -9,6 +9,8 @@ if (isset($_SESSION['emp_no'])) {
     header('location:/zaihai/bm/applicator_in.php');
   } else if ($_SESSION['role'] == 'ME') {
     header('location:/zaihai/me/accounts.php');
+  } else if ($_SESSION['role'] == 'PD') {
+    header('location:/zaihai/pd/verify_checksheet.php');
   }
 }
 ?>
@@ -48,6 +50,7 @@ if (isset($_SESSION['emp_no'])) {
               <!-- <option value="Inspector">Inspector</option> -->
               <option value="BM">BM</option>
               <option value="ME">ME</option>
+              <option value="PD">PD</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">

@@ -9,6 +9,7 @@
 		get_applicator_no_datalist_in_search();
 		get_terminal_name_datalist_in_search();
 		get_location_datalist_in_search();
+		get_borrowed_by_dropdown();
 		get_recent_applicator_in();
 		realtime_get_recent_applicator_in = setInterval(get_recent_applicator_in, 10000);
 	});
@@ -216,32 +217,177 @@
         document.body.removeChild(link);
     }
 
+	$('#applicator_in').on('show.bs.modal', function (e) {
+		setTimeout(() => {
+			document.getElementById("ai_location_before").focus();
+		}, 200);
+	});
+
+	$('#applicator_in').on('hidden.bs.modal', function (e) {
+		document.getElementById('ai_opt_scan').checked = true;
+		document.getElementById('ai_opt_scan_div').classList.remove('d-none');
+		document.getElementById('ai_opt_borrowed_div').classList.add('d-none');
+		document.getElementById("ai_borrowed_by_location").value = '';
+		document.getElementById("ai_borrowed_by_remarks").value = '';
+		reset_applicator_in_fields(1);
+		document.getElementById("ai_applicator_no").disabled = true;
+		document.getElementById("ai_terminal_name").disabled = true;
+	});
+
+	const get_borrowed_by_dropdown = () => {
+		$.ajax({
+			url: '../process/me/car_maker/cm_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_borrowed_by_dropdown'
+			},  
+			success: response => {
+				document.getElementById("ai_borrowed_by_location").innerHTML = response;
+			}
+		});
+	}
+
+	const toggle_opt_divs = () => {
+		const scanDiv = document.getElementById('ai_opt_scan_div');
+		const borrowedDiv = document.getElementById('ai_opt_borrowed_div');
+		
+		const ai_location_before = document.getElementById("ai_location_before").value;
+		const ai_borrowed_by_location = document.getElementById("ai_borrowed_by_location").value;
+		const ai_borrowed_by_remarks = document.getElementById("ai_borrowed_by_remarks").value;
+		const ai_applicator_no = document.getElementById("ai_applicator_no").value;
+		const ai_terminal_name = document.getElementById("ai_terminal_name").value;
+
+		// Check if any of the input fields have a value
+		const hasValue = ai_location_before || ai_borrowed_by_location || ai_borrowed_by_remarks || ai_applicator_no || ai_terminal_name;
+
+		if (hasValue) {
+			if (document.getElementById('ai_opt_scan').checked) {
+				scanDiv.classList.remove('d-none');
+				borrowedDiv.classList.add('d-none');
+				document.getElementById("ai_borrowed_by_location").value = '';
+				document.getElementById("ai_borrowed_by_remarks").value = '';
+				reset_applicator_in_fields(1);
+				document.getElementById("ai_applicator_no").disabled = true;
+				document.getElementById("ai_terminal_name").disabled = true;
+			} else if (document.getElementById('ai_opt_borrowed').checked) {
+				document.getElementById('ai_opt_scan').checked = true;
+				document.getElementById('ai_opt_borrowed').checked = false;
+			}
+		} else {
+			if (document.getElementById('ai_opt_scan').checked) {
+				scanDiv.classList.remove('d-none');
+				borrowedDiv.classList.add('d-none');
+				document.getElementById("ai_applicator_no").disabled = true;
+				document.getElementById("ai_location_before").focus();
+			} else if (document.getElementById('ai_opt_borrowed').checked) {
+				scanDiv.classList.add('d-none');
+				borrowedDiv.classList.remove('d-none');
+				document.getElementById("ai_applicator_no").disabled = false;
+			}
+		}
+	}
+
+	var delay = (function () {
+        var timer = 0;
+        return function (callback, ms) {
+            clearTimeout(timer);
+            timer = setTimeout(callback, ms);
+        };
+    })();
+
+	sessionStorage.setItem('zs_ai_location_before', '');
+	sessionStorage.setItem('zs_ai_applicator_no', '');
+	sessionStorage.setItem('zs_ai_terminal_name', '');
+
+	document.getElementById("ai_location_before").addEventListener("input", e => {
+		delay(function () {
+			if (document.getElementById("ai_location_before").value.length < 256) {
+				document.getElementById("ai_location_before").value = "";
+			}
+			let ai_location_before = sessionStorage.getItem('zs_ai_location_before');
+			if (ai_location_before != '') {
+				document.getElementById("ai_location_before").value = ai_location_before;
+				sessionStorage.setItem('zs_ai_location_before', '');
+			}
+		}, 100);
+	});
+
 	document.getElementById("ai_location_before").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ai_location_before', e.target.value);
 		document.getElementById("ai_location_before").disabled = true;
 		document.getElementById("ai_applicator_no").disabled = false;
 		document.getElementById("ai_applicator_no").focus();
 	});
 
+	// Get references to the select elements
+	const borrowedBySelect = document.getElementById("ai_borrowed_by_location");
+	const remarksSelect = document.getElementById("ai_borrowed_by_remarks");
+
+	// Function to check if both selects have values
+	function checkSelects() {
+		if (borrowedBySelect.value && remarksSelect.value) {
+			document.getElementById("ai_applicator_no").focus();
+		}
+	}
+
+	// Add event listeners to both select elements
+	borrowedBySelect.addEventListener("change", checkSelects);
+	remarksSelect.addEventListener("change", checkSelects);
+
+	document.getElementById("ai_applicator_no").addEventListener("input", e => {
+		delay(function () {
+            if (document.getElementById("ai_applicator_no").value.length < 256) {
+                document.getElementById("ai_applicator_no").value = "";
+            }
+			let ai_applicator_no = sessionStorage.getItem('zs_ai_applicator_no');
+			if (ai_applicator_no != '') {
+				document.getElementById("ai_applicator_no").value = ai_applicator_no;
+				sessionStorage.setItem('zs_ai_applicator_no', '');
+			}
+        }, 100);
+	});
+
 	document.getElementById("ai_applicator_no").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ai_applicator_no', e.target.value);
 		document.getElementById("ai_applicator_no").disabled = true;
 		document.getElementById("ai_terminal_name").disabled = false;
 		document.getElementById("ai_terminal_name").focus();
 	});
 
+	document.getElementById("ai_terminal_name").addEventListener("input", e => {
+		delay(function () {
+            if (document.getElementById("ai_terminal_name").value.length < 256) {
+                document.getElementById("ai_terminal_name").value = "";
+            }
+			let ai_terminal_name = sessionStorage.getItem('zs_ai_terminal_name');
+			if (ai_terminal_name != '') {
+				document.getElementById("ai_terminal_name").value = ai_terminal_name;
+				sessionStorage.setItem('zs_ai_terminal_name', '');
+			}
+        }, 100);
+	});
+
 	document.getElementById("ai_terminal_name").addEventListener("change", e => {
 		e.preventDefault();
+		sessionStorage.setItem('zs_ai_terminal_name', e.target.value);
 		document.getElementById("ai_terminal_name").disabled = true;
 		in_applicator();
 	});
 
-	const reset_applicator_in_fields = () => {
+	const reset_applicator_in_fields = opt => {
 		document.getElementById("ai_location_before").value = '';
 		document.getElementById("ai_applicator_no").value = '';
 		document.getElementById("ai_terminal_name").value = '';
-		document.getElementById("ai_location_before").disabled = false;
-		document.getElementById("ai_location_before").focus();
+		if (opt == 1) {
+			document.getElementById("ai_location_before").disabled = false;
+			document.getElementById("ai_location_before").focus();
+		} else if (opt == 2) {
+			document.getElementById("ai_applicator_no").disabled = false;
+			document.getElementById("ai_applicator_no").focus();
+		}
 	}
 
 	const display_applicator_in_out_result = (id, type, message) => {
@@ -261,8 +407,30 @@
 		}, duration);
 	}
 
+	const get_checked_radio_button = name => {
+		var element = document.getElementsByName(name);
+		var value = '';
+		for (var i = 0; i < element.length; i++) {
+			if (element[i].checked)
+				value = element[i].value;
+		}
+		return value;
+	}
+
 	const in_applicator = () => {
-		let location_before = document.getElementById("ai_location_before").value;
+		let location_before = "";
+		let opt = parseInt(get_checked_radio_button("ai_opt"));
+
+		if (opt == 1) {
+			location_before = document.getElementById("ai_location_before").value;
+		} else if (opt == 2) {
+			let ai_borrowed_by_location = document.getElementById("ai_borrowed_by_location").value;
+			let ai_borrowed_by_remarks = document.getElementById("ai_borrowed_by_remarks").value;
+			if (ai_borrowed_by_location != '' && ai_borrowed_by_remarks != '') {
+				location_before = "Borrowed By " + ai_borrowed_by_location + " " + ai_borrowed_by_remarks;
+			}
+		}
+
 		let applicator_no = document.getElementById("ai_applicator_no").value;
 		let terminal_name = document.getElementById("ai_terminal_name").value;
 
@@ -283,7 +451,7 @@
 				} else {
 					display_applicator_in_out_result('in_applicator_result', 'error', response);
 				}
-				reset_applicator_in_fields();
+				reset_applicator_in_fields(opt);
 			}
 		});
 	}

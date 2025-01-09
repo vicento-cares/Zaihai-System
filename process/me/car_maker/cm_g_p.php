@@ -62,3 +62,28 @@ if ($method == 'get_car_model_dropdown_search') {
 		echo '<option selected value="">All</option>';
 	}
 }
+
+// Get Borrowed By Car Maker / Car Model Dropdown
+if ($method == 'get_borrowed_by_dropdown') {
+	$sql = "SELECT 
+				CASE 
+					WHEN car_maker = car_model THEN car_maker
+					ELSE CONCAT(car_maker, ' ', car_model)
+				END AS car_maker_model
+			FROM 
+				m_car_maker";
+
+	$stmt = $conn -> prepare($sql);
+	$stmt -> execute();
+
+	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
+		echo '<option disabled selected value="">Select Borrowed By</option>';
+		foreach ($results as $row) {
+			echo '<option value="'.htmlspecialchars($row['car_maker_model']).'">'.htmlspecialchars($row['car_maker_model']).'</option>';
+		}
+	} else {
+		echo '<option disabled selected value="">Select Borrowed By</option>';
+	}
+}

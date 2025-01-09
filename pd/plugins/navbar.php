@@ -4,14 +4,14 @@ include '../process/login.php';
 
 if (!isset($_SESSION['emp_no'])) {
   header('location:/zaihai/login');
-} else if ($_SESSION['role'] == 'Shop') {
-  header('location:/zaihai/shop/applicator_list.php');
 } else if ($_SESSION['role'] == 'Inspector') {
   header('location:/zaihai/inspector/applicator_checksheet.php');
+} else if ($_SESSION['role'] == 'Shop') {
+  header('location:/zaihai/shop/applicator_list.php');
+} else if ($_SESSION['role'] == 'ME') {
+  header('location:/zaihai/me/accounts.php');
 } else if ($_SESSION['role'] == 'BM') {
   header('location:/zaihai/bm/applicator_in.php');
-} else if ($_SESSION['role'] == 'PD') {
-  header('location:/zaihai/pd/verify_checksheet.php');
 }
 ?>  
 <!DOCTYPE html>
@@ -19,15 +19,13 @@ if (!isset($_SESSION['emp_no'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Zaihai | ME</title>
+  <title>Zaihai | PD</title>
 
   <link rel="icon" href="../dist/img/logo.ico" type="image/x-icon" />
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="../dist/css/font.min.css">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="../plugins/ionicons/css/ionicons.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">
   <!-- overlayScrollbars -->
@@ -43,25 +41,6 @@ if (!isset($_SESSION['emp_no'])) {
       height: 50px;
       -webkit-animation: spin 2s linear infinite;
       animation: spin 2s linear infinite;
-    }
-
-    .btn-file {
-      position: relative;
-      overflow: hidden;
-    }
-    .btn-file input[type=file] {
-      position: absolute;
-      top: 0;
-      right: 0;
-      min-width: 100%;
-      min-height: 100%;
-      font-size: 100px;
-      text-align: right;
-      filter: alpha(opacity=0);
-      opacity: 0;
-      outline: none;   
-      cursor: inherit;
-      display: block;
     }
 
     @keyframes spin {
