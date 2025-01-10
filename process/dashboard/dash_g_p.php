@@ -106,10 +106,10 @@ if ($method == 'get_current_applicator_out_charts') {
     $sql = "SELECT
                 a.car_maker,
                 a.car_model,
-                SUM(CASE WHEN aio.trd_no LIKE '%_R1%' THEN 1 ELSE 0 END) AS total_r1,
-                SUM(CASE WHEN aio.trd_no LIKE '%_R2%' THEN 1 ELSE 0 END) AS total_r2,
-                SUM(CASE WHEN aio.trd_no LIKE '%_F1%' THEN 1 ELSE 0 END) AS total_f1,
-                SUM(CASE WHEN aio.trd_no LIKE '%_F2%' THEN 1 ELSE 0 END) AS total_f2
+                SUM(CASE WHEN aio.trd_no LIKE '%[_]R1%' THEN 1 ELSE 0 END) AS total_r1,
+                SUM(CASE WHEN aio.trd_no LIKE '%[_]R2%' THEN 1 ELSE 0 END) AS total_r2,
+                SUM(CASE WHEN aio.trd_no LIKE '%[_]F1%' THEN 1 ELSE 0 END) AS total_f1,
+                SUM(CASE WHEN aio.trd_no LIKE '%[_]F2%' THEN 1 ELSE 0 END) AS total_f2
             FROM 
                 t_applicator_in_out aio
             LEFT JOIN

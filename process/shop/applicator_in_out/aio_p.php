@@ -61,6 +61,7 @@ if ($method == 'out_applicator') {
                     if (!$row) {
                         $sql = "SELECT id FROM t_applicator_in_out 
                                 WHERE trd_no = ?";
+                        $params = [];
                         $params[] = $location;
 
                         // Check "Borrowed" Keyword on Location
