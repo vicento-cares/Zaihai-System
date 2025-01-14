@@ -227,6 +227,8 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
+					// Auto Log Out after verification
+					window.location.href = '../process/logout.php';
 				} else {
 					Swal.fire({
                         icon: 'error',

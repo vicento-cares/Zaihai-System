@@ -9,7 +9,7 @@
 		get_applicator_no_datalist_search();
 		get_location_datalist_search();
 		get_recent_applicator_list();
-		realtime_get_recent_applicator_list = setInterval(get_recent_applicator_list, 10000);
+		realtime_get_recent_applicator_list = setInterval(get_recent_applicator_list, 30000);
 	});
 
 	// const get_car_maker_dropdown_search = () => {

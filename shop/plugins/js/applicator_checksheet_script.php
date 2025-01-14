@@ -10,7 +10,7 @@
 		get_terminal_name_datalist_in_search();
 		get_location_datalist_in_search();
         get_recent_applicator_in_pending();
-        realtime_get_recent_applicator_in_pending = setInterval(get_recent_applicator_in_pending, 15000);
+        realtime_get_recent_applicator_in_pending = setInterval(get_recent_applicator_in_pending, 30000);
     });
 	
 	// const get_car_maker_dropdown_in_search = () => {
