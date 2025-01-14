@@ -5,15 +5,15 @@ require '../conn.php';
 $method = $_GET['method'];
 
 $color_map = array(
-    'Suzuki YV7' => '#007bff', // Primary
-    'Mazda J12' => '#6c757d', // Secondary
-    'Mazda Merge' => '#28a745', // Success
-    'Toyota' => '#dc3545', // Danger
-    'Subaru' => '#ffc107', // Warning
-    'Honda T20' => '#17a2b8', // Info
-    'Honda Old' => '#343a40', // Dark
-    'Honda TKRA' => '#e83e8c', // Pink
-    'Daihatsu D01L' => '#fd7e14' // orange
+    'Suzuki YV7' => '#f8bbd0', // Light Pink
+    'Mazda J12' => '#ffc107', // Warning
+    'Mazda Merge' => '#d8cbaf', // Dark Beige
+    'Toyota' => '#28a745', // Success
+    'Subaru' => '#fd7e14', // orange
+    'Honda T20' => '#8a2be2', // violet
+    'Honda Old' => '#dc3545', // Danger
+    'Honda TKRA' => '#007bff', // Primary
+    'Daihatsu D01L' => '#e83e8c', // Dark Pink
 );
 
 if ($method == 'get_applicator_list_status_count') {
@@ -22,16 +22,20 @@ if ($method == 'get_applicator_list_status_count') {
     $sql = "SELECT 
                 COUNT(CASE WHEN status = 'Ready To Use' THEN id END) AS total_rtu,
                 COUNT(CASE WHEN status = 'Out' THEN id END) AS total_out,
-                COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_pending
+                COUNT(CASE WHEN status = 'Pending' AND location LIKE '%Zaihai%' THEN id END) AS total_pending_zaihai,
+                COUNT(CASE WHEN status = 'Pending' AND location LIKE '%BM%' THEN id END) AS total_pending_bm,
+                COUNT(CASE WHEN status = 'Ready To Use' THEN id END) + COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_in
             FROM t_applicator_list";
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
         $data = [
-            'total_rtu' => intval($row['total_rtu']), 
-            'total_out' => intval($row['total_out']), 
-            'total_pending' => intval($row['total_pending'])
+            'total_rtu' => intval($row['total_rtu']),
+            'total_out' => intval($row['total_out']),
+            'total_pending_zaihai' => intval($row['total_pending_zaihai']),
+            'total_pending_bm' => intval($row['total_pending_bm']),
+            'total_in' => intval($row['total_in'])
         ];
     }
 

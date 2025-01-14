@@ -28,7 +28,7 @@ include 'plugins/navbar/viewer_navbar.php';
                         <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline">
                                 <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Registered Applicators & Terminals Count as of <?=date("F j, Y")?></h3>
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Applicator Status Count as of <?=date("F j, Y")?></h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
@@ -41,6 +41,19 @@ include 'plugins/navbar/viewer_navbar.php';
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-lightblue">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_applicator_current"></h2>
+                                                    <h4><b>Total</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-gear-b"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
                                         <div class="col-sm-4">
                                             <div class="small-box bg-success">
                                                 <div class="inner mb-3">
@@ -55,7 +68,22 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="small-box bg-danger">
+                                            <div class="small-box bg-teal">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_in"></h2>
+                                                    <h4><b>Total In</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                <i class="ion ion-log-in"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-warning">
                                                 <div class="inner mb-3">
                                                     <h2 id="total_out"></h2>
                                                     <h4><b>Total Out</b></h4>
@@ -68,10 +96,23 @@ include 'plugins/navbar/viewer_navbar.php';
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="small-box bg-warning">
+                                            <div class="small-box bg-danger">
                                                 <div class="inner mb-3">
-                                                    <h2 id="total_pending"></h2>
-                                                    <h4><b>Total Pending</b></h4>
+                                                    <h2 id="total_pending_zaihai"></h2>
+                                                    <h4><b>Total Pending (Zaihai)</b></h4>
+                                                    <h4>Applicators</h4>
+                                                </div>
+                                                <div class="icon">
+                                                    <i class="ion ion-loop"></i>
+                                                </div>
+                                                <div class="small-box-footer"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="small-box bg-maroon">
+                                                <div class="inner mb-3">
+                                                    <h2 id="total_pending_bm"></h2>
+                                                    <h4><b>Total Pending (BM)</b></h4>
                                                     <h4>Applicators</h4>
                                                 </div>
                                                 <div class="icon">

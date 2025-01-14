@@ -42,7 +42,9 @@
 			success: response => {
 				document.getElementById("total_rtu").innerHTML = `<b>${response.total_rtu}</b>`;
 				document.getElementById("total_out").innerHTML = `<b>${response.total_out}</b>`;
-				document.getElementById("total_pending").innerHTML = `<b>${response.total_pending}</b>`;
+				document.getElementById("total_pending_zaihai").innerHTML = `<b>${response.total_pending_zaihai}</b>`;
+				document.getElementById("total_pending_bm").innerHTML = `<b>${response.total_pending_bm}</b>`;
+				document.getElementById("total_in").innerHTML = `<b>${response.total_in}</b>`;
 			}
 		});
 	}
@@ -61,7 +63,7 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#dc3545', '#ffc107'];
+				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -297,6 +299,7 @@
 			},  
 			success: response => {
 				document.getElementById("total_applicator").innerHTML = `<b>${response.total_applicator}</b>`;
+				document.getElementById("total_applicator_current").innerHTML = `<b>${response.total_applicator}</b>`;
 				document.getElementById("total_terminal").innerHTML = `<b>${response.total_terminal}</b>`;
 				document.getElementById("total_applicator_terminal").innerHTML = `<b>${response.total_applicator_terminal}</b>`;
 			}
