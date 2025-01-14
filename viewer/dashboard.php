@@ -41,86 +41,91 @@ include 'plugins/navbar/viewer_navbar.php';
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-lightblue">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_applicator_current"></h2>
-                                                    <h4><b>Total</b></h4>
-                                                    <h4>Applicators</h4>
+                                        <div class="col-lg-8 col-sm-12">
+                                                <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-lightblue">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_applicator_current"></h2>
+                                                            <h4><b>Total</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-gear-b"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
                                                 </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-gear-b"></i>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-success">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_rtu"></h2>
+                                                            <h4><b>Total Ready To Use</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-checkmark-circled"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
                                                 </div>
-                                                <div class="small-box-footer"></div>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-teal">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_in"></h2>
+                                                            <h4><b>Total In</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                        <i class="ion ion-log-in"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-warning">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_out"></h2>
+                                                            <h4><b>Total Out</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-log-out"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-danger">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_pending_zaihai"></h2>
+                                                            <h4><b>Total Pending (Zaihai)</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-loop"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-maroon">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_pending_bm"></h2>
+                                                            <h4><b>Total Pending (BM)</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-loop"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-success">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_rtu"></h2>
-                                                    <h4><b>Total Ready To Use</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-checkmark-circled"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-teal">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_in"></h2>
-                                                    <h4><b>Total In</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                <i class="ion ion-log-in"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-warning">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_out"></h2>
-                                                    <h4><b>Total Out</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-log-out"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-danger">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_pending_zaihai"></h2>
-                                                    <h4><b>Total Pending (Zaihai)</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-loop"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-maroon">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_pending_bm"></h2>
-                                                    <h4><b>Total Pending (BM)</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-loop"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
+                                        <div class="col-lg-4 col-sm-12" id="current_applicator_list_status_count_chart2"></div>
                                     </div>
                                     <div class="row" id="current_applicator_list_status_count_chart"></div>
                                     <div class="row mb-2">

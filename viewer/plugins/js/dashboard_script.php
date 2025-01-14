@@ -1,5 +1,6 @@
 <script type="text/javascript">
 	let current_applicator_list_status_count_chart;
+	let current_applicator_list_status_count_chart2;
 	let current_trd_carts_reuse_count_chart;
 	let current_active_trd_count_chart;
 	let current_applicators_terminals_count_chart;
@@ -17,6 +18,7 @@
 	document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_list_status_count();
 		get_current_applicator_list_status_count_chart();
+		get_current_applicator_list_status_count_chart2();
 		get_current_trd_carts_reuse_count_chart();
 		get_current_active_trd_count_chart();
 		get_current_applicator_out_charts();
@@ -108,6 +110,86 @@
 
 				current_applicator_list_status_count_chart = new ApexCharts(ctx, options);
 				current_applicator_list_status_count_chart.render();
+			}
+		});
+	}
+
+	const get_current_applicator_list_status_count_chart2 = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_applicator_list_status_count_chart2'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#3c8dbc', '#20c997', '#ffc107'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#current_applicator_list_status_count_chart2");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%',
+							endingShape: 'flat'
+						},
+					},
+					dataLabels: {
+						position: 'top', // Position of the data labels (top, center, bottom)
+						enabled: true,   // Enable data labels
+						formatter: function (val) {
+							return val; // You can customize the label format here
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					yaxis: {
+						title: {
+							text: 'Total Applicator Count'
+						}
+					},
+					xaxis: {
+						categories: response.categories
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					},
+					fill: {
+						opacity: 1
+					},
+					title: {
+						text: `Current Overall Applicator Status Count`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_applicator_list_status_count_chart2) {
+					current_applicator_list_status_count_chart2.destroy();
+				}
+
+				current_applicator_list_status_count_chart2 = new ApexCharts(ctx, options);
+				current_applicator_list_status_count_chart2.render();
 			}
 		});
 	}

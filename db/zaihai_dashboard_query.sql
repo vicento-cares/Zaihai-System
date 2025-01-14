@@ -30,6 +30,27 @@ FROM
     t_applicator_list
 	WHERE car_maker = ? AND car_model = ?;
 
+-- All applicators updated
+SELECT 
+    COUNT(CASE WHEN status = 'Ready To Use' THEN id END) AS total_rtu,
+    COUNT(CASE WHEN status = 'Out' THEN id END) AS total_out,
+    COUNT(CASE WHEN status = 'Pending' AND location LIKE '%Zaihai%' THEN id END) AS total_pending_zaihai,
+    COUNT(CASE WHEN status = 'Pending' AND location LIKE '%BM%' THEN id END) AS total_pending_bm,
+    COUNT(CASE WHEN status = 'Ready To Use' THEN id END) + COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_in
+FROM t_applicator_list;
+
+-- Total Applicator, Out and In Counts
+WITH 
+    applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator)
+
+SELECT 
+    (SELECT total_applicator FROM applicator_count) AS total_applicator,
+    COUNT(CASE WHEN at.status = 'Ready To Use' THEN at.id END) + 
+    COUNT(CASE WHEN at.status = 'Pending' THEN at.id END) AS total_in,
+    COUNT(CASE WHEN at.status = 'Out' THEN at.id END) AS total_out
+FROM 
+    t_applicator_list at;
+
 -- Applicator Out Count by Car Maker, Car Model and TRD CART Positions on t_applicator_in_out
 SELECT
 	a.car_maker,
