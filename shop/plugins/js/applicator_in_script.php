@@ -11,7 +11,7 @@
 		get_location_datalist_in_search();
 		get_borrowed_by_dropdown();
 		get_recent_applicator_in();
-		realtime_get_recent_applicator_in = setInterval(get_recent_applicator_in, 10000);
+		realtime_get_recent_applicator_in = setInterval(get_recent_applicator_in, 30000);
 	});
 
 	// const get_car_maker_dropdown_in_search = () => {

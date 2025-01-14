@@ -31,7 +31,7 @@ include '../modals/applicator_checksheet_view.php';
 <script src="../dist/js/adminlte.js"></script>
 
 <!-- Idletime Script -->
-<script src="../dist/js/idletime.js"></script>
+<!-- <script src="../dist/js/idletime.js"></script> -->
 
 </body>
 </html>
