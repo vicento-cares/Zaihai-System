@@ -1312,6 +1312,273 @@ if ($method == 'get_month_aioi_chart2') {
     echo json_encode($finalData);
 }
 
+if ($method == 'get_month_caioi_chart') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+
+    $data = [];
+    $categories = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+            DECLARE @CarMaker NVARCHAR(255) = ?;
+            DECLARE @CarModel NVARCHAR(255) = ?;
+
+            WITH DateRange AS (
+                SELECT 
+                    DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+                FROM 
+                    master.dbo.spt_values
+                WHERE 
+                    type = 'P' AND 
+                    number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+            ),
+            FilteredApplicatorHistoryOut AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+                    'date_out' AS date_type  -- Indicate the type of date
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryIn AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+                    'date_in' AS date_type  -- Indicate the type of date
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryInspected AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+                    'date_inspected' AS date_type  -- Indicate the type of date
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            CombinedApplicatorStatus AS (
+                SELECT * FROM 
+                    FilteredApplicatorHistoryOut
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryIn
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryInspected
+            )
+
+            SELECT 
+                CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+                cas.car_maker,
+                cas.car_model,
+                COUNT(CASE WHEN date_type = 'date_out' THEN cas.applicator_no END) AS total_out,
+                COUNT(CASE WHEN date_type = 'date_in' THEN cas.applicator_no END) AS total_in,
+                COUNT(CASE WHEN date_type = 'date_inspected' THEN cas.applicator_no END) AS total_inspected
+            FROM 
+                DateRange dr
+            LEFT JOIN 
+                CombinedApplicatorStatus cas ON 
+                    cas.date_column >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+                    cas.date_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+            GROUP BY 
+                dr.report_date, cas.car_maker, cas.car_model 
+            ORDER BY 
+                dr.report_date";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $car_maker, $car_model);
+
+    $stmt->execute($params);
+
+    // Get the number of days in the specified month and year
+    $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+    // Initialize an array to hold the counts for each car maker and model
+    $statusCounts = [];
+
+    // Fetch results and populate the terminalData array
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Add unique report_date to categories
+        if (!in_array($row['report_date'], $categories)) {
+            $categories[] = $row['report_date'];
+        }
+
+        if (!empty($row['car_maker']) && !empty($row['car_model'])) {
+            // Create a unique key for date types
+            $dateOutKey = 'Out';
+            $dateInKey = 'In';
+            $dateInspectedKey = 'Inspected';
+
+            // Initialize the statusCounts for this dateOutKey if it doesn't exist
+            if (!isset($statusCounts[$dateOutKey])) {
+                $statusCounts[$dateOutKey] = array_fill(0, $daysInMonth, 0);
+            }
+            // Initialize the statusCounts for this dateInKey if it doesn't exist
+            if (!isset($statusCounts[$dateInKey])) {
+                $statusCounts[$dateInKey] = array_fill(0, $daysInMonth, 0);
+            }
+            // Initialize the statusCounts for this dateInspectedKey if it doesn't exist
+            if (!isset($statusCounts[$dateInspectedKey])) {
+                $statusCounts[$dateInspectedKey] = array_fill(0, $daysInMonth, 0);
+            }
+
+            // Update the count for the specified status
+            $dateIndex = array_search($row['report_date'], $categories);
+            if ($dateIndex !== false) {
+                $statusCounts[$dateOutKey][$dateIndex] += intval($row['total_out']); // Use total for counts
+                $statusCounts[$dateInKey][$dateIndex] += intval($row['total_in']); // Use total for counts
+                $statusCounts[$dateInspectedKey][$dateIndex] += intval($row['total_inspected']); // Use total for counts
+            }
+        }
+    }
+
+    // Create the final data structure
+    foreach ($statusCounts as $dateTypeKey => $counts) {
+        $data[] = [
+            'name' => $dateTypeKey,
+            'data' => $counts
+        ];
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data]);
+}
+
+if ($method == 'get_month_caioi_chart2') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+
+    $data = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+            DECLARE @CarMaker NVARCHAR(255) = ?;
+            DECLARE @CarModel NVARCHAR(255) = ?;
+
+            WITH FilteredApplicatorHistoryOut AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+                    'date_out' AS date_type  -- Indicate the type of date
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryIn AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+                    'date_in' AS date_type  -- Indicate the type of date
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryInspected AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+                    'date_inspected' AS date_type  -- Indicate the type of date
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            CombinedApplicatorStatus AS (
+                SELECT * FROM 
+                    FilteredApplicatorHistoryOut
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryIn
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryInspected
+            )
+
+            SELECT 
+                COUNT(CASE WHEN date_type = 'date_out' THEN applicator_no END) AS total_out,
+                COUNT(CASE WHEN date_type = 'date_in' THEN applicator_no END) AS total_in,
+                COUNT(CASE WHEN date_type = 'date_inspected' THEN applicator_no END) AS total_inspected
+            FROM 
+                CombinedApplicatorStatus";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $car_maker, $car_model);
+    $stmt->execute($params);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $categories = ['Out', 'In', 'Inspected'];
+
+        // Add values to data
+        $data[] = (int)$row['total_out'];
+        $data[] = (int)$row['total_in'];
+        $data[] = (int)$row['total_inspected'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => $data
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
 if ($method == 'get_month_amd_chart') {
     $year = $_GET['year'];
     $month = $_GET['month'];

@@ -12,6 +12,8 @@
 	let month_term_usage_chart2;
 	let month_aioi_chart;
 	let month_aioi_chart2;
+	let month_caioi_chart;
+	let month_caioi_chart2;
 	let month_amd_chart;
 
 	// DOMContentLoaded function
@@ -529,6 +531,7 @@
 				document.getElementById("month_a_adj_cnt3_car_maker_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_maker_search").innerHTML = response;
 				document.getElementById("month_aioi_car_maker_search").innerHTML = response;
+				document.getElementById("month_caioi_car_maker_search").innerHTML = response;
 			}
 		});
 	}
@@ -546,6 +549,7 @@
 				document.getElementById("month_a_adj_cnt3_car_model_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_model_search").innerHTML = response;
 				document.getElementById("month_aioi_car_model_search").innerHTML = response;
+				document.getElementById("month_caioi_car_model_search").innerHTML = response;
 			}
 		});
 	}
@@ -826,6 +830,7 @@
 			success: response => {
 				document.getElementById("month_term_usage_year_search").innerHTML = response;
 				document.getElementById("month_aioi_year_search").innerHTML = response;
+				document.getElementById("month_caioi_year_search").innerHTML = response;
 				document.getElementById("month_amd_year_search").innerHTML = response;
 			}
 		});
@@ -1133,6 +1138,160 @@
 
 				month_aioi_chart2 = new ApexCharts(ctx, options);
 				month_aioi_chart2.render();
+			}
+		});
+	}
+
+	document.getElementById("month_caioi_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_caioi_chart();
+	});
+
+	const get_month_caioi_chart = () => {
+		let year = document.getElementById("month_caioi_year_search").value;
+		let month = document.getElementById("month_caioi_month_search").value;
+		let car_maker = document.getElementById("month_caioi_car_maker_search").value;
+		let car_model = document.getElementById("month_caioi_car_model_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_caioi_chart',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+				console.log(response.colorMap);
+
+				get_month_caioi_chart2();
+
+				let concat_label = car_maker + ' ';
+
+				if (car_maker != car_model) {
+					concat_label += car_model;
+				}
+
+				const seriesColorMap = {
+											'Out': '#ffc107', // Warning
+											'In': '#dc3545', // Danger
+											'Inspected': '#28a745' // Success
+										};
+    
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data) // Convert the data object to an array
+					};
+				});
+
+				// Generate the colors array based on the series names
+				const colors = seriesData.map(item => seriesColorMap[item.name] || '#343a40'); // Default color if name not found
+
+				let ctx = document.querySelector("#month_caioi_chart");
+
+				var options = {
+					chart: {
+						type: 'line',
+						height: 350
+					},
+					series: seriesData,
+					colors: colors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Monthly Combined Applicator Status at ${concat_label} Zaihai Shop`,
+						align: 'left'
+					},
+					stroke: {
+						curve: 'smooth'
+					},
+					markers: {
+						size: 5
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_caioi_chart) {
+					month_caioi_chart.destroy();
+				}
+
+				month_caioi_chart = new ApexCharts(ctx, options);
+				month_caioi_chart.render();
+			}
+		});
+	}
+
+	const get_month_caioi_chart2 = () => {
+		let year = document.getElementById("month_caioi_year_search").value;
+		let month = document.getElementById("month_caioi_month_search").value;
+		let car_maker = document.getElementById("month_caioi_car_maker_search").value;
+		let car_model = document.getElementById("month_caioi_car_model_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_caioi_chart2',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+				console.log(response.colorMap);
+
+				let ctx = document.querySelector("#month_caioi_chart2");
+
+				const categoryColorMap = {
+											'Out': '#ffc107', // Warning
+											'In': '#dc3545', // Danger
+											'Inspected': '#28a745' // Success
+										};
+
+				// Generate the colors array based on the categories in response
+				const colors = response.categories.map(category => categoryColorMap[category] || '#343a40'); // Default color if category not found
+
+				var options = {
+					chart: {
+						type: 'pie'
+					},
+					series: response.data,
+					labels: response.categories,
+					colors: colors,
+					title: {
+						text: `Monthly Combined Applicator Status`,
+						align: 'center'
+					},
+					legend: {
+						position: 'bottom',
+						horizontalAlign: 'center',
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_caioi_chart2) {
+					month_caioi_chart2.destroy();
+				}
+
+				month_caioi_chart2 = new ApexCharts(ctx, options);
+				month_caioi_chart2.render();
 			}
 		});
 	}

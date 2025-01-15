@@ -980,6 +980,178 @@ FROM
 GROUP BY 
     car_maker, car_model;
 
+-- Sample Query for Combined Daily Count of Applicator Out + In + Inspected based on t_applicator_in_out_history Specific Maker Models 
+-- (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2024;  -- Specify the year
+DECLARE @Month INT = 12;   -- Specify the month (November)
+DECLARE @CarMaker NVARCHAR(255) = 'Daihatsu';
+DECLARE @CarModel NVARCHAR(255) = 'D01L';
+
+WITH DateRange AS (
+    SELECT 
+        DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+    FROM 
+        master.dbo.spt_values
+    WHERE 
+        type = 'P' AND 
+        number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+),
+FilteredApplicatorHistoryOut AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+		'date_out' AS date_type  -- Indicate the type of date
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryIn AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+		CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+		'date_in' AS date_type  -- Indicate the type of date
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryInspected AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+		'date_inspected' AS date_type  -- Indicate the type of date
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+CombinedApplicatorStatus AS (
+	SELECT * FROM 
+		FilteredApplicatorHistoryOut
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryIn
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryInspected
+)
+
+SELECT 
+    CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+    cas.car_maker,
+    cas.car_model,
+	COUNT(CASE WHEN date_type = 'date_out' THEN cas.applicator_no END) AS total_out,
+	COUNT(CASE WHEN date_type = 'date_in' THEN cas.applicator_no END) AS total_in,
+	COUNT(CASE WHEN date_type = 'date_inspected' THEN cas.applicator_no END) AS total_inspected
+FROM 
+    DateRange dr
+LEFT JOIN 
+    CombinedApplicatorStatus cas ON 
+        cas.date_column >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+        cas.date_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+GROUP BY 
+    dr.report_date, cas.car_maker, cas.car_model 
+ORDER BY 
+    dr.report_date;
+
+-- Sample Query for Combined Daily Count of Applicator Out + In + Inspected based on t_applicator_in_out_history Specific Maker Models 
+-- (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2025;  -- Specify the year
+DECLARE @Month INT = 1;   -- Specify the month (November)
+DECLARE @CarMaker NVARCHAR(255) = 'Daihatsu';
+DECLARE @CarModel NVARCHAR(255) = 'D01L';
+
+WITH FilteredApplicatorHistoryOut AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+		'date_out' AS date_type  -- Indicate the type of date
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryIn AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+		CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+		'date_in' AS date_type  -- Indicate the type of date
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryInspected AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+		'date_inspected' AS date_type  -- Indicate the type of date
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+CombinedApplicatorStatus AS (
+	SELECT * FROM 
+		FilteredApplicatorHistoryOut
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryIn
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryInspected
+)
+
+SELECT 
+    COUNT(CASE WHEN date_type = 'date_out' THEN applicator_no END) AS total_out,
+	COUNT(CASE WHEN date_type = 'date_in' THEN applicator_no END) AS total_in,
+	COUNT(CASE WHEN date_type = 'date_inspected' THEN applicator_no END) AS total_inspected
+FROM 
+    CombinedApplicatorStatus;
+
 
 
 
