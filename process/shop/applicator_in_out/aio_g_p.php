@@ -381,7 +381,12 @@ if ($method == 'get_recent_applicator_out') {
     $c = 0;
 
     $sql = "SELECT aio.id, aio.serial_no, aio.applicator_no, aio.terminal_name, aio.trd_no, aio.operator_out, aio.date_time_out,
-            a.car_maker, a.car_model
+            a.car_maker, a.car_model, 
+            -- Downtime column
+            CASE 
+                WHEN DATEDIFF(MINUTE, aio.date_time_out, GETDATE()) > 1440 THEN 1 
+                ELSE 0 
+            END AS downtime
             FROM t_applicator_in_out aio
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             WHERE aio.zaihai_stock_address IS NULL AND aio.date_time_in IS NULL";
@@ -400,31 +405,36 @@ if ($method == 'get_recent_applicator_out') {
     if (!empty($location)) {
         $sql .= " AND aio.trd_no LIKE '%$location%'";
     }
-    $sql .= " ORDER BY aio.date_time_out DESC";
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
+    $sql .= " ORDER BY aio.date_time_out ASC";
 
-            // If Role is BM
-            if ($role == 'BM') {
-                echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#applicator_in_bm"
-                    onclick="get_applicator_out_details(&quot;'.$row['id'].'&quot;)">';
-            } else {
-                echo '<tr>';
-            }
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['serial_no'].'</td>';
-            echo '<td>'.$row['car_maker'].'</td>';
-            echo '<td>'.$row['car_model'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['terminal_name'].'</td>';
-            echo '<td>'.$row['trd_no'].'</td>';
-            echo '<td>'.$row['operator_out'].'</td>';
-            echo '<td>'.$row['date_time_out'].'</td>';
-            echo '</tr>';
+    $stmt = $conn->prepare($sql);
+	$stmt->execute();
+
+    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+        $c++;
+
+        $row_class = '';
+        if (intval($row['downtime']) == 1) {
+            $row_class = 'bg-danger';
         }
+
+        // If Role is BM
+        if ($role == 'BM') {
+            echo '<tr style="cursor:pointer;" class="modal-trigger '.$row_class.'" data-toggle="modal" data-target="#applicator_in_bm"
+                onclick="get_applicator_out_details(&quot;'.$row['id'].'&quot;)">';
+        } else {
+            echo '<tr class="'.$row_class.'">';
+        }
+        echo '<td>'.$c.'</td>';
+        echo '<td>'.$row['serial_no'].'</td>';
+        echo '<td>'.$row['car_maker'].'</td>';
+        echo '<td>'.$row['car_model'].'</td>';
+        echo '<td>'.$row['applicator_no'].'</td>';
+        echo '<td>'.$row['terminal_name'].'</td>';
+        echo '<td>'.$row['trd_no'].'</td>';
+        echo '<td>'.$row['operator_out'].'</td>';
+        echo '<td>'.$row['date_time_out'].'</td>';
+        echo '</tr>';
     }
 }
 
@@ -534,6 +544,11 @@ if ($method == 'get_recent_applicator_in') {
     $sql = "SELECT t1.serial_no, t1.applicator_no, t1.terminal_name, 
                 t1.trd_no, t1.operator_out, t1.date_time_out, 
                 t1.zaihai_stock_address, t1.operator_in, t1.date_time_in, 
+                -- Downtime column
+                CASE 
+                    WHEN DATEDIFF(MINUTE, t1.date_time_in, GETDATE()) > 1440 THEN 1 
+                    ELSE 0 
+                END AS downtime, 
                 a.car_maker, a.car_model
             FROM t_applicator_in_out t1
             JOIN (
@@ -564,28 +579,34 @@ if ($method == 'get_recent_applicator_in') {
         $sql .= " AND t1.trd_no LIKE '%$location%'";
     }
 
-    $sql .= " ORDER BY t1.date_time_in DESC";
+    $sql .= " ORDER BY t1.date_time_in ASC";
 
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    $stmt = $conn->prepare($sql);
 	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
 
-            echo '<tr>';
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['serial_no'].'</td>';
-            echo '<td>'.$row['car_maker'].'</td>';
-            echo '<td>'.$row['car_model'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['terminal_name'].'</td>';
-            echo '<td>'.$row['trd_no'].'</td>';
-            echo '<td>'.$row['operator_out'].'</td>';
-            echo '<td>'.$row['date_time_out'].'</td>';
-            echo '<td>'.$row['zaihai_stock_address'].'</td>';
-            echo '<td>'.$row['operator_in'].'</td>';
-            echo '<td>'.$row['date_time_in'].'</td>';
-            echo '</tr>';
+    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+        $c++;
+
+        $row_class = '';
+        if (intval($row['downtime']) == 1) {
+            $row_class = 'bg-danger';
         }
+
+        echo '<tr class="'.$row_class.'">';
+        echo '<td>'.$c.'</td>';
+        echo '<td>'.$row['serial_no'].'</td>';
+        echo '<td>'.$row['car_maker'].'</td>';
+        echo '<td>'.$row['car_model'].'</td>';
+        echo '<td>'.$row['applicator_no'].'</td>';
+        echo '<td>'.$row['terminal_name'].'</td>';
+        echo '<td>'.$row['trd_no'].'</td>';
+        echo '<td>'.$row['operator_out'].'</td>';
+        echo '<td>'.$row['date_time_out'].'</td>';
+        echo '<td>'.$row['zaihai_stock_address'].'</td>';
+        echo '<td>'.$row['operator_in'].'</td>';
+        echo '<td>'.$row['date_time_in'].'</td>';
+        echo '</tr>';
     }
 }
+
+$conn = null;

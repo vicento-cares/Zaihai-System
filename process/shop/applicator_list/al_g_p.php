@@ -156,7 +156,12 @@ if ($method == 'get_recent_applicator_list') {
 							END
 						) 
 				END AS elapsed_time,
-				date_updated
+				date_updated,
+				-- Downtime column
+				CASE 
+					WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) > 1440 THEN 1 
+					ELSE 0 
+				END AS downtime
 			FROM t_applicator_list
             WHERE car_maker != ''";
 
@@ -183,7 +188,13 @@ if ($method == 'get_recent_applicator_list') {
 
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		$c++;
-		echo '<tr>';
+
+		$row_class = '';
+		if (intval($row['downtime']) == 1 && $row['status'] != 'Ready To Use') {
+			$row_class = 'bg-danger';
+		}
+		echo '<tr class="'.$row_class.'">';
+
 		echo '<td>'.$c.'</td>';
 		echo '<td>'.$row['car_maker'].'</td>';
 		echo '<td>'.$row['car_model'].'</td>';
