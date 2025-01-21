@@ -634,6 +634,8 @@ include 'plugins/navbar/viewer_navbar.php';
                                                     <option value="12">December</option>
                                                 </select>
                                             </div>
+                                        </div>
+                                        <div class="row mb-4">
                                             <div class="col-sm-3">
                                                 <label>Car Maker</label>
                                                 <select id="month_caioi_car_maker_search" class="form-control" required>
@@ -646,9 +648,16 @@ include 'plugins/navbar/viewer_navbar.php';
                                                     <option selected value="">Select Car Model</option>
                                                 </select>
                                             </div>
-                                        </div>
-                                        <div class="row mb-4">
-                                            <div class="col-sm-3 offset-sm-9">
+                                            <div class="col-sm-3">
+                                                <label>Shift</label>
+                                                <select id="month_caioi_shift_search" class="form-control" required>
+                                                    <option selected value="ALL">ALL</option>
+                                                    <option value="DS">DS</option>
+                                                    <option value="NS">NS</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>&nbsp;</label>
                                                 <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sync"></i> Generate</button>
                                             </div>
                                         </div>

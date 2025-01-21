@@ -982,10 +982,11 @@ GROUP BY
 
 -- Sample Query for Combined Daily Count of Applicator Out + In + Inspected based on t_applicator_in_out_history Specific Maker Models 
 -- (1 Month - DS & NS) Exact Month
-DECLARE @Year INT = 2024;  -- Specify the year
-DECLARE @Month INT = 12;   -- Specify the month (November)
+DECLARE @Year INT = 2025;  -- Specify the year
+DECLARE @Month INT = 1;   -- Specify the month (November)
 DECLARE @CarMaker NVARCHAR(255) = 'Daihatsu';
 DECLARE @CarModel NVARCHAR(255) = 'D01L';
+DECLARE @Shift VARCHAR(3) = 'ALL';  -- Set the shift variable to 'ALL', 'DS', or 'NS'
 
 WITH DateRange AS (
     SELECT 
@@ -1002,7 +1003,11 @@ FilteredApplicatorHistoryOut AS (
 		a.car_maker,
 		a.car_model,
         CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
-		'date_out' AS date_type  -- Indicate the type of date
+		'date_out' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
     FROM 
         t_applicator_in_out_history aioh
     LEFT JOIN 
@@ -1019,7 +1024,11 @@ FilteredApplicatorHistoryIn AS (
 		a.car_maker,
 		a.car_model,
 		CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
-		'date_in' AS date_type  -- Indicate the type of date
+		'date_in' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
     FROM 
         t_applicator_in_out_history aioh
     LEFT JOIN 
@@ -1036,7 +1045,11 @@ FilteredApplicatorHistoryInspected AS (
 		a.car_maker,
 		a.car_model,
         CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
-		'date_inspected' AS date_type  -- Indicate the type of date
+		'date_inspected' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
     FROM 
         t_applicator_in_out_history aioh
     LEFT JOIN 
@@ -1062,9 +1075,21 @@ SELECT
     CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
     cas.car_maker,
     cas.car_model,
-	COUNT(CASE WHEN date_type = 'date_out' THEN cas.applicator_no END) AS total_out,
-	COUNT(CASE WHEN date_type = 'date_in' THEN cas.applicator_no END) AS total_in,
-	COUNT(CASE WHEN date_type = 'date_inspected' THEN cas.applicator_no END) AS total_inspected
+	COUNT(CASE 
+        WHEN date_type = 'date_out' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN cas.applicator_no 
+        END) AS total_out,
+    COUNT(CASE 
+        WHEN date_type = 'date_in' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN cas.applicator_no 
+        END) AS total_in,
+    COUNT(CASE 
+        WHEN date_type = 'date_inspected' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN cas.applicator_no 
+        END) AS total_inspected
 FROM 
     DateRange dr
 LEFT JOIN 
@@ -1082,6 +1107,7 @@ DECLARE @Year INT = 2025;  -- Specify the year
 DECLARE @Month INT = 1;   -- Specify the month (November)
 DECLARE @CarMaker NVARCHAR(255) = 'Daihatsu';
 DECLARE @CarModel NVARCHAR(255) = 'D01L';
+DECLARE @Shift VARCHAR(3) = 'ALL';  -- Set the shift variable to 'ALL', 'DS', or 'NS'
 
 WITH FilteredApplicatorHistoryOut AS (
     SELECT 
@@ -1089,7 +1115,11 @@ WITH FilteredApplicatorHistoryOut AS (
 		a.car_maker,
 		a.car_model,
         CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
-		'date_out' AS date_type  -- Indicate the type of date
+		'date_out' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
     FROM 
         t_applicator_in_out_history aioh
     LEFT JOIN 
@@ -1106,7 +1136,11 @@ FilteredApplicatorHistoryIn AS (
 		a.car_maker,
 		a.car_model,
 		CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
-		'date_in' AS date_type  -- Indicate the type of date
+		'date_in' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
     FROM 
         t_applicator_in_out_history aioh
     LEFT JOIN 
@@ -1123,7 +1157,11 @@ FilteredApplicatorHistoryInspected AS (
 		a.car_maker,
 		a.car_model,
         CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
-		'date_inspected' AS date_type  -- Indicate the type of date
+		'date_inspected' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
     FROM 
         t_applicator_in_out_history aioh
     LEFT JOIN 
@@ -1146,9 +1184,21 @@ CombinedApplicatorStatus AS (
 )
 
 SELECT 
-    COUNT(CASE WHEN date_type = 'date_out' THEN applicator_no END) AS total_out,
-	COUNT(CASE WHEN date_type = 'date_in' THEN applicator_no END) AS total_in,
-	COUNT(CASE WHEN date_type = 'date_inspected' THEN applicator_no END) AS total_inspected
+    COUNT(CASE 
+        WHEN date_type = 'date_out' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN applicator_no 
+        END) AS total_out,
+    COUNT(CASE 
+        WHEN date_type = 'date_in' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN applicator_no 
+        END) AS total_in,
+    COUNT(CASE 
+        WHEN date_type = 'date_inspected' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN applicator_no 
+        END) AS total_inspected
 FROM 
     CombinedApplicatorStatus;
 

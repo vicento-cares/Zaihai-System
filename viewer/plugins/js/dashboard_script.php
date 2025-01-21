@@ -1152,6 +1152,7 @@
 		let month = document.getElementById("month_caioi_month_search").value;
 		let car_maker = document.getElementById("month_caioi_car_maker_search").value;
 		let car_model = document.getElementById("month_caioi_car_model_search").value;
+		let shift = document.getElementById("month_caioi_shift_search").value;
 
 		$.ajax({
 			url: '../process/dashboard/dash_g_p.php',
@@ -1163,7 +1164,8 @@
 				year: year,
 				month: month,
 				car_maker: car_maker,
-				car_model: car_model
+				car_model: car_model,
+				shift: shift
 			},  
 			success: response => {
 				console.log(response.categories);
@@ -1173,9 +1175,13 @@
 				get_month_caioi_chart2();
 
 				let concat_label = car_maker + ' ';
+				let shift_label = '';
 
 				if (car_maker != car_model) {
 					concat_label += car_model;
+				}
+				if (shift != 'ALL') {
+					shift_label = shift;
 				}
 
 				const seriesColorMap = {
@@ -1208,7 +1214,7 @@
 						categories: response.categories
 					},
 					title: {
-						text: `Monthly Combined Applicator Status at ${concat_label} Zaihai Shop`,
+						text: `Monthly Combined Applicator Status at ${concat_label} Zaihai Shop ${shift_label}`,
 						align: 'left'
 					},
 					stroke: {
@@ -1239,6 +1245,7 @@
 		let month = document.getElementById("month_caioi_month_search").value;
 		let car_maker = document.getElementById("month_caioi_car_maker_search").value;
 		let car_model = document.getElementById("month_caioi_car_model_search").value;
+		let shift = document.getElementById("month_caioi_shift_search").value;
 
 		$.ajax({
 			url: '../process/dashboard/dash_g_p.php',
@@ -1250,12 +1257,19 @@
 				year: year,
 				month: month,
 				car_maker: car_maker,
-				car_model: car_model
+				car_model: car_model,
+				shift: shift
 			},  
 			success: response => {
 				console.log(response.categories);
 				console.log(response.data);
 				console.log(response.colorMap);
+
+				let shift_label = '';
+
+				if (shift != 'ALL') {
+					shift_label = shift;
+				}
 
 				let ctx = document.querySelector("#month_caioi_chart2");
 
@@ -1276,7 +1290,7 @@
 					labels: response.categories,
 					colors: colors,
 					title: {
-						text: `Monthly Combined Applicator Status`,
+						text: `Monthly Combined Applicator Status ${shift_label}`,
 						align: 'center'
 					},
 					legend: {

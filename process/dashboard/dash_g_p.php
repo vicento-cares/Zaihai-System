@@ -1317,6 +1317,7 @@ if ($method == 'get_month_caioi_chart') {
     $month = $_GET['month'];
     $car_maker = $_GET['car_maker'];
     $car_model = $_GET['car_model'];
+    $shift = $_GET['shift'];
 
     $data = [];
     $categories = [];
@@ -1325,6 +1326,7 @@ if ($method == 'get_month_caioi_chart') {
             DECLARE @Month INT = ?;   -- Specify the month (November)
             DECLARE @CarMaker NVARCHAR(255) = ?;
             DECLARE @CarModel NVARCHAR(255) = ?;
+            DECLARE @Shift VARCHAR(3) = ?;  -- Set the shift variable to 'ALL', 'DS', or 'NS'
 
             WITH DateRange AS (
                 SELECT 
@@ -1341,7 +1343,11 @@ if ($method == 'get_month_caioi_chart') {
                     a.car_maker,
                     a.car_model,
                     CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
-                    'date_out' AS date_type  -- Indicate the type of date
+                    'date_out' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
                 FROM 
                     t_applicator_in_out_history aioh
                 LEFT JOIN 
@@ -1358,7 +1364,11 @@ if ($method == 'get_month_caioi_chart') {
                     a.car_maker,
                     a.car_model,
                     CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
-                    'date_in' AS date_type  -- Indicate the type of date
+                    'date_in' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
                 FROM 
                     t_applicator_in_out_history aioh
                 LEFT JOIN 
@@ -1375,7 +1385,11 @@ if ($method == 'get_month_caioi_chart') {
                     a.car_maker,
                     a.car_model,
                     CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
-                    'date_inspected' AS date_type  -- Indicate the type of date
+                    'date_inspected' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
                 FROM 
                     t_applicator_in_out_history aioh
                 LEFT JOIN 
@@ -1401,9 +1415,21 @@ if ($method == 'get_month_caioi_chart') {
                 CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
                 cas.car_maker,
                 cas.car_model,
-                COUNT(CASE WHEN date_type = 'date_out' THEN cas.applicator_no END) AS total_out,
-                COUNT(CASE WHEN date_type = 'date_in' THEN cas.applicator_no END) AS total_in,
-                COUNT(CASE WHEN date_type = 'date_inspected' THEN cas.applicator_no END) AS total_inspected
+                COUNT(CASE 
+                    WHEN date_type = 'date_out' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN cas.applicator_no 
+                    END) AS total_out,
+                COUNT(CASE 
+                    WHEN date_type = 'date_in' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN cas.applicator_no 
+                    END) AS total_in,
+                COUNT(CASE 
+                    WHEN date_type = 'date_inspected' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN cas.applicator_no 
+                    END) AS total_inspected
             FROM 
                 DateRange dr
             LEFT JOIN 
@@ -1416,7 +1442,7 @@ if ($method == 'get_month_caioi_chart') {
                 dr.report_date";
 
     $stmt = $conn->prepare($sql);
-    $params = array($year, $month, $car_maker, $car_model);
+    $params = array($year, $month, $car_maker, $car_model, $shift);
 
     $stmt->execute($params);
 
@@ -1479,6 +1505,7 @@ if ($method == 'get_month_caioi_chart2') {
     $month = $_GET['month'];
     $car_maker = $_GET['car_maker'];
     $car_model = $_GET['car_model'];
+    $shift = $_GET['shift'];
 
     $data = [];
 
@@ -1486,6 +1513,7 @@ if ($method == 'get_month_caioi_chart2') {
             DECLARE @Month INT = ?;   -- Specify the month (November)
             DECLARE @CarMaker NVARCHAR(255) = ?;
             DECLARE @CarModel NVARCHAR(255) = ?;
+            DECLARE @Shift VARCHAR(3) = ?;  -- Set the shift variable to 'ALL', 'DS', or 'NS'
 
             WITH FilteredApplicatorHistoryOut AS (
                 SELECT 
@@ -1493,7 +1521,11 @@ if ($method == 'get_month_caioi_chart2') {
                     a.car_maker,
                     a.car_model,
                     CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
-                    'date_out' AS date_type  -- Indicate the type of date
+                    'date_out' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
                 FROM 
                     t_applicator_in_out_history aioh
                 LEFT JOIN 
@@ -1510,7 +1542,11 @@ if ($method == 'get_month_caioi_chart2') {
                     a.car_maker,
                     a.car_model,
                     CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
-                    'date_in' AS date_type  -- Indicate the type of date
+                    'date_in' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
                 FROM 
                     t_applicator_in_out_history aioh
                 LEFT JOIN 
@@ -1527,7 +1563,11 @@ if ($method == 'get_month_caioi_chart2') {
                     a.car_maker,
                     a.car_model,
                     CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
-                    'date_inspected' AS date_type  -- Indicate the type of date
+                    'date_inspected' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
                 FROM 
                     t_applicator_in_out_history aioh
                 LEFT JOIN 
@@ -1550,14 +1590,26 @@ if ($method == 'get_month_caioi_chart2') {
             )
 
             SELECT 
-                COUNT(CASE WHEN date_type = 'date_out' THEN applicator_no END) AS total_out,
-                COUNT(CASE WHEN date_type = 'date_in' THEN applicator_no END) AS total_in,
-                COUNT(CASE WHEN date_type = 'date_inspected' THEN applicator_no END) AS total_inspected
+                COUNT(CASE 
+                    WHEN date_type = 'date_out' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN applicator_no 
+                    END) AS total_out,
+                COUNT(CASE 
+                    WHEN date_type = 'date_in' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN applicator_no 
+                    END) AS total_in,
+                COUNT(CASE 
+                    WHEN date_type = 'date_inspected' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN applicator_no 
+                    END) AS total_inspected
             FROM 
                 CombinedApplicatorStatus";
 
     $stmt = $conn->prepare($sql);
-    $params = array($year, $month, $car_maker, $car_model);
+    $params = array($year, $month, $car_maker, $car_model, $shift);
     $stmt->execute($params);
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
