@@ -134,6 +134,9 @@ if ($method == 'make_checksheet') {
             $isTransactionActive = false;
         }
         echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+        $conn = null;
         exit();
     }
 }
+
+$conn = null;

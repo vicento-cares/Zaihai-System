@@ -113,6 +113,7 @@ if ($method == 'out_applicator') {
                                     $isTransactionActive = false;
                                 }
                                 echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                                $conn = null;
                                 exit();
                             }
                         } else {
@@ -254,6 +255,7 @@ if ($method == 'in_applicator') {
                                 $isTransactionActive = false;
                             }
                             echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                            $conn = null;
                             exit();
                         }
                     } else {
@@ -294,3 +296,5 @@ if ($method == 'in_applicator') {
         }
     }
 }
+
+$conn = null;

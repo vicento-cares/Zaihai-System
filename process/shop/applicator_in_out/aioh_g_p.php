@@ -82,49 +82,50 @@ if ($method == 'get_applicator_history') {
 
     $sql .= " ORDER BY aioh.date_time_in DESC";
 
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    $stmt = $conn->prepare($sql);
 	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
 
-            $inspection_date = '';
-            $inspection_time = '';
+    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+        $c++;
 
-            if (!empty($row['inspection_date_time'])) {
-                $inspection_date_time = new DateTime($row['inspection_date_time']);
-                $inspection_date = $inspection_date_time->format('Y-m-d');
-                $inspection_time = $inspection_date_time->format('H:i:s');
-            }
-            
-            $applicator_no_split = split_applicator_no($row['applicator_no']);
-            $terminal_name_split = split_terminal_name($row['terminal_name']);
+        $inspection_date = '';
+        $inspection_time = '';
 
-            echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#applicator_checksheet_view" 
-                    onclick="get_ac_details(&quot;'.$row['serial_no'].'~!~'.$row['equipment_no'].'~!~'.$applicator_no_split.'~!~'.$terminal_name_split.'~!~'.
-                    $inspection_date.'~!~'.$inspection_time.'~!~'.$row['inspection_shift'].'~!~'.$row['adjustment_content'].'~!~'.$row['adjustment_content_remarks'].'~!~'.$row['cross_section_result'].'~!~'.
-                    $row['inspected_by'].'~!~'.$row['checked_by'].'~!~'.$row['confirmed_by'].'~!~'.$row['judgement'].'~!~'.
-                    $row['ac1'].'~!~'.$row['ac2'].'~!~'.$row['ac3'].'~!~'.$row['ac4'].'~!~'.$row['ac5'].'~!~'.$row['ac6'].'~!~'.$row['ac7'].'~!~'.$row['ac8'].'~!~'.$row['ac9'].'~!~'.$row['ac10'].'~!~'.
-                    $row['ac1_s'].'~!~'.$row['ac2_s'].'~!~'.$row['ac3_s'].'~!~'.$row['ac4_s'].'~!~'.$row['ac5_s'].'~!~'.$row['ac6_s'].'~!~'.$row['ac7_s'].'~!~'.$row['ac8_s'].'~!~'.$row['ac9_s'].'~!~'.$row['ac10_s'].'~!~'.
-                    $row['ac1_r'].'~!~'.$row['ac2_r'].'~!~'.$row['ac3_r'].'~!~'.$row['ac4_r'].'~!~'.$row['ac5_r'].'~!~'.$row['ac6_r'].'~!~'.$row['ac7_r'].'~!~'.$row['ac8_r'].'~!~'.$row['ac9_r'].'~!~'.$row['ac10_r'].'&quot;)">';
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['serial_no'].'</td>';
-            echo '<td>'.$row['car_maker'].'</td>';
-            echo '<td>'.$row['car_model'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['terminal_name'].'</td>';
-            echo '<td>'.$row['trd_no'].'</td>';
-            echo '<td>'.$row['operator_out'].'</td>';
-            echo '<td>'.$row['date_time_out'].'</td>';
-            echo '<td>'.$row['zaihai_stock_address'].'</td>';
-            echo '<td>'.$row['line_address'].'</td>';
-            echo '<td>'.$row['operator_in'].'</td>';
-            echo '<td>'.$row['date_time_in'].'</td>';
-            echo '<td>'.$row['inspected_by_no'].'</td>';
-            echo '<td>'.$row['confirmation_date'].'</td>';
-            echo '<td>'.$row['adjustment_content'].'</td>';
-            echo '<td>'.$row['adjustment_content_remarks'].'</td>';
-            echo '</tr>';
+        if (!empty($row['inspection_date_time'])) {
+            $inspection_date_time = new DateTime($row['inspection_date_time']);
+            $inspection_date = $inspection_date_time->format('Y-m-d');
+            $inspection_time = $inspection_date_time->format('H:i:s');
         }
+        
+        $applicator_no_split = split_applicator_no($row['applicator_no']);
+        $terminal_name_split = split_terminal_name($row['terminal_name']);
+
+        echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#applicator_checksheet_view" 
+                onclick="get_ac_details(&quot;'.$row['serial_no'].'~!~'.$row['equipment_no'].'~!~'.$applicator_no_split.'~!~'.$terminal_name_split.'~!~'.
+                $inspection_date.'~!~'.$inspection_time.'~!~'.$row['inspection_shift'].'~!~'.$row['adjustment_content'].'~!~'.$row['adjustment_content_remarks'].'~!~'.$row['cross_section_result'].'~!~'.
+                $row['inspected_by'].'~!~'.$row['checked_by'].'~!~'.$row['confirmed_by'].'~!~'.$row['judgement'].'~!~'.
+                $row['ac1'].'~!~'.$row['ac2'].'~!~'.$row['ac3'].'~!~'.$row['ac4'].'~!~'.$row['ac5'].'~!~'.$row['ac6'].'~!~'.$row['ac7'].'~!~'.$row['ac8'].'~!~'.$row['ac9'].'~!~'.$row['ac10'].'~!~'.
+                $row['ac1_s'].'~!~'.$row['ac2_s'].'~!~'.$row['ac3_s'].'~!~'.$row['ac4_s'].'~!~'.$row['ac5_s'].'~!~'.$row['ac6_s'].'~!~'.$row['ac7_s'].'~!~'.$row['ac8_s'].'~!~'.$row['ac9_s'].'~!~'.$row['ac10_s'].'~!~'.
+                $row['ac1_r'].'~!~'.$row['ac2_r'].'~!~'.$row['ac3_r'].'~!~'.$row['ac4_r'].'~!~'.$row['ac5_r'].'~!~'.$row['ac6_r'].'~!~'.$row['ac7_r'].'~!~'.$row['ac8_r'].'~!~'.$row['ac9_r'].'~!~'.$row['ac10_r'].'&quot;)">';
+        echo '<td>'.$c.'</td>';
+        echo '<td>'.$row['serial_no'].'</td>';
+        echo '<td>'.$row['car_maker'].'</td>';
+        echo '<td>'.$row['car_model'].'</td>';
+        echo '<td>'.$row['applicator_no'].'</td>';
+        echo '<td>'.$row['terminal_name'].'</td>';
+        echo '<td>'.$row['trd_no'].'</td>';
+        echo '<td>'.$row['operator_out'].'</td>';
+        echo '<td>'.$row['date_time_out'].'</td>';
+        echo '<td>'.$row['zaihai_stock_address'].'</td>';
+        echo '<td>'.$row['line_address'].'</td>';
+        echo '<td>'.$row['operator_in'].'</td>';
+        echo '<td>'.$row['date_time_in'].'</td>';
+        echo '<td>'.$row['inspected_by_no'].'</td>';
+        echo '<td>'.$row['confirmation_date'].'</td>';
+        echo '<td>'.$row['adjustment_content'].'</td>';
+        echo '<td>'.$row['adjustment_content_remarks'].'</td>';
+        echo '</tr>';
     }
 }
+
+$conn = null;

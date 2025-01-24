@@ -28,7 +28,7 @@ include 'plugins/navbar/viewer_navbar.php';
                         <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline">
                                 <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Registered Applicators & Terminals Count as of <?=date("F j, Y")?></h3>
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Applicator Status Count as of <?=date("F j, Y")?></h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
@@ -41,45 +41,91 @@ include 'plugins/navbar/viewer_navbar.php';
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-success">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_rtu"></h2>
-                                                    <h4><b>Total Ready To Use</b></h4>
-                                                    <h4>Applicators</h4>
+                                        <div class="col-lg-8 col-sm-12">
+                                                <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-lightblue">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_applicator_current"></h2>
+                                                            <h4><b>Total</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-gear-b"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
                                                 </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-checkmark-circled"></i>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-success">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_rtu"></h2>
+                                                            <h4><b>Total Ready To Use</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-checkmark-circled"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
                                                 </div>
-                                                <div class="small-box-footer"></div>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-teal">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_in"></h2>
+                                                            <h4><b>Total In</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                        <i class="ion ion-log-in"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-warning">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_out"></h2>
+                                                            <h4><b>Total Out</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-log-out"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-danger">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_pending_zaihai"></h2>
+                                                            <h4><b>Total Pending (Zaihai)</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-loop"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <div class="small-box bg-maroon">
+                                                        <div class="inner mb-3">
+                                                            <h2 id="total_pending_bm"></h2>
+                                                            <h4><b>Total Pending (BM)</b></h4>
+                                                            <h4>Applicators</h4>
+                                                        </div>
+                                                        <div class="icon">
+                                                            <i class="ion ion-loop"></i>
+                                                        </div>
+                                                        <div class="small-box-footer"></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-danger">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_out"></h2>
-                                                    <h4><b>Total Out</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-log-out"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="small-box bg-warning">
-                                                <div class="inner mb-3">
-                                                    <h2 id="total_pending"></h2>
-                                                    <h4><b>Total Pending</b></h4>
-                                                    <h4>Applicators</h4>
-                                                </div>
-                                                <div class="icon">
-                                                    <i class="ion ion-loop"></i>
-                                                </div>
-                                                <div class="small-box-footer"></div>
-                                            </div>
-                                        </div>
+                                        <div class="col-lg-4 col-sm-12" id="current_applicator_list_status_count_chart2"></div>
                                     </div>
                                     <div class="row" id="current_applicator_list_status_count_chart"></div>
                                     <div class="row mb-2">
@@ -537,6 +583,88 @@ include 'plugins/navbar/viewer_navbar.php';
                                     <div class="row">
                                         <div class="col-8" id="month_aioi_chart"></div>
                                         <div class="col-4" id="month_aioi_chart2"></div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline collapsed-card">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-list mr-2"></i>Monthly Combined Applicator Out, In and Inspected Chart</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <form id="month_caioi_form">
+                                        <div class="row mb-2">
+                                            <div class="col-sm-3">
+                                                <label>Year</label>
+                                                <select id="month_caioi_year_search" class="form-control" required>
+                                                    <option selected value="">Select Year</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Month</label>
+                                                <select id="month_caioi_month_search" class="form-control" required>
+                                                    <option selected value="">Select Month</option>
+                                                    <option value="1">January</option>
+                                                    <option value="2">February</option>
+                                                    <option value="3">March</option>
+                                                    <option value="4">April</option>
+                                                    <option value="5">May</option>
+                                                    <option value="6">June</option>
+                                                    <option value="7">July</option>
+                                                    <option value="8">August</option>
+                                                    <option value="9">September</option>
+                                                    <option value="10">October</option>
+                                                    <option value="11">November</option>
+                                                    <option value="12">December</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <div class="col-sm-3">
+                                                <label>Car Maker</label>
+                                                <select id="month_caioi_car_maker_search" class="form-control" required>
+                                                    <option selected value="">Select Car Maker</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Car Model</label>
+                                                <select id="month_caioi_car_model_search" class="form-control" required>
+                                                    <option selected value="">Select Car Model</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>Shift</label>
+                                                <select id="month_caioi_shift_search" class="form-control" required>
+                                                    <option selected value="ALL">ALL</option>
+                                                    <option value="DS">DS</option>
+                                                    <option value="NS">NS</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <label>&nbsp;</label>
+                                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sync"></i> Generate</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="row">
+                                        <div class="col-8" id="month_caioi_chart"></div>
+                                        <div class="col-4" id="month_caioi_chart2"></div>
                                     </div>
                                 </div>
                                 <!-- /.card-body -->

@@ -34,6 +34,11 @@ if ($method == 'get_recent_applicator_in_pending') {
     $sql = "SELECT t1.serial_no, t1.applicator_no, t1.terminal_name, 
                 t1.trd_no, t1.operator_out, t1.date_time_out, 
                 t1.zaihai_stock_address, t1.operator_in, t1.date_time_in, 
+                -- Downtime column
+                CASE 
+                    WHEN DATEDIFF(MINUTE, t1.date_time_in, GETDATE()) > 1440 THEN 1 
+                    ELSE 0 
+                END AS downtime, 
                 a.car_maker, a.car_model
             FROM t_applicator_in_out t1
             JOIN (
@@ -70,29 +75,35 @@ if ($method == 'get_recent_applicator_in_pending') {
         $sql .= " AND acct.role IN ('Shop', 'Inspector')";
     }
 
-    $sql .= " ORDER BY t1.date_time_in DESC";
+    $sql .= " ORDER BY t1.date_time_in ASC";
 
-    $stmt = $conn->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    $stmt = $conn->prepare($sql);
 	$stmt->execute();
-    if ($stmt->rowCount() > 0) {
-		foreach($stmt->fetchALL() as $row){
-            $c++;
 
-            echo '<tr style="cursor:pointer;" class="modal-trigger" 
-                    onclick="get_applicator_in_pending_details(&#96;'.htmlspecialchars($row['applicator_no']).'~!~'.htmlspecialchars(addslashes($row['terminal_name'])).'&#96;)">';
-            echo '<td>'.$c.'</td>';
-            echo '<td>'.$row['serial_no'].'</td>';
-            echo '<td>'.$row['car_maker'].'</td>';
-            echo '<td>'.$row['car_model'].'</td>';
-            echo '<td>'.$row['applicator_no'].'</td>';
-            echo '<td>'.$row['terminal_name'].'</td>';
-            echo '<td>'.$row['trd_no'].'</td>';
-            echo '<td>'.$row['operator_out'].'</td>';
-            echo '<td>'.$row['date_time_out'].'</td>';
-            echo '<td>'.$row['zaihai_stock_address'].'</td>';
-            echo '<td>'.$row['operator_in'].'</td>';
-            echo '<td>'.$row['date_time_in'].'</td>';
-            echo '</tr>';
+    while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+        $c++;
+
+        $row_class = '';
+        if (intval($row['downtime']) == 1) {
+            $row_class = 'bg-danger';
         }
+
+        echo '<tr style="cursor:pointer;" class="modal-trigger '.$row_class.'" 
+                onclick="get_applicator_in_pending_details(&#96;'.htmlspecialchars($row['applicator_no']).'~!~'.htmlspecialchars(addslashes($row['terminal_name'])).'&#96;)">';
+        echo '<td>'.$c.'</td>';
+        echo '<td>'.$row['serial_no'].'</td>';
+        echo '<td>'.$row['car_maker'].'</td>';
+        echo '<td>'.$row['car_model'].'</td>';
+        echo '<td>'.$row['applicator_no'].'</td>';
+        echo '<td>'.$row['terminal_name'].'</td>';
+        echo '<td>'.$row['trd_no'].'</td>';
+        echo '<td>'.$row['operator_out'].'</td>';
+        echo '<td>'.$row['date_time_out'].'</td>';
+        echo '<td>'.$row['zaihai_stock_address'].'</td>';
+        echo '<td>'.$row['operator_in'].'</td>';
+        echo '<td>'.$row['date_time_in'].'</td>';
+        echo '</tr>';
     }
 }
+
+$conn = null;

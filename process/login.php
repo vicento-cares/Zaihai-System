@@ -76,6 +76,7 @@ if (isset($_POST['login_btn'])) {
                 $_SESSION['full_name'] = $full_name;
                 $_SESSION['role'] = $role;
 
+                $conn_emp_mgt = null;
                 header('location:/zaihai/pd/verify_checksheet.php');
                 exit();
             } else {
@@ -84,6 +85,7 @@ if (isset($_POST['login_btn'])) {
         } else {
             echo '<script>alert("Sign In Failed. Maybe an incorrect credential or account not found")</script>';
         }
+        $conn_emp_mgt = null;
     } else {
         $check = "SELECT emp_no, full_name, role FROM m_accounts 
                     WHERE emp_no = ? COLLATE SQL_Latin1_General_CP1_CS_AS";

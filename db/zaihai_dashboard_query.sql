@@ -30,6 +30,27 @@ FROM
     t_applicator_list
 	WHERE car_maker = ? AND car_model = ?;
 
+-- All applicators updated
+SELECT 
+    COUNT(CASE WHEN status = 'Ready To Use' THEN id END) AS total_rtu,
+    COUNT(CASE WHEN status = 'Out' THEN id END) AS total_out,
+    COUNT(CASE WHEN status = 'Pending' AND location LIKE '%Zaihai%' THEN id END) AS total_pending_zaihai,
+    COUNT(CASE WHEN status = 'Pending' AND location LIKE '%BM%' THEN id END) AS total_pending_bm,
+    COUNT(CASE WHEN status = 'Ready To Use' THEN id END) + COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_in
+FROM t_applicator_list;
+
+-- Total Applicator, Out and In Counts
+WITH 
+    applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator)
+
+SELECT 
+    (SELECT total_applicator FROM applicator_count) AS total_applicator,
+    COUNT(CASE WHEN at.status = 'Ready To Use' THEN at.id END) + 
+    COUNT(CASE WHEN at.status = 'Pending' THEN at.id END) AS total_in,
+    COUNT(CASE WHEN at.status = 'Out' THEN at.id END) AS total_out
+FROM 
+    t_applicator_list at;
+
 -- Applicator Out Count by Car Maker, Car Model and TRD CART Positions on t_applicator_in_out
 SELECT
 	a.car_maker,
@@ -959,6 +980,228 @@ FROM
 GROUP BY 
     car_maker, car_model;
 
+-- Sample Query for Combined Daily Count of Applicator Out + In + Inspected based on t_applicator_in_out_history Specific Maker Models 
+-- (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2025;  -- Specify the year
+DECLARE @Month INT = 1;   -- Specify the month (November)
+DECLARE @CarMaker NVARCHAR(255) = 'Daihatsu';
+DECLARE @CarModel NVARCHAR(255) = 'D01L';
+DECLARE @Shift VARCHAR(3) = 'ALL';  -- Set the shift variable to 'ALL', 'DS', or 'NS'
+
+WITH DateRange AS (
+    SELECT 
+        DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+    FROM 
+        master.dbo.spt_values
+    WHERE 
+        type = 'P' AND 
+        number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+),
+FilteredApplicatorHistoryOut AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+		'date_out' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryIn AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+		CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+		'date_in' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryInspected AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+		'date_inspected' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+CombinedApplicatorStatus AS (
+	SELECT * FROM 
+		FilteredApplicatorHistoryOut
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryIn
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryInspected
+)
+
+SELECT 
+    CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+    cas.car_maker,
+    cas.car_model,
+	COUNT(CASE 
+        WHEN date_type = 'date_out' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN cas.applicator_no 
+        END) AS total_out,
+    COUNT(CASE 
+        WHEN date_type = 'date_in' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN cas.applicator_no 
+        END) AS total_in,
+    COUNT(CASE 
+        WHEN date_type = 'date_inspected' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN cas.applicator_no 
+        END) AS total_inspected
+FROM 
+    DateRange dr
+LEFT JOIN 
+    CombinedApplicatorStatus cas ON 
+        cas.date_column >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+        cas.date_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+GROUP BY 
+    dr.report_date, cas.car_maker, cas.car_model 
+ORDER BY 
+    dr.report_date;
+
+-- Sample Query for Combined Daily Count of Applicator Out + In + Inspected based on t_applicator_in_out_history Specific Maker Models 
+-- (1 Month - DS & NS) Exact Month
+DECLARE @Year INT = 2025;  -- Specify the year
+DECLARE @Month INT = 1;   -- Specify the month (November)
+DECLARE @CarMaker NVARCHAR(255) = 'Daihatsu';
+DECLARE @CarModel NVARCHAR(255) = 'D01L';
+DECLARE @Shift VARCHAR(3) = 'ALL';  -- Set the shift variable to 'ALL', 'DS', or 'NS'
+
+WITH FilteredApplicatorHistoryOut AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+		'date_out' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryIn AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+		CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+		'date_in' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+FilteredApplicatorHistoryInspected AS (
+    SELECT 
+        aioh.applicator_no,
+		a.car_maker,
+		a.car_model,
+        CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+		'date_inspected' AS date_type,  -- Indicate the type of date
+		CASE 
+			WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+			ELSE 'NS'
+		END AS shift  -- Determine the shift
+    FROM 
+        t_applicator_in_out_history aioh
+    LEFT JOIN 
+        m_applicator a ON aioh.applicator_no = a.applicator_no 
+	WHERE
+		aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+		aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+		a.car_maker = @CarMaker AND 
+		a.car_model = @CarModel -- Adjusted to include the entire month
+),
+CombinedApplicatorStatus AS (
+	SELECT * FROM 
+		FilteredApplicatorHistoryOut
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryIn
+	UNION ALL
+	SELECT * FROM 
+		FilteredApplicatorHistoryInspected
+)
+
+SELECT 
+    COUNT(CASE 
+        WHEN date_type = 'date_out' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN applicator_no 
+        END) AS total_out,
+    COUNT(CASE 
+        WHEN date_type = 'date_in' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN applicator_no 
+        END) AS total_in,
+    COUNT(CASE 
+        WHEN date_type = 'date_inspected' AND 
+             (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+        THEN applicator_no 
+        END) AS total_inspected
+FROM 
+    CombinedApplicatorStatus;
+
 
 
 
@@ -1169,6 +1412,11 @@ SELECT
                 END
             ) 
     END AS elapsed_time,
-	date_updated
+	date_updated,
+    -- Downtime column
+    CASE 
+        WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) > 1440 THEN 1 
+        ELSE 0 
+    END AS downtime
 FROM t_applicator_list
 ORDER BY status ASC, date_updated ASC;

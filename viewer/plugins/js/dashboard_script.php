@@ -1,5 +1,6 @@
 <script type="text/javascript">
 	let current_applicator_list_status_count_chart;
+	let current_applicator_list_status_count_chart2;
 	let current_trd_carts_reuse_count_chart;
 	let current_active_trd_count_chart;
 	let current_applicators_terminals_count_chart;
@@ -11,12 +12,15 @@
 	let month_term_usage_chart2;
 	let month_aioi_chart;
 	let month_aioi_chart2;
+	let month_caioi_chart;
+	let month_caioi_chart2;
 	let month_amd_chart;
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
 		get_applicator_list_status_count();
 		get_current_applicator_list_status_count_chart();
+		get_current_applicator_list_status_count_chart2();
 		get_current_trd_carts_reuse_count_chart();
 		get_current_active_trd_count_chart();
 		get_current_applicator_out_charts();
@@ -42,7 +46,9 @@
 			success: response => {
 				document.getElementById("total_rtu").innerHTML = `<b>${response.total_rtu}</b>`;
 				document.getElementById("total_out").innerHTML = `<b>${response.total_out}</b>`;
-				document.getElementById("total_pending").innerHTML = `<b>${response.total_pending}</b>`;
+				document.getElementById("total_pending_zaihai").innerHTML = `<b>${response.total_pending_zaihai}</b>`;
+				document.getElementById("total_pending_bm").innerHTML = `<b>${response.total_pending_bm}</b>`;
+				document.getElementById("total_in").innerHTML = `<b>${response.total_in}</b>`;
 			}
 		});
 	}
@@ -61,7 +67,7 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#dc3545', '#ffc107'];
+				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -106,6 +112,86 @@
 
 				current_applicator_list_status_count_chart = new ApexCharts(ctx, options);
 				current_applicator_list_status_count_chart.render();
+			}
+		});
+	}
+
+	const get_current_applicator_list_status_count_chart2 = () => {
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_applicator_list_status_count_chart2'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#3c8dbc', '#20c997', '#ffc107'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#current_applicator_list_status_count_chart2");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%',
+							endingShape: 'flat'
+						},
+					},
+					dataLabels: {
+						position: 'top', // Position of the data labels (top, center, bottom)
+						enabled: true,   // Enable data labels
+						formatter: function (val) {
+							return val; // You can customize the label format here
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					yaxis: {
+						title: {
+							text: 'Total Applicator Count'
+						}
+					},
+					xaxis: {
+						categories: response.categories
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					},
+					fill: {
+						opacity: 1
+					},
+					title: {
+						text: `Current Overall Applicator Status Count`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (current_applicator_list_status_count_chart2) {
+					current_applicator_list_status_count_chart2.destroy();
+				}
+
+				current_applicator_list_status_count_chart2 = new ApexCharts(ctx, options);
+				current_applicator_list_status_count_chart2.render();
 			}
 		});
 	}
@@ -297,6 +383,7 @@
 			},  
 			success: response => {
 				document.getElementById("total_applicator").innerHTML = `<b>${response.total_applicator}</b>`;
+				document.getElementById("total_applicator_current").innerHTML = `<b>${response.total_applicator}</b>`;
 				document.getElementById("total_terminal").innerHTML = `<b>${response.total_terminal}</b>`;
 				document.getElementById("total_applicator_terminal").innerHTML = `<b>${response.total_applicator_terminal}</b>`;
 			}
@@ -444,6 +531,7 @@
 				document.getElementById("month_a_adj_cnt3_car_maker_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_maker_search").innerHTML = response;
 				document.getElementById("month_aioi_car_maker_search").innerHTML = response;
+				document.getElementById("month_caioi_car_maker_search").innerHTML = response;
 			}
 		});
 	}
@@ -461,6 +549,7 @@
 				document.getElementById("month_a_adj_cnt3_car_model_search").innerHTML = response;
 				document.getElementById("month_term_usage_car_model_search").innerHTML = response;
 				document.getElementById("month_aioi_car_model_search").innerHTML = response;
+				document.getElementById("month_caioi_car_model_search").innerHTML = response;
 			}
 		});
 	}
@@ -741,6 +830,7 @@
 			success: response => {
 				document.getElementById("month_term_usage_year_search").innerHTML = response;
 				document.getElementById("month_aioi_year_search").innerHTML = response;
+				document.getElementById("month_caioi_year_search").innerHTML = response;
 				document.getElementById("month_amd_year_search").innerHTML = response;
 			}
 		});
@@ -1048,6 +1138,174 @@
 
 				month_aioi_chart2 = new ApexCharts(ctx, options);
 				month_aioi_chart2.render();
+			}
+		});
+	}
+
+	document.getElementById("month_caioi_form").addEventListener("submit", e => {
+		e.preventDefault();
+		get_month_caioi_chart();
+	});
+
+	const get_month_caioi_chart = () => {
+		let year = document.getElementById("month_caioi_year_search").value;
+		let month = document.getElementById("month_caioi_month_search").value;
+		let car_maker = document.getElementById("month_caioi_car_maker_search").value;
+		let car_model = document.getElementById("month_caioi_car_model_search").value;
+		let shift = document.getElementById("month_caioi_shift_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_caioi_chart',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model,
+				shift: shift
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+				console.log(response.colorMap);
+
+				get_month_caioi_chart2();
+
+				let concat_label = car_maker + ' ';
+				let shift_label = '';
+
+				if (car_maker != car_model) {
+					concat_label += car_model;
+				}
+				if (shift != 'ALL') {
+					shift_label = shift;
+				}
+
+				const seriesColorMap = {
+											'Out': '#ffc107', // Warning
+											'In': '#dc3545', // Danger
+											'Inspected': '#28a745' // Success
+										};
+    
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data) // Convert the data object to an array
+					};
+				});
+
+				// Generate the colors array based on the series names
+				const colors = seriesData.map(item => seriesColorMap[item.name] || '#343a40'); // Default color if name not found
+
+				let ctx = document.querySelector("#month_caioi_chart");
+
+				var options = {
+					chart: {
+						type: 'line',
+						height: 350
+					},
+					series: seriesData,
+					colors: colors,
+					xaxis: {
+						categories: response.categories
+					},
+					title: {
+						text: `Monthly Combined Applicator Status at ${concat_label} Zaihai Shop ${shift_label}`,
+						align: 'left'
+					},
+					stroke: {
+						curve: 'smooth'
+					},
+					markers: {
+						size: 5
+					},
+					tooltip: {
+						shared: true,
+						intersect: false
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_caioi_chart) {
+					month_caioi_chart.destroy();
+				}
+
+				month_caioi_chart = new ApexCharts(ctx, options);
+				month_caioi_chart.render();
+			}
+		});
+	}
+
+	const get_month_caioi_chart2 = () => {
+		let year = document.getElementById("month_caioi_year_search").value;
+		let month = document.getElementById("month_caioi_month_search").value;
+		let car_maker = document.getElementById("month_caioi_car_maker_search").value;
+		let car_model = document.getElementById("month_caioi_car_model_search").value;
+		let shift = document.getElementById("month_caioi_shift_search").value;
+
+		$.ajax({
+			url: '../process/dashboard/dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_month_caioi_chart2',
+				year: year,
+				month: month,
+				car_maker: car_maker,
+				car_model: car_model,
+				shift: shift
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+				console.log(response.colorMap);
+
+				let shift_label = '';
+
+				if (shift != 'ALL') {
+					shift_label = shift;
+				}
+
+				let ctx = document.querySelector("#month_caioi_chart2");
+
+				const categoryColorMap = {
+											'Out': '#ffc107', // Warning
+											'In': '#dc3545', // Danger
+											'Inspected': '#28a745' // Success
+										};
+
+				// Generate the colors array based on the categories in response
+				const colors = response.categories.map(category => categoryColorMap[category] || '#343a40'); // Default color if category not found
+
+				var options = {
+					chart: {
+						type: 'pie'
+					},
+					series: response.data,
+					labels: response.categories,
+					colors: colors,
+					title: {
+						text: `Monthly Combined Applicator Status ${shift_label}`,
+						align: 'center'
+					},
+					legend: {
+						position: 'bottom',
+						horizontalAlign: 'center',
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (month_caioi_chart2) {
+					month_caioi_chart2.destroy();
+				}
+
+				month_caioi_chart2 = new ApexCharts(ctx, options);
+				month_caioi_chart2.render();
 			}
 		});
 	}

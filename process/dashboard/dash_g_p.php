@@ -5,15 +5,15 @@ require '../conn.php';
 $method = $_GET['method'];
 
 $color_map = array(
-    'Suzuki YV7' => '#007bff', // Primary
-    'Mazda J12' => '#6c757d', // Secondary
-    'Mazda Merge' => '#28a745', // Success
-    'Toyota' => '#dc3545', // Danger
-    'Subaru' => '#ffc107', // Warning
-    'Honda T20' => '#17a2b8', // Info
-    'Honda Old' => '#343a40', // Dark
-    'Honda TKRA' => '#e83e8c', // Pink
-    'Daihatsu D01L' => '#fd7e14' // orange
+    'Suzuki YV7' => '#f8bbd0', // Light Pink
+    'Mazda J12' => '#ffc107', // Warning
+    'Mazda Merge' => '#d8cbaf', // Dark Beige
+    'Toyota' => '#28a745', // Success
+    'Subaru' => '#fd7e14', // orange
+    'Honda T20' => '#8a2be2', // violet
+    'Honda Old' => '#dc3545', // Danger
+    'Honda TKRA' => '#007bff', // Primary
+    'Daihatsu D01L' => '#e83e8c', // Dark Pink
 );
 
 if ($method == 'get_applicator_list_status_count') {
@@ -22,16 +22,20 @@ if ($method == 'get_applicator_list_status_count') {
     $sql = "SELECT 
                 COUNT(CASE WHEN status = 'Ready To Use' THEN id END) AS total_rtu,
                 COUNT(CASE WHEN status = 'Out' THEN id END) AS total_out,
-                COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_pending
+                COUNT(CASE WHEN status = 'Pending' AND location LIKE '%Zaihai%' THEN id END) AS total_pending_zaihai,
+                COUNT(CASE WHEN status = 'Pending' AND location LIKE '%BM%' THEN id END) AS total_pending_bm,
+                COUNT(CASE WHEN status = 'Ready To Use' THEN id END) + COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_in
             FROM t_applicator_list";
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
         $data = [
-            'total_rtu' => intval($row['total_rtu']), 
-            'total_out' => intval($row['total_out']), 
-            'total_pending' => intval($row['total_pending'])
+            'total_rtu' => intval($row['total_rtu']),
+            'total_out' => intval($row['total_out']),
+            'total_pending_zaihai' => intval($row['total_pending_zaihai']),
+            'total_pending_bm' => intval($row['total_pending_bm']),
+            'total_in' => intval($row['total_in'])
         ];
     }
 
@@ -92,6 +96,65 @@ if ($method == 'get_current_applicator_list_status_count_chart') {
             [
                 'name' => 'Pending',
                 'data' => $data['Pending']
+            ]
+        ]
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
+if ($method == 'get_current_applicator_list_status_count_chart2') {
+    $data = [];
+
+    $sql = "WITH 
+                applicator_count AS (SELECT COUNT(id) AS total_applicator FROM m_applicator)
+
+            SELECT 
+                (SELECT total_applicator FROM applicator_count) AS total_applicator,
+                COUNT(CASE WHEN at.status = 'Ready To Use' THEN at.id END) + 
+                COUNT(CASE WHEN at.status = 'Pending' THEN at.id END) AS total_in,
+                COUNT(CASE WHEN at.status = 'Out' THEN at.id END) AS total_out
+            FROM 
+                t_applicator_list at";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $data['TotalApplicator'][] = (int)$row['total_applicator'];
+        $data['In'][] = 0; // or some default value
+        $data['Out'][] = 0; // or some default value
+        $data['TotalApplicator'][] = 0; // or some default value
+        $data['In'][] = (int)$row['total_in'];
+        $data['Out'][] = (int)$row['total_out'];
+    } else {
+        // Handle the case where no results are returned
+        $data['TotalApplicator'][] = 0; // or some default value
+        $data['In'][] = 0; // or some default value
+        $data['Out'][] = 0; // or some default value
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => [
+            "Total Applicator",
+            "In + Out"
+        ],
+        'data' => [
+            [
+                'name' => 'Total Applicator',
+                'data' => $data['TotalApplicator']
+            ],
+            [
+                'name' => 'In',
+                'data' => $data['In']
+            ],
+            [
+                'name' => 'Out',
+                'data' => $data['Out']
             ]
         ]
     ];
@@ -1243,6 +1306,325 @@ if ($method == 'get_month_aioi_chart2') {
         'categories' => $categories,
         'data' => $data,
         'colorMap' => $color_map
+    ];
+
+    // Encode the categories and data as JSON
+    echo json_encode($finalData);
+}
+
+if ($method == 'get_month_caioi_chart') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $shift = $_GET['shift'];
+
+    $data = [];
+    $categories = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+            DECLARE @CarMaker NVARCHAR(255) = ?;
+            DECLARE @CarModel NVARCHAR(255) = ?;
+            DECLARE @Shift VARCHAR(3) = ?;  -- Set the shift variable to 'ALL', 'DS', or 'NS'
+
+            WITH DateRange AS (
+                SELECT 
+                    DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+                FROM 
+                    master.dbo.spt_values
+                WHERE 
+                    type = 'P' AND 
+                    number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+            ),
+            FilteredApplicatorHistoryOut AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+                    'date_out' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryIn AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+                    'date_in' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryInspected AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+                    'date_inspected' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            CombinedApplicatorStatus AS (
+                SELECT * FROM 
+                    FilteredApplicatorHistoryOut
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryIn
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryInspected
+            )
+
+            SELECT 
+                CAST(dr.report_date AS DATE) AS report_date,  -- Label the report date as DATE
+                cas.car_maker,
+                cas.car_model,
+                COUNT(CASE 
+                    WHEN date_type = 'date_out' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN cas.applicator_no 
+                    END) AS total_out,
+                COUNT(CASE 
+                    WHEN date_type = 'date_in' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN cas.applicator_no 
+                    END) AS total_in,
+                COUNT(CASE 
+                    WHEN date_type = 'date_inspected' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN cas.applicator_no 
+                    END) AS total_inspected
+            FROM 
+                DateRange dr
+            LEFT JOIN 
+                CombinedApplicatorStatus cas ON 
+                    cas.date_column >= DATEADD(HOUR, 6, CAST(dr.report_date AS DATETIME2)) AND 
+                    cas.date_column < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(dr.report_date AS DATETIME2)))  -- Adjusted to ensure the range is from 6 AM to just before 6 AM the next day
+            GROUP BY 
+                dr.report_date, cas.car_maker, cas.car_model 
+            ORDER BY 
+                dr.report_date";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $car_maker, $car_model, $shift);
+
+    $stmt->execute($params);
+
+    // Get the number of days in the specified month and year
+    $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+    // Initialize an array to hold the counts for each car maker and model
+    $statusCounts = [];
+
+    // Fetch results and populate the terminalData array
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Add unique report_date to categories
+        if (!in_array($row['report_date'], $categories)) {
+            $categories[] = $row['report_date'];
+        }
+
+        if (!empty($row['car_maker']) && !empty($row['car_model'])) {
+            // Create a unique key for date types
+            $dateOutKey = 'Out';
+            $dateInKey = 'In';
+            $dateInspectedKey = 'Inspected';
+
+            // Initialize the statusCounts for this dateOutKey if it doesn't exist
+            if (!isset($statusCounts[$dateOutKey])) {
+                $statusCounts[$dateOutKey] = array_fill(0, $daysInMonth, 0);
+            }
+            // Initialize the statusCounts for this dateInKey if it doesn't exist
+            if (!isset($statusCounts[$dateInKey])) {
+                $statusCounts[$dateInKey] = array_fill(0, $daysInMonth, 0);
+            }
+            // Initialize the statusCounts for this dateInspectedKey if it doesn't exist
+            if (!isset($statusCounts[$dateInspectedKey])) {
+                $statusCounts[$dateInspectedKey] = array_fill(0, $daysInMonth, 0);
+            }
+
+            // Update the count for the specified status
+            $dateIndex = array_search($row['report_date'], $categories);
+            if ($dateIndex !== false) {
+                $statusCounts[$dateOutKey][$dateIndex] += intval($row['total_out']); // Use total for counts
+                $statusCounts[$dateInKey][$dateIndex] += intval($row['total_in']); // Use total for counts
+                $statusCounts[$dateInspectedKey][$dateIndex] += intval($row['total_inspected']); // Use total for counts
+            }
+        }
+    }
+
+    // Create the final data structure
+    foreach ($statusCounts as $dateTypeKey => $counts) {
+        $data[] = [
+            'name' => $dateTypeKey,
+            'data' => $counts
+        ];
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data]);
+}
+
+if ($method == 'get_month_caioi_chart2') {
+    $year = $_GET['year'];
+    $month = $_GET['month'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $shift = $_GET['shift'];
+
+    $data = [];
+
+    $sql = "DECLARE @Year INT = ?;  -- Specify the year
+            DECLARE @Month INT = ?;   -- Specify the month (November)
+            DECLARE @CarMaker NVARCHAR(255) = ?;
+            DECLARE @CarModel NVARCHAR(255) = ?;
+            DECLARE @Shift VARCHAR(3) = ?;  -- Set the shift variable to 'ALL', 'DS', or 'NS'
+
+            WITH FilteredApplicatorHistoryOut AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_out AS DATETIME2(2)) AS date_column,
+                    'date_out' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_out AS TIME) >= '06:00:00' AND CAST(aioh.date_time_out AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_out >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_out < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryIn AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.date_time_in AS DATETIME2(2)) AS date_column,
+                    'date_in' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.date_time_in AS TIME) >= '06:00:00' AND CAST(aioh.date_time_in AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.date_time_in >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.date_time_in < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            FilteredApplicatorHistoryInspected AS (
+                SELECT 
+                    aioh.applicator_no,
+                    a.car_maker,
+                    a.car_model,
+                    CAST(aioh.confirmation_date AS DATETIME2(2)) AS date_column,
+                    'date_inspected' AS date_type,  -- Indicate the type of date
+                    CASE 
+                        WHEN CAST(aioh.confirmation_date AS TIME) >= '06:00:00' AND CAST(aioh.confirmation_date AS TIME) < '18:00:00' THEN 'DS'
+                        ELSE 'NS'
+                    END AS shift  -- Determine the shift
+                FROM 
+                    t_applicator_in_out_history aioh
+                LEFT JOIN 
+                    m_applicator a ON aioh.applicator_no = a.applicator_no 
+                WHERE
+                    aioh.confirmation_date >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME2)) AND 
+                    aioh.confirmation_date < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) AND 
+                    a.car_maker = @CarMaker AND 
+                    a.car_model = @CarModel -- Adjusted to include the entire month
+            ),
+            CombinedApplicatorStatus AS (
+                SELECT * FROM 
+                    FilteredApplicatorHistoryOut
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryIn
+                UNION ALL
+                SELECT * FROM 
+                    FilteredApplicatorHistoryInspected
+            )
+
+            SELECT 
+                COUNT(CASE 
+                    WHEN date_type = 'date_out' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN applicator_no 
+                    END) AS total_out,
+                COUNT(CASE 
+                    WHEN date_type = 'date_in' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN applicator_no 
+                    END) AS total_in,
+                COUNT(CASE 
+                    WHEN date_type = 'date_inspected' AND 
+                        (@Shift = 'ALL' OR (shift = 'DS' AND @Shift = 'DS') OR (shift = 'NS' AND @Shift = 'NS')) 
+                    THEN applicator_no 
+                    END) AS total_inspected
+            FROM 
+                CombinedApplicatorStatus";
+
+    $stmt = $conn->prepare($sql);
+    $params = array($year, $month, $car_maker, $car_model, $shift);
+    $stmt->execute($params);
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $categories = ['Out', 'In', 'Inspected'];
+
+        // Add values to data
+        $data[] = (int)$row['total_out'];
+        $data[] = (int)$row['total_in'];
+        $data[] = (int)$row['total_inspected'];
+    }
+
+    // Create the final data structure
+    $finalData = [
+        'categories' => $categories,
+        'data' => $data
     ];
 
     // Encode the categories and data as JSON
