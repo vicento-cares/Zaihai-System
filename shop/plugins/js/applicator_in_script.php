@@ -381,6 +381,7 @@
 		document.getElementById("ai_location_before").value = '';
 		document.getElementById("ai_applicator_no").value = '';
 		document.getElementById("ai_terminal_name").value = '';
+		sessionStorage.setItem('zs_ai_terminal_name', '');
 		if (opt == 1) {
 			document.getElementById("ai_location_before").disabled = false;
 			document.getElementById("ai_location_before").focus();

@@ -382,6 +382,7 @@
 		document.getElementById("ao_location").value = '';
 		document.getElementById("ao_applicator_no").value = '';
 		document.getElementById("ao_terminal_name").value = '';
+		sessionStorage.setItem('zs_ao_terminal_name', '');
 		if (opt == 1) {
 			document.getElementById("ao_location").disabled = false;
 			document.getElementById("ao_location").focus();
