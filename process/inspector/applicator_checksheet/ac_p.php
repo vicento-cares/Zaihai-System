@@ -1,4 +1,8 @@
 <?php
+session_set_cookie_params(0, "/zaihai");
+session_name("zaihai");
+session_start();
+
 require '../../conn.php';
 include '../../lib/main.php';
 
@@ -22,6 +26,7 @@ if ($method == 'make_checksheet') {
     $cross_section_result = $_POST['cross_section_result'];
     $inspected_by = $_POST['inspected_by'];
     $inspected_by_no = $_POST['inspected_by_no'];
+    $created_from_itf = 0;
 
     $ac_s_3 = 'Replace';
     
@@ -70,72 +75,171 @@ if ($method == 'make_checksheet') {
         }
     }
 
-    $isTransactionActive = false;
+    $inspector = $_SESSION['emp_no'];
+    $role = $_SESSION['role'];
 
-    try {
-        if (!$isTransactionActive) {
-            $conn->beginTransaction();
-            $isTransactionActive = true;
-        }
-    
-        $sql = "INSERT INTO t_applicator_c 
-            (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
-            adjustment_content, adjustment_content_remarks, cross_section_result, inspected_by, inspected_by_no,  
-            ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
-            ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s,
-            ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn -> prepare($sql);
-        $params = array($serial_no, $equipment_no, $applicator_no_split, $terminal_name, $location, $line_address, $inspection_date_time, $inspection_shift, 
-                        $adjustment_content, $adjustment_content_remarks, $cross_section_result, $inspected_by, $inspected_by_no, 
-                        $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
-                        $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
-                        $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9]);
-        $stmt -> execute($params);
+    if (empty($inspector)) {
+        echo 'Session was expired. Please Re-Login your account.';
+    } else {
+        if ($role == 'BM') {
+            $created_from_itf = 1;
+        } 
 
-        $sql = "INSERT INTO t_applicator_in_out_history 
-                (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
-                SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date
-                FROM t_applicator_in_out
-                WHERE serial_no = ?";
-        $stmt = $conn -> prepare($sql);
-        $params = array($serial_no);
-        $stmt -> execute($params);
-
-        $sql = "UPDATE t_applicator_in_out_history 
-                SET zaihai_stock_address = ?, inspected_by = ?, confirmation_date = ?
-                WHERE serial_no = ?";
-        $stmt = $conn -> prepare($sql);
-        $params = array($location, $inspected_by_no, $server_date_time, $serial_no);
-        $stmt -> execute($params);
-
-        $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = ?";
-        $stmt = $conn -> prepare($sql);
-        $params = array($serial_no);
-        $stmt -> execute($params);
-
-        $sql = "UPDATE t_applicator_list 
-                SET location = ?, status = 'Ready To Use', date_updated = ?
-                WHERE applicator_no = ?";
-        $stmt = $conn->prepare($sql);
-        $params = array($location, $server_date_time, $applicator_no);
-        $stmt->execute($params);
-    
-        $conn->commit();
         $isTransactionActive = false;
-        echo 'success';
-    } catch (Exception $e) {
-        if ($isTransactionActive) {
-            $conn->rollBack();
+
+        try {
+            if (!$isTransactionActive) {
+                $conn->beginTransaction();
+                $isTransactionActive = true;
+            }
+        
+            $sql = "INSERT INTO t_applicator_c 
+                (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
+                adjustment_content, adjustment_content_remarks, cross_section_result, inspected_by, inspected_by_no, created_from_itf, 
+                ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
+                ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s,
+                ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn -> prepare($sql);
+            $params = array($serial_no, $equipment_no, $applicator_no_split, $terminal_name, $location, $line_address, $inspection_date_time, $inspection_shift, 
+                            $adjustment_content, $adjustment_content_remarks, $cross_section_result, $inspected_by, $inspected_by_no, $created_from_itf, 
+                            $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
+                            $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
+                            $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9]);
+            $stmt -> execute($params);
+
+            if ($created_from_itf == 0) {
+                $sql = "INSERT INTO t_applicator_in_out_history 
+                        (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
+                        SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date
+                        FROM t_applicator_in_out
+                        WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($serial_no);
+                $stmt -> execute($params);
+
+                $sql = "UPDATE t_applicator_in_out_history 
+                        SET zaihai_stock_address = ?, inspected_by = ?, confirmation_date = ?
+                        WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($location, $inspected_by_no, $server_date_time, $serial_no);
+                $stmt -> execute($params);
+
+                $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($serial_no);
+                $stmt -> execute($params);
+
+                $sql = "UPDATE t_applicator_list 
+                        SET location = ?, status = 'Ready To Use', date_updated = ?
+                        WHERE applicator_no = ?";
+                $stmt = $conn->prepare($sql);
+                $params = array($location, $server_date_time, $applicator_no);
+                $stmt->execute($params);
+            }
+        
+            $conn->commit();
             $isTransactionActive = false;
+            echo 'success';
+        } catch (Exception $e) {
+            if ($isTransactionActive) {
+                $conn->rollBack();
+                $isTransactionActive = false;
+            }
+            echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+            $conn = null;
+            exit();
         }
-        echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-        $conn = null;
-        exit();
+    }
+}
+
+if ($method == 'shop_confirm_checksheet') {
+    $serial_no = $_POST['serial_no'];
+
+    $shop_confirmed_by = $_SESSION['full_name'];
+    $shop_confirmed_by_no = $_SESSION['emp_no'];
+
+    if (empty($shop_confirmed_by)) {
+        echo 'Session was expired. Please Re-Login your account.';
+    } else {
+        $sql = "SELECT a.zaihai_stock_address, a.applicator_no, ac.inspected_by_no 
+                FROM t_applicator_in_out aio
+                LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no 
+                LEFT JOIN t_applicator_c ac ON aio.serial_no = ac.serial_no 
+                WHERE aio.serial_no = ?";
+        $stmt = $conn -> prepare($sql);
+        $params = array($serial_no);
+        $stmt -> execute($params);
+
+        $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $location = $row['zaihai_stock_address'];
+            $applicator_no = $row['applicator_no'];
+            $inspected_by_no = $row['inspected_by_no'];
+
+            $isTransactionActive = false;
+
+            try {
+                if (!$isTransactionActive) {
+                    $conn->beginTransaction();
+                    $isTransactionActive = true;
+                }
+
+                $sql = "UPDATE t_applicator_c 
+                        SET shop_confirmed_by = ?, shop_confirmed_by_no = ?, shop_confirmed_date_time = ?
+                        WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($shop_confirmed_by, $shop_confirmed_by_no, $server_date_time, $serial_no);
+                $stmt -> execute($params);
+            
+                $sql = "INSERT INTO t_applicator_in_out_history 
+                        (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
+                        SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date
+                        FROM t_applicator_in_out
+                        WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($serial_no);
+                $stmt -> execute($params);
+
+                $sql = "UPDATE t_applicator_in_out_history 
+                        SET zaihai_stock_address = ?, inspected_by = ?, confirmation_date = ?
+                        WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($location, $inspected_by_no, $server_date_time, $serial_no);
+                $stmt -> execute($params);
+
+                $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($serial_no);
+                $stmt -> execute($params);
+
+                $sql = "UPDATE t_applicator_list 
+                        SET location = ?, status = 'Ready To Use', date_updated = ?
+                        WHERE applicator_no = ?";
+                $stmt = $conn->prepare($sql);
+                $params = array($location, $server_date_time, $applicator_no);
+                $stmt->execute($params);
+                
+                $conn->commit();
+                $isTransactionActive = false;
+                echo 'success';
+            } catch (Exception $e) {
+                if ($isTransactionActive) {
+                    $conn->rollBack();
+                    $isTransactionActive = false;
+                }
+                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                $conn = null;
+                exit();
+            }
+        } else {
+            echo 'Checksheet Not Found. Please Try Again or Call IT Personnel Immediately!';
+        }
     }
 }
 

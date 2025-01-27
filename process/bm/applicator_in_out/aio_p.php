@@ -61,7 +61,6 @@ if ($method == 'in_applicator') {
                 if ($status == 'Out' && $status2 == 'Ready To Use') {
                     $sql = "SELECT TOP 1 
                                 aio.id, 
-                                aio.trd_no, 
                                 a.car_maker, 
                                 a.car_model
                             FROM 
@@ -70,20 +69,19 @@ if ($method == 'in_applicator') {
                                 m_applicator a ON aio.applicator_no = a.applicator_no
                             WHERE 
                                 aio.applicator_no = ? AND 
-                                aio.trd_no = ? AND 
                                 aio.zaihai_stock_address IS NULL 
                                 AND aio.date_time_in IS NULL
                             ORDER BY 
                                 aio.id DESC";
                     $stmt = $conn->prepare($sql);
-                    $params = array($applicator_no, $location_before);
+                    $params = array($applicator_no);
                     $stmt->execute($params);
 
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
                     if ($car_maker != $row['car_maker'] && $car_model != $row['car_model']) {
                         echo 'Unmatched Applicator New and Applicator Old on Car Maker / Car Model! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
-                    } else if ($row && $location_before == $row['trd_no']) {
+                    } else {
                         $isTransactionActive = false;
 
                         try {
@@ -149,8 +147,6 @@ if ($method == 'in_applicator') {
                             echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
                             exit();
                         }
-                    } else {
-                        echo 'Unmatched TRD / Cart Location';
                     }
                 } else if ($status == 'Pending' && $status2 == 'Out') {
                     echo 'Applicator Already In Pending or Applicator New Already Out';
