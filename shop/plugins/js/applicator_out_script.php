@@ -268,8 +268,8 @@
 				document.getElementById("ao_borrowed_by_location").value = '';
 				document.getElementById("ao_borrowed_by_remarks").value = '';
 				reset_applicator_out_fields(1);
-				document.getElementById("ai_applicator_no").disabled = true;
-				document.getElementById("ai_terminal_name").disabled = true;
+				document.getElementById("ao_applicator_no").disabled = true;
+				document.getElementById("ao_terminal_name").disabled = true;
 			} else if (document.getElementById('ao_opt_borrowed').checked) {
 				document.getElementById('ao_opt_scan').checked = true;
 				document.getElementById('ao_opt_borrowed').checked = false;
