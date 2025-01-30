@@ -12,7 +12,7 @@ if ($method == 'in_applicator') {
     $id = $_POST['id'];
     $location = "BM Receiving Area";
     $operator_bm = $_SESSION['emp_no'];
-    $applicator_no_new = $_POST['applicator_no_new'];
+    $applicator_no_new = trim($_POST['applicator_no_new']);
 
     if (is_valid_applicator_no($applicator_no_new) == false) {
         echo 'Invalid Applicator No.';

@@ -9,9 +9,9 @@ include '../../lib/main.php';
 $method = $_POST['method'];
 
 if ($method == 'out_applicator') {
-    $location = $_POST['location'];
-    $applicator_no = $_POST['applicator_no'];
-    $terminal_name = $_POST['terminal_name'];
+    $location = trim($_POST['location']);
+    $applicator_no = trim($_POST['applicator_no']);
+    $terminal_name = trim($_POST['terminal_name']);
     $operator_out = $_SESSION['emp_no'];
     $car_maker = $_SESSION['car_maker'];
     $car_model = $_SESSION['car_model'];
@@ -159,10 +159,10 @@ if ($method == 'out_applicator') {
 }
 
 if ($method == 'in_applicator') {
-    $location_before = $_POST['location_before'];
+    $location_before = trim($_POST['location_before']);
     $location = "Zaihai Receiving Area";
-    $applicator_no = $_POST['applicator_no'];
-    $terminal_name = $_POST['terminal_name'];
+    $applicator_no = trim($_POST['applicator_no']);
+    $terminal_name = trim($_POST['terminal_name']);
     $operator_in = $_SESSION['emp_no'];
     $car_maker = $_SESSION['car_maker'];
     $car_model = $_SESSION['car_model'];
