@@ -239,7 +239,7 @@
 				document.getElementById("ai_bm_applicator_no_new").value = ai_bm_applicator_no_new;
 				sessionStorage.setItem('zs_ai_bm_applicator_no_new', '');
 			}
-        }, 100);
+        }, 130);
 	});
 
 	document.getElementById("ai_bm_applicator_no_new").addEventListener("change", e => {

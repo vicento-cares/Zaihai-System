@@ -310,7 +310,7 @@
 				document.getElementById("ai_location_before").value = ai_location_before;
 				sessionStorage.setItem('zs_ai_location_before', '');
 			}
-		}, 100);
+		}, 130);
 	});
 
 	document.getElementById("ai_location_before").addEventListener("change", e => {
@@ -346,7 +346,7 @@
 				document.getElementById("ai_applicator_no").value = ai_applicator_no;
 				sessionStorage.setItem('zs_ai_applicator_no', '');
 			}
-        }, 100);
+        }, 130);
 	});
 
 	document.getElementById("ai_applicator_no").addEventListener("change", e => {
@@ -367,7 +367,7 @@
 				document.getElementById("ai_terminal_name").value = ai_terminal_name;
 				sessionStorage.setItem('zs_ai_terminal_name', '');
 			}
-        }, 100);
+        }, 130);
 	});
 
 	document.getElementById("ai_terminal_name").addEventListener("change", e => {

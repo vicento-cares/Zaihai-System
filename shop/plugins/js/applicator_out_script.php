@@ -310,7 +310,7 @@
 				document.getElementById("ao_location").value = ao_location;
 				sessionStorage.setItem('zs_ao_location', '');
 			}
-		}, 100);
+		}, 130);
 	});
 
 	document.getElementById("ao_location").addEventListener("change", e => {
@@ -347,7 +347,7 @@
 				document.getElementById("ao_applicator_no").value = ao_applicator_no;
 				sessionStorage.setItem('zs_ao_applicator_no', '');
 			}
-        }, 100);
+        }, 130);
 	});
 
 	document.getElementById("ao_applicator_no").addEventListener("change", e => {
@@ -368,7 +368,7 @@
 				document.getElementById("ao_terminal_name").value = ao_terminal_name;
 				sessionStorage.setItem('zs_ao_terminal_name', '');
 			}
-        }, 100);
+        }, 130);
 	});
 
 	document.getElementById("ao_terminal_name").addEventListener("change", e => {
