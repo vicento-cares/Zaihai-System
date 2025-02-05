@@ -87,19 +87,21 @@ include 'plugins/navbar/viewer_navbar.php';
                                             <thead style="text-align: center;">
                                                 <tr>
                                                 <th>#</th>
+                                                <th>Error Code</th>
                                                 <th>Serial No.</th>
-                                                <th>Car Maker</th>
-                                                <th>Car Model</th>
-                                                <th>Applicator No.</th>
-                                                <th>Terminal Name</th>
-                                                <th>TRD No.</th>
-                                                <th>Operator Out</th>
-                                                <th>Date Time Out</th>
+                                                <th>Zaihai Car Maker</th>
+                                                <th>Zaihai Car Model</th>
+                                                <th>Scanned Applicator No.</th>
+                                                <th>Scanned Terminal Name</th>
+                                                <th>Scanned TRD No.</th>
+                                                <th>Scanned By No.</th>
+                                                <th>Interface</th>
+                                                <th>Date Recorded</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="recentApplicatorErrMonData" style="text-align: center;">
                                                 <tr>
-                                                <td colspan="9" style="text-align:center;">
+                                                <td colspan="11" style="text-align:center;">
                                                     <div class="spinner-border text-dark" role="status">
                                                     <span class="sr-only">Loading...</span>
                                                     </div>
