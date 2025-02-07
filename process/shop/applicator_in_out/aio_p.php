@@ -122,6 +122,23 @@ if ($method == 'out_applicator') {
                                 }
                                 $error_status = 1;
                                 $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+
+                                $error_log_arr = [
+                                    'error_status' => $error_status,
+                                    'error_name' => $message,
+                                    'serial_no' => "",
+                                    'scanned_applicator_no' => $applicator_no,
+                                    'scanned_terminal_name' => $terminal_name,
+                                    'scanned_trd_no' => $location,
+                                    'scanned_by_no' => $operator_out,
+                                    'interface' => 'Shop Applicator Out',
+                                    'zaihai_car_maker' => $car_maker,
+                                    'zaihai_car_model' => $car_model,
+                                    'ip' => $ip
+                                ];
+                        
+                                insert_error_log($error_log_arr, $conn);
+                                echo $message;
                                 $conn = null;
                                 exit();
                             }
@@ -274,6 +291,24 @@ if ($method == 'in_applicator') {
                                 $conn->rollBack();
                                 $error_status = 1;
                                 $message = 'Failed. Please Try Again or Call IT Personnel Immediately!';
+
+                                $error_log_arr = [
+                                    'error_status' => $error_status,
+                                    'error_name' => $message,
+                                    'serial_no' => $serial_no,
+                                    'scanned_applicator_no' => $applicator_no,
+                                    'scanned_terminal_name' => $terminal_name,
+                                    'scanned_trd_no' => $location_before,
+                                    'scanned_by_no' => $operator_out,
+                                    'interface' => 'Shop Applicator In',
+                                    'zaihai_car_maker' => $car_maker,
+                                    'zaihai_car_model' => $car_model,
+                                    'ip' => $ip
+                                ];
+                        
+                                insert_error_log($error_log_arr, $conn);
+                                echo $message;
+                                $conn = null;
                                 exit();
                             }
                         
@@ -295,6 +330,23 @@ if ($method == 'in_applicator') {
                             }
                             $error_status = 1;
                             $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+
+                            $error_log_arr = [
+                                'error_status' => $error_status,
+                                'error_name' => $message,
+                                'serial_no' => $serial_no,
+                                'scanned_applicator_no' => $applicator_no,
+                                'scanned_terminal_name' => $terminal_name,
+                                'scanned_trd_no' => $location_before,
+                                'scanned_by_no' => $operator_out,
+                                'interface' => 'Shop Applicator In',
+                                'zaihai_car_maker' => $car_maker,
+                                'zaihai_car_model' => $car_model,
+                                'ip' => $ip
+                            ];
+                    
+                            insert_error_log($error_log_arr, $conn);
+                            echo $message;
                             $conn = null;
                             exit();
                         }
@@ -346,9 +398,9 @@ if ($method == 'in_applicator') {
             'serial_no' => $serial_no,
             'scanned_applicator_no' => $applicator_no,
             'scanned_terminal_name' => $terminal_name,
-            'scanned_trd_no' => $location,
+            'scanned_trd_no' => $location_before,
             'scanned_by_no' => $operator_out,
-            'interface' => 'Shop Applicator Out',
+            'interface' => 'Shop Applicator In',
             'zaihai_car_maker' => $car_maker,
             'zaihai_car_model' => $car_model,
             'ip' => $ip

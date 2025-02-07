@@ -148,26 +148,28 @@ if ($method == 'get_recent_applicator_out') {
 
     $c = 0;
 
-    $sql = "SELECT error_code, serial_no, scanned_applicator_no, scanned_terminal_name, scanned_trd_no, scanned_by_no, 
-            interface, date_recorded, zaihai_car_maker, zaihai_car_model
-            FROM t_error_monitoring 
-            WHERE date_started IS NULL";
+    $sql = "SELECT em.error_code, em.serial_no, em.scanned_applicator_no, em.scanned_terminal_name, em.scanned_trd_no, em.scanned_by_no, 
+            em.interface, em.date_recorded, em.zaihai_car_maker, em.zaihai_car_model, em.it_error_details, 
+            err.error_name 
+            FROM t_error_monitoring em 
+            LEFT JOIN m_errors err ON em.error_code = err.error_code 
+            WHERE em.date_started IS NULL";
     if (!empty($car_maker)) {
-        $sql .= " AND zaihai_car_maker='$car_maker'";
+        $sql .= " AND em.zaihai_car_maker='$car_maker'";
     }
     if (!empty($car_model)) {
-        $sql .= " AND zaihai_car_model='$car_model'";
+        $sql .= " AND em.zaihai_car_model='$car_model'";
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND scanned_applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND em.scanned_applicator_no LIKE '%$applicator_no%'";
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND scanned_terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND em.scanned_terminal_name LIKE '%$terminal_name%'";
     }
     if (!empty($location)) {
-        $sql .= " AND scanned_trd_no LIKE '%$location%'";
+        $sql .= " AND em.scanned_trd_no LIKE '%$location%'";
     }
-    $sql .= " ORDER BY date_recorded ASC";
+    $sql .= " ORDER BY em.date_recorded ASC";
 
     $stmt = $conn->prepare($sql);
 	$stmt->execute();
@@ -178,6 +180,7 @@ if ($method == 'get_recent_applicator_out') {
         echo '<tr>';
         echo '<td>'.$c.'</td>';
         echo '<td>'.$row['error_code'].'</td>';
+        echo '<td>'.$row['error_name'].'</td>';
         echo '<td>'.$row['serial_no'].'</td>';
         echo '<td>'.$row['zaihai_car_maker'].'</td>';
         echo '<td>'.$row['zaihai_car_model'].'</td>';
@@ -187,6 +190,7 @@ if ($method == 'get_recent_applicator_out') {
         echo '<td>'.$row['scanned_by_no'].'</td>';
         echo '<td>'.$row['interface'].'</td>';
         echo '<td>'.$row['date_recorded'].'</td>';
+        echo '<td>'.$row['it_error_details'].'</td>';
         echo '</tr>';
     }
 }

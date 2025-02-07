@@ -88,6 +88,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                                 <tr>
                                                 <th>#</th>
                                                 <th>Error Code</th>
+                                                <th>Error Name</th>
                                                 <th>Serial No.</th>
                                                 <th>Zaihai Car Maker</th>
                                                 <th>Zaihai Car Model</th>
@@ -97,11 +98,12 @@ include 'plugins/navbar/viewer_navbar.php';
                                                 <th>Scanned By No.</th>
                                                 <th>Interface</th>
                                                 <th>Date Recorded</th>
+                                                <th>It Error Details</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="recentApplicatorErrMonData" style="text-align: center;">
                                                 <tr>
-                                                <td colspan="11" style="text-align:center;">
+                                                <td colspan="13" style="text-align:center;">
                                                     <div class="spinner-border text-dark" role="status">
                                                     <span class="sr-only">Loading...</span>
                                                     </div>

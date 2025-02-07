@@ -78,32 +78,39 @@ function insert_error_log($error_log_arr, $conn) {
     if ($error_log_arr['error_status'] == 0) {
         return;
     }
+
+    $find_error_name = "Failed.";
+    $error_name = "";
+    $it_error_details = "";
+
+    $error_name_position = strpos($error_log_arr['error_name'], $find_error_name);
+
+    if ($error_name_position !== false) {
+        $error_name = "Failed. Please Try Again or Call IT Personnel Immediately!";
+        $it_error_details = $error_log_arr['error_name'];
+    } else {
+        $error_name = $error_log_arr['error_name'];
+    }
     
     $sql = "SELECT error_code FROM m_errors WHERE error_name = ?";
     $stmt = $conn->prepare($sql);
-    $params = array($error_log_arr['error_name']);
+    $params = array($error_name);
     $stmt->execute($params);
 
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
         $error_code = $row['error_code'];
-
-        $isTransactionActive = false;
     
         try {
-            if (!$isTransactionActive) {
-                $conn->beginTransaction();
-                $isTransactionActive = true;
-            }
             $sql = "INSERT INTO t_error_monitoring 
                         (error_code, serial_no, 
                         scanned_applicator_no, scanned_terminal_name, scanned_trd_no, scanned_by_no, 
-                        interface, zaihai_car_maker, zaihai_car_model, ip) 
+                        interface, zaihai_car_maker, zaihai_car_model, ip, it_error_details) 
                     VALUES 
                         (?, ?, 
                         ?, ?, ?, ?, 
-                        ?, ?, ?, ?)";
+                        ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $params = array(
                         $error_code, 
@@ -115,15 +122,12 @@ function insert_error_log($error_log_arr, $conn) {
                         $error_log_arr['interface'], 
                         $error_log_arr['zaihai_car_maker'], 
                         $error_log_arr['zaihai_car_model'], 
-                        $error_log_arr['ip']
+                        $error_log_arr['ip'],
+                        $it_error_details
                     );
             $stmt->execute($params);
         } catch (Exception $e) {
-            if ($isTransactionActive) {
-                $conn->rollBack();
-                $isTransactionActive = false;
-            }
-            echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+            echo 'Failed. Please Try Again or Call IT Personnel Immediately! (Error Log Function Error): ' . $e->getMessage();
             $conn = null;
             exit();
         }

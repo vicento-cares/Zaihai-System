@@ -6,6 +6,9 @@ session_start();
 require '../../conn.php';
 include '../../lib/main.php';
 
+// REMOTE IP ADDRESS
+$ip = $_SERVER['REMOTE_ADDR'];
+
 $method = $_POST['method'];
 
 if ($method == 'make_checksheet') {
@@ -27,6 +30,15 @@ if ($method == 'make_checksheet') {
     $inspected_by = $_POST['inspected_by'];
     $inspected_by_no = $_POST['inspected_by_no'];
     $created_from_itf = 0;
+
+    $car_maker = "";
+    $car_model = "";
+    if (isset($_SESSION['car_maker']) && !empty($_SESSION['car_maker'])) {
+        $car_maker = $_SESSION['car_maker'];
+    }
+    if (isset($_SESSION['car_model']) && !empty($_SESSION['car_model'])) {
+        $car_model = $_SESSION['car_model'];
+    }
 
     $ac_s_3 = 'Replace';
     
@@ -150,7 +162,30 @@ if ($method == 'make_checksheet') {
                 $conn->rollBack();
                 $isTransactionActive = false;
             }
-            echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+            $error_status = 1;
+            $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+            $interface = 'Shop Applicator Checksheet';
+
+            if ($role == 'BM') {
+                $interface = 'BM Applicator Checksheet';
+            }
+
+            $error_log_arr = [
+                'error_status' => $error_status,
+                'error_name' => $message,
+                'serial_no' => $serial_no,
+                'scanned_applicator_no' => $applicator_no,
+                'scanned_terminal_name' => $terminal_name,
+                'scanned_trd_no' => $location,
+                'scanned_by_no' => $inspected_by_no,
+                'interface' => $interface,
+                'zaihai_car_maker' => $car_maker,
+                'zaihai_car_model' => $car_model,
+                'ip' => $ip
+            ];
+    
+            insert_error_log($error_log_arr, $conn);
+            echo $message;
             $conn = null;
             exit();
         }
@@ -163,10 +198,13 @@ if ($method == 'shop_confirm_checksheet') {
     $shop_confirmed_by = $_SESSION['full_name'];
     $shop_confirmed_by_no = $_SESSION['emp_no'];
 
+    $car_maker = $_SESSION['car_maker'];
+    $car_model = $_SESSION['car_model'];
+
     if (empty($shop_confirmed_by)) {
         echo 'Session was expired. Please Re-Login your account.';
     } else {
-        $sql = "SELECT a.zaihai_stock_address, a.applicator_no, ac.inspected_by_no 
+        $sql = "SELECT a.zaihai_stock_address, a.applicator_no, ac.terminal_name, ac.inspected_by_no 
                 FROM t_applicator_in_out aio
                 LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no 
                 LEFT JOIN t_applicator_c ac ON aio.serial_no = ac.serial_no 
@@ -180,6 +218,7 @@ if ($method == 'shop_confirm_checksheet') {
         if ($row) {
             $location = $row['zaihai_stock_address'];
             $applicator_no = $row['applicator_no'];
+            $terminal_name = $row['terminal_name'];
             $inspected_by_no = $row['inspected_by_no'];
 
             $isTransactionActive = false;
@@ -233,7 +272,25 @@ if ($method == 'shop_confirm_checksheet') {
                     $conn->rollBack();
                     $isTransactionActive = false;
                 }
-                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+                $error_status = 1;
+                $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+
+                $error_log_arr = [
+                    'error_status' => $error_status,
+                    'error_name' => $message,
+                    'serial_no' => $serial_no,
+                    'scanned_applicator_no' => $applicator_no,
+                    'scanned_terminal_name' => $terminal_name,
+                    'scanned_trd_no' => $location,
+                    'scanned_by_no' => $shop_confirmed_by_no,
+                    'interface' => 'Shop Confirm Applicator Checksheet',
+                    'zaihai_car_maker' => $car_maker,
+                    'zaihai_car_model' => $car_model,
+                    'ip' => $ip
+                ];
+        
+                insert_error_log($error_log_arr, $conn);
+                echo $message;
                 $conn = null;
                 exit();
             }
