@@ -9,6 +9,7 @@
 		get_applicator_no_datalist_out_search();
 		get_terminal_name_datalist_out_search();
 		get_location_datalist_out_search();
+		get_error_name_dropdown_out_search();
 		get_recent_applicator_err_mon();
 		realtime_get_recent_applicator_err_mon = setInterval(get_recent_applicator_err_mon, 10000);
 	});
@@ -83,6 +84,20 @@
 		});
 	}
 
+	const get_error_name_dropdown_out_search = () => {
+		$.ajax({
+			url: '../process/error_monitoring/err_mon_g_p.php',
+			type: 'GET',
+			cache: false,
+			data: {
+				method: 'get_error_name_dropdown_out_search'
+			},  
+			success: response => {
+				document.getElementById("aem_error_name_search").innerHTML = response;
+			}
+		});
+	}
+
 	var typingTimerAoApplicatorNoSearch;
 	var typingTimerAoTerminalNameSearch;
     var typingTimerAoLocationSearch;
@@ -132,6 +147,7 @@
 		let applicator_no = document.getElementById('aem_applicator_no_search').value;
 		let terminal_name = document.getElementById('aem_terminal_name_search').value;
 		let location = document.getElementById('aem_location_search').value;
+		let error_name = document.getElementById('aem_error_name_search').value;
 
 		sessionStorage.setItem('zs_aem_car_maker_search', car_maker);
 		sessionStorage.setItem('zs_aem_car_model_search', car_model);
@@ -149,7 +165,8 @@
 				car_model: car_model,
 				applicator_no: applicator_no,
 				terminal_name: terminal_name,
-				location: location
+				location: location,
+				error_name: error_name
 			},
 			success: (response) => {
                 $('#recentApplicatorErrMonData').html(response);

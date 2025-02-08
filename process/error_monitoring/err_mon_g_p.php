@@ -125,6 +125,27 @@ if ($method == 'get_location_datalist_out_search') {
 	}
 }
 
+// Get Error Name Dropdown
+if ($method == 'get_error_name_dropdown_out_search') {
+	$sql = "SELECT err.error_name FROM t_error_monitoring em 
+            LEFT JOIN m_errors err ON em.error_code = err.error_code 
+            WHERE date_started IS NULL
+            GROUP BY err.error_name ORDER BY err.error_name ASC";
+	$stmt = $conn -> prepare($sql);
+	$stmt -> execute();
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+	if (count($results) > 0) {
+		echo '<option selected value="">All</option>';
+		foreach ($results as $row) {
+			echo '<option value="'.htmlspecialchars($row['error_name']).'">'.htmlspecialchars($row['error_name']).'</option>';
+		}
+	} else {
+		echo '<option selected value="">All</option>';
+	}
+}
+
 if ($method == 'get_recent_applicator_out') {
     $car_maker = '';
     $car_model = '';
@@ -145,6 +166,7 @@ if ($method == 'get_recent_applicator_out') {
     $applicator_no = addslashes($_GET['applicator_no']);
     $terminal_name = addslashes($_GET['terminal_name']);
     $location = addslashes($_GET['location']);
+    $error_name = addslashes($_GET['error_name']);
 
     $c = 0;
 
@@ -168,6 +190,9 @@ if ($method == 'get_recent_applicator_out') {
     }
     if (!empty($location)) {
         $sql .= " AND em.scanned_trd_no LIKE '%$location%'";
+    }
+    if (!empty($error_name)) {
+        $sql .= " AND err.error_name='$error_name'";
     }
     $sql .= " ORDER BY em.date_recorded ASC";
 

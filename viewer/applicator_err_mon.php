@@ -40,7 +40,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
-                                    <div class="row mb-4">
+                                    <div class="row mb-2">
                                         <div class="col-sm-2">
                                             <label>Car Maker</label>
                                             <select id="aem_car_maker_search" class="form-control" onchange="get_recent_applicator_err_mon()">
@@ -69,11 +69,19 @@ include 'plugins/navbar/viewer_navbar.php';
                                             <datalist id="aem_terminal_name_search_list"></datalist>
                                         </div>
                                     </div>
-                                    <div class="row mb-2">
-                                        <div class="col-sm-3 offset-sm-6">
+                                    <div class="row mb-4">
+                                        <div class="col-sm-4">
+                                            <label>Error Name</label>
+                                            <select id="aem_error_name_search" class="form-control" onchange="get_recent_applicator_err_mon()">
+                                                <option selected value="">All</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3 offset-sm-2">
+                                            <label>&nbsp;</label>
                                             <button type="button" class="btn btn-secondary btn-block" onclick="export_recent_applicator_err_mon('recentApplicatorErrMonTable')"><i class="fas fa-download"></i> Export</button>
                                         </div>
                                         <div class="col-sm-3">
+                                            <label>&nbsp;</label>
                                             <button type="button" class="btn btn-success btn-block" onclick="get_recent_applicator_err_mon()"><i class="fas fa-search"></i> Search</button>
                                         </div>
                                     </div>
