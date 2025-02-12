@@ -145,10 +145,11 @@ if ($method == 'in_applicator') {
                             $stmt->execute($params);
 
                             // Applicator New Out (BM)
-                            $serial_no = date("ymdh");
-                            $rand = substr(md5(microtime()),rand(0,26),5);
-                            $serial_no = 'MEI-295-AC-'.$serial_no;
-                            $serial_no = $serial_no.''.$rand;
+                            // $serial_no = date("ymdh");
+                            // $rand = substr(md5(microtime()),rand(0,26),5);
+                            // $serial_no = 'MEI-295-AC-'.$serial_no;
+                            // $serial_no = $serial_no.''.$rand;
+                            $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
 
                             $sql = "INSERT INTO t_applicator_in_out (serial_no, applicator_no, terminal_name, trd_no, operator_out) 
                                     VALUES (?, ?, ?, ?, ?)";

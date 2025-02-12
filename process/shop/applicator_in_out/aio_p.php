@@ -86,10 +86,11 @@ if ($method == 'out_applicator') {
                         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
                         if (!$row) {
-                            $serial_no = date("ymdh");
-                            $rand = substr(md5(microtime()),rand(0,26),5);
-                            $serial_no = 'MEI-295-AC-'.$serial_no;
-                            $serial_no = $serial_no.''.$rand;
+                            // $serial_no = date("ymdh");
+                            // $rand = substr(md5(microtime()),rand(0,26),5);
+                            // $serial_no = 'MEI-295-AC-'.$serial_no;
+                            // $serial_no = $serial_no.''.$rand;
+                            $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
 
                             $isTransactionActive = false;
 
