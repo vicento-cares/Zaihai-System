@@ -4,23 +4,23 @@
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
-		get_car_maker_dropdown_out_search();
-		get_car_model_dropdown_out_search();
-		get_applicator_no_datalist_out_search();
-		get_terminal_name_datalist_out_search();
-		get_location_datalist_out_search();
-		get_error_name_dropdown_out_search();
+		get_car_maker_dropdown_search();
+		get_car_model_dropdown_search();
+		get_applicator_no_datalist_search();
+		get_terminal_name_datalist_search();
+		get_location_datalist_search();
+		get_error_name_dropdown_search();
 		get_recent_applicator_err_mon();
 		realtime_get_recent_applicator_err_mon = setInterval(get_recent_applicator_err_mon, 10000);
 	});
 
-	const get_car_maker_dropdown_out_search = () => {
+	const get_car_maker_dropdown_search = () => {
 		$.ajax({
 			url: '../process/error_monitoring/err_mon_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_car_maker_dropdown_out_search'
+				method: 'get_car_maker_dropdown_search'
 			},  
 			success: response => {
 				document.getElementById("aem_car_maker_search").innerHTML = response;
@@ -28,13 +28,13 @@
 		});
 	}
 
-	const get_car_model_dropdown_out_search = () => {
+	const get_car_model_dropdown_search = () => {
 		$.ajax({
 			url: '../process/error_monitoring/err_mon_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_car_model_dropdown_out_search'
+				method: 'get_car_model_dropdown_search'
 			},  
 			success: response => {
 				document.getElementById("aem_car_model_search").innerHTML = response;
@@ -42,13 +42,13 @@
 		});
 	}
 
-	const get_applicator_no_datalist_out_search = () => {
+	const get_applicator_no_datalist_search = () => {
 		$.ajax({
 			url: '../process/error_monitoring/err_mon_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_applicator_no_datalist_out_search'
+				method: 'get_applicator_no_datalist_search'
 			},  
 			success: response => {
 				document.getElementById("aem_applicator_no_search_list").innerHTML = response;
@@ -56,13 +56,13 @@
 		});
 	}
 
-	const get_terminal_name_datalist_out_search = () => {
+	const get_terminal_name_datalist_search = () => {
 		$.ajax({
 			url: '../process/error_monitoring/err_mon_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_terminal_name_datalist_out_search'
+				method: 'get_terminal_name_datalist_search'
 			},  
 			success: response => {
 				document.getElementById("aem_terminal_name_search_list").innerHTML = response;
@@ -70,13 +70,13 @@
 		});
 	}
 
-	const get_location_datalist_out_search = () => {
+	const get_location_datalist_search = () => {
 		$.ajax({
 			url: '../process/error_monitoring/err_mon_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_location_datalist_out_search'
+				method: 'get_location_datalist_search'
 			},  
 			success: response => {
 				document.getElementById("aem_location_search_list").innerHTML = response;
@@ -84,13 +84,13 @@
 		});
 	}
 
-	const get_error_name_dropdown_out_search = () => {
+	const get_error_name_dropdown_search = () => {
 		$.ajax({
 			url: '../process/error_monitoring/err_mon_g_p.php',
 			type: 'GET',
 			cache: false,
 			data: {
-				method: 'get_error_name_dropdown_out_search'
+				method: 'get_error_name_dropdown_search'
 			},  
 			success: response => {
 				document.getElementById("aem_error_name_search").innerHTML = response;
@@ -160,7 +160,7 @@
 			url: "../process/error_monitoring/err_mon_g_p.php",
 			cache: false,
 			data: {
-				method: "get_recent_applicator_out",
+				method: "get_recent_applicator_err_mon",
 				car_maker: car_maker,
 				car_model: car_model,
 				applicator_no: applicator_no,

@@ -14,9 +14,10 @@ if (isset($_SESSION['role'])) {
 }
 
 // Get Car Maker Dropdown Out
-if ($method == 'get_car_maker_dropdown_out_search') {
+if ($method == 'get_car_maker_dropdown_search') {
 	$sql = "SELECT zaihai_car_maker FROM t_error_monitoring
-            WHERE date_started IS NULL
+            WHERE date_started IS NULL AND 
+                (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())
             GROUP BY zaihai_car_maker ORDER BY zaihai_car_maker ASC";
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
@@ -31,9 +32,10 @@ if ($method == 'get_car_maker_dropdown_out_search') {
 }
 
 // Get Car Model Dropdown Out
-if ($method == 'get_car_model_dropdown_out_search') {
+if ($method == 'get_car_model_dropdown_search') {
 	$sql = "SELECT zaihai_car_model FROM t_error_monitoring
-            WHERE date_started IS NULL
+            WHERE date_started IS NULL AND 
+                (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())
             GROUP BY zaihai_car_model ORDER BY zaihai_car_model ASC";
 	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
 	$stmt -> execute();
@@ -48,8 +50,9 @@ if ($method == 'get_car_model_dropdown_out_search') {
 }
 
 // Get Applicator No. Datalist Out
-if ($method == 'get_applicator_no_datalist_out_search') {
-	$sql = "SELECT scanned_applicator_no FROM t_error_monitoring WHERE date_started IS NULL";
+if ($method == 'get_applicator_no_datalist_search') {
+	$sql = "SELECT scanned_applicator_no FROM t_error_monitoring WHERE date_started IS NULL AND 
+                (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())";
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
@@ -74,8 +77,9 @@ if ($method == 'get_applicator_no_datalist_out_search') {
 }
 
 // Get Terminal Name Datalist Out
-if ($method == 'get_terminal_name_datalist_out_search') {
-	$sql = "SELECT scanned_terminal_name FROM t_error_monitoring WHERE date_started IS NULL";
+if ($method == 'get_terminal_name_datalist_search') {
+	$sql = "SELECT scanned_terminal_name FROM t_error_monitoring WHERE date_started IS NULL AND 
+                (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())";
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
@@ -100,8 +104,9 @@ if ($method == 'get_terminal_name_datalist_out_search') {
 }
 
 // Get Location Datalist Out
-if ($method == 'get_location_datalist_out_search') {
-	$sql = "SELECT scanned_trd_no FROM t_error_monitoring WHERE date_started IS NULL";
+if ($method == 'get_location_datalist_search') {
+	$sql = "SELECT scanned_trd_no FROM t_error_monitoring WHERE date_started IS NULL AND 
+                (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())";
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
@@ -126,10 +131,11 @@ if ($method == 'get_location_datalist_out_search') {
 }
 
 // Get Error Name Dropdown
-if ($method == 'get_error_name_dropdown_out_search') {
+if ($method == 'get_error_name_dropdown_search') {
 	$sql = "SELECT err.error_name FROM t_error_monitoring em 
             LEFT JOIN m_errors err ON em.error_code = err.error_code 
-            WHERE date_started IS NULL
+            WHERE em.date_started IS NULL AND 
+                (em.date_recorded >= DATEADD(DAY, -7, GETDATE()) AND em.date_recorded <= GETDATE())
             GROUP BY err.error_name ORDER BY err.error_name ASC";
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
@@ -146,7 +152,7 @@ if ($method == 'get_error_name_dropdown_out_search') {
 	}
 }
 
-if ($method == 'get_recent_applicator_out') {
+if ($method == 'get_recent_applicator_err_mon') {
     $car_maker = '';
     $car_model = '';
 
@@ -170,12 +176,17 @@ if ($method == 'get_recent_applicator_out') {
 
     $c = 0;
 
-    $sql = "SELECT em.error_code, em.serial_no, em.scanned_applicator_no, em.scanned_terminal_name, em.scanned_trd_no, em.scanned_by_no, 
-            em.interface, em.date_recorded, em.zaihai_car_maker, em.zaihai_car_model, em.it_error_details, 
-            err.error_name 
-            FROM t_error_monitoring em 
-            LEFT JOIN m_errors err ON em.error_code = err.error_code 
-            WHERE em.date_started IS NULL";
+    $sql = "SELECT 
+                em.error_code, em.serial_no, em.scanned_applicator_no, em.scanned_terminal_name, em.scanned_trd_no, em.scanned_by_no, 
+                em.interface, em.date_recorded, em.zaihai_car_maker, em.zaihai_car_model, em.it_error_details, 
+                err.error_name 
+            FROM 
+                t_error_monitoring em 
+            LEFT JOIN 
+                m_errors err ON em.error_code = err.error_code 
+            WHERE 
+                em.date_started IS NULL AND 
+                (em.date_recorded >= DATEADD(DAY, -7, GETDATE()) AND em.date_recorded <= GETDATE())";
     if (!empty($car_maker)) {
         $sql .= " AND em.zaihai_car_maker='$car_maker'";
     }
