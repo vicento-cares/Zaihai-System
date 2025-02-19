@@ -583,7 +583,7 @@
             </div>
             <div class="col-lg-1 col-sm-12">
               <div class="form-group mb-0">
-                <input type="radio" id="cross_section_result_ok_ac_i" name="cross_section_result_ac_i" value="1">
+                <input type="radio" id="cross_section_result_ok_ac_i" name="cross_section_result_ac_i" value="1" required>
                 <label class="h4" for="cross_section_result_ok_ac_i">◯</label>
               </div>
             </div>
