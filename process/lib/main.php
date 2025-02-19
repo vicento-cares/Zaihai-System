@@ -63,8 +63,8 @@ function removeBomUtf8($s){
 }
 
 function containsBorrowed($string) {
-    // Use strpos to find the position of "Borrowed" in the string
-    $position = strpos($string, "Borrowed");
+    // Use stripos to find the position of "Borrowed" in a case-insensitive manner
+    $position = stripos($string, "Borrowed");
     
     // Check if the position is not false (meaning the word was found)
     if ($position !== false) {

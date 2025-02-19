@@ -90,18 +90,20 @@ if ($method == 'out_applicator') {
                                     $conn->beginTransaction();
                                     $isTransactionActive = true;
                                 }
+
+                                $locationToUpper = strtoupper($location); //ToUpper Update
                             
                                 $sql = "INSERT INTO t_applicator_in_out (serial_no, applicator_no, terminal_name, trd_no, operator_out) 
                                     VALUES (?, ?, ?, ?, ?)";
                                 $stmt = $conn -> prepare($sql);
-                                $params = array($serial_no, $applicator_no, $terminal_name, $location, $operator_out);
+                                $params = array($serial_no, $applicator_no, $terminal_name, $locationToUpper, $operator_out);
                                 $stmt -> execute($params);
 
                                 $sql = "UPDATE t_applicator_list 
                                         SET location = ?, status = 'Out', date_updated = ?
                                         WHERE applicator_no = ?";
                                 $stmt = $conn->prepare($sql);
-                                $params = array($location, $server_date_time, $applicator_no);
+                                $params = array($locationToUpper, $server_date_time, $applicator_no);
                                 $stmt->execute($params);
                             
                                 $conn->commit();
