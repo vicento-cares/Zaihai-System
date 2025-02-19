@@ -80,6 +80,7 @@
                             <li><a href="viewer/applicator_out.php" class="dropdown-item">Applicator Out</a></li>
                             <li><a href="viewer/applicator_in.php" class="dropdown-item">Applicator In</a></li>
                             <li><a href="viewer/applicator_history.php" class="dropdown-item">Applicator History</a></li>
+                            <li><a href="viewer/applicator_err_mon.php" class="dropdown-item">Applicator Error Monitoring</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">

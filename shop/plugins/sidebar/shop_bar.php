@@ -71,6 +71,18 @@
           </a>
         </li>
         <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/shop_confirm.php") { ?>
+          <a href="shop_confirm.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="shop_confirm.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-tasks"></i>
+            <p>
+              Confirm BM Checksheet
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
           <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/applicator_history.php") { ?>
           <a href="applicator_history.php" class="nav-link active">
           <?php } else { ?>
