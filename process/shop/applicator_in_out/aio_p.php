@@ -212,7 +212,7 @@ if ($method == 'out_applicator') {
 }
 
 if ($method == 'in_applicator') {
-    $location_before = trim($_POST['location_before']);
+    $location_before = strtoupper(trim($_POST['location_before'])); //ToUpper Update
     $location = "Zaihai Receiving Area";
     $applicator_no = trim($_POST['applicator_no']);
     $terminal_name = trim($_POST['terminal_name']);
