@@ -37,10 +37,6 @@ const timerIncrement = () => {
         // Applicator In Interval
         clearInterval(realtime_get_recent_applicator_in);
         break;
-      case "/zaihai/viewer/applicator_err_mon.php":
-        // Applicator Out Interval
-        clearInterval(realtime_get_recent_applicator_err_mon);
-        break;
       default:
     }
 

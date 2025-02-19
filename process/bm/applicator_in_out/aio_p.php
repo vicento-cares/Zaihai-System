@@ -6,9 +6,6 @@ session_start();
 require '../../conn.php';
 include '../../lib/main.php';
 
-// REMOTE IP ADDRESS
-$ip = $_SERVER['REMOTE_ADDR'];
-
 $method = $_POST['method'];
 
 if ($method == 'in_applicator') {
@@ -16,16 +13,11 @@ if ($method == 'in_applicator') {
     $location = "BM Receiving Area";
     $operator_bm = $_SESSION['emp_no'];
     $applicator_no_new = trim($_POST['applicator_no_new']);
-    $serial_no = '';
-
-    $message = '';
-    $error_status = 0;
-    $error_log_arr = [];
 
     if (is_valid_applicator_no($applicator_no_new) == false) {
-        $message = 'Invalid Applicator No.';
+        echo 'Invalid Applicator No.';
     } else if (empty($operator_bm)) {
-        $message = 'Session was expired. Please Re-Login your account.';
+        echo 'Session was expired. Please Re-Login your account.';
     } else {
         $sql = "SELECT applicator_no, terminal_name, trd_no FROM t_applicator_in_out WHERE id = ?
                 AND zaihai_stock_address IS NULL AND date_time_in IS NULL";
@@ -69,6 +61,7 @@ if ($method == 'in_applicator') {
                 if ($status == 'Out' && $status2 == 'Ready To Use') {
                     $sql = "SELECT TOP 1 
                                 aio.id, 
+                                aio.trd_no, 
                                 a.car_maker, 
                                 a.car_model
                             FROM 
@@ -77,19 +70,20 @@ if ($method == 'in_applicator') {
                                 m_applicator a ON aio.applicator_no = a.applicator_no
                             WHERE 
                                 aio.applicator_no = ? AND 
+                                aio.trd_no = ? AND 
                                 aio.zaihai_stock_address IS NULL 
                                 AND aio.date_time_in IS NULL
                             ORDER BY 
                                 aio.id DESC";
                     $stmt = $conn->prepare($sql);
-                    $params = array($applicator_no);
+                    $params = array($applicator_no, $location_before);
                     $stmt->execute($params);
 
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
                     if ($car_maker != $row['car_maker'] && $car_model != $row['car_model']) {
-                        $message = 'Unmatched Applicator New and Applicator Old on Car Maker / Car Model! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
-                    } else {
+                        echo 'Unmatched Applicator New and Applicator Old on Car Maker / Car Model! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
+                    } else if ($row && $location_before == $row['trd_no']) {
                         $isTransactionActive = false;
 
                         try {
@@ -114,26 +108,7 @@ if ($method == 'in_applicator') {
                             if ($updated_rows === 0) {
                                 // No rows were updated, roll back the transaction
                                 $conn->rollBack();
-                                $error_status = 1;
-                                $message = 'Failed. Please Try Again or Call IT Personnel Immediately!';
-
-                                $error_log_arr = [
-                                    'error_status' => $error_status,
-                                    'error_name' => $message,
-                                    'serial_no' => $serial_no,
-                                    'scanned_applicator_no' => $applicator_no,
-                                    'scanned_terminal_name' => $terminal_name,
-                                    'scanned_trd_no' => $location,
-                                    'scanned_by_no' => $operator_bm,
-                                    'interface' => 'BM Applicator In',
-                                    'zaihai_car_maker' => $car_maker,
-                                    'zaihai_car_model' => $car_model,
-                                    'ip' => $ip
-                                ];
-                        
-                                insert_error_log($error_log_arr, $conn);
-                                echo $message;
-                                $conn = null;
+                                echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
                                 exit();
                             }
 
@@ -145,11 +120,10 @@ if ($method == 'in_applicator') {
                             $stmt->execute($params);
 
                             // Applicator New Out (BM)
-                            // $serial_no = date("ymdh");
-                            // $rand = substr(md5(microtime()),rand(0,26),5);
-                            // $serial_no = 'MEI-295-AC-'.$serial_no;
-                            // $serial_no = $serial_no.''.$rand;
-                            $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
+                            $serial_no = date("ymdh");
+                            $rand = substr(md5(microtime()),rand(0,26),5);
+                            $serial_no = 'MEI-295-AC-'.$serial_no;
+                            $serial_no = $serial_no.''.$rand;
 
                             $sql = "INSERT INTO t_applicator_in_out (serial_no, applicator_no, terminal_name, trd_no, operator_out) 
                                     VALUES (?, ?, ?, ?, ?)";
@@ -166,41 +140,24 @@ if ($method == 'in_applicator') {
                         
                             $conn->commit();
                             $isTransactionActive = false;
-                            $message = 'success';
+                            echo 'success';
                         } catch (Exception $e) {
                             if ($isTransactionActive) {
                                 $conn->rollBack();
                                 $isTransactionActive = false;
                             }
-                            $error_status = 1;
-                            $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-
-                            $error_log_arr = [
-                                'error_status' => $error_status,
-                                'error_name' => $message,
-                                'serial_no' => $serial_no,
-                                'scanned_applicator_no' => $applicator_no,
-                                'scanned_terminal_name' => $terminal_name,
-                                'scanned_trd_no' => $location,
-                                'scanned_by_no' => $operator_bm,
-                                'interface' => 'BM Applicator In',
-                                'zaihai_car_maker' => $car_maker,
-                                'zaihai_car_model' => $car_model,
-                                'ip' => $ip
-                            ];
-                    
-                            insert_error_log($error_log_arr, $conn);
-                            echo $message;
-                            $conn = null;
+                            echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
                             exit();
                         }
+                    } else {
+                        echo 'Unmatched TRD / Cart Location';
                     }
                 } else if ($status == 'Pending' && $status2 == 'Out') {
-                    $message = 'Applicator Already In Pending or Applicator New Already Out';
+                    echo 'Applicator Already In Pending or Applicator New Already Out';
                 } else if ($status == 'Out' && $status2 == 'Out') {
-                    $message = 'Applicator or Applicator New Already Out';
+                    echo 'Applicator or Applicator New Already Out';
                 } else {
-                    $message = 'Applicator Currently Ready To Use or Applicator New Still Pending';
+                    echo 'Applicator Currently Ready To Use or Applicator New Still Pending';
                 }
             } else {
                 $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ?";
@@ -218,39 +175,17 @@ if ($method == 'in_applicator') {
                 $is_terminal_found = $stmt -> fetch(PDO::FETCH_ASSOC);
 
                 if (!$is_applicator_found && !$is_terminal_found) {
-                    $message = 'Applicator New And Terminal Not Found';
+                    echo 'Applicator New And Terminal Not Found';
                 } else if (!$is_applicator_found) {
-                    $message = 'Applicator New Not Found';
+                    echo 'Applicator New Not Found';
                 } else if (!$is_terminal_found) {
-                    $message = 'Terminal Not Found';
+                    echo 'Terminal Not Found';
                 } else {
-                    $message = 'Unmatched Or Record Not Found On Applicator Terminal (Applicator New)';
+                    echo 'Unmatched Or Record Not Found On Applicator Terminal (Applicator New)';
                 }
-
-                $error_status = 1;
             }
         } else {
-            $message = 'Applicator Out Record was lost or already in';
+            echo 'Applicator Out Record was lost or already in';
         }
     }
-
-    if ($message != 'success') {
-        $error_log_arr = [
-            'error_status' => $error_status,
-            'error_name' => $message,
-            'serial_no' => $serial_no,
-            'scanned_applicator_no' => $applicator_no,
-            'scanned_terminal_name' => $terminal_name,
-            'scanned_trd_no' => $location,
-            'scanned_by_no' => $operator_bm,
-            'interface' => 'BM Applicator In',
-            'zaihai_car_maker' => $car_maker,
-            'zaihai_car_model' => $car_model,
-            'ip' => $ip
-        ];
-
-        insert_error_log($error_log_arr, $conn);
-    }
-
-    echo $message;
 }

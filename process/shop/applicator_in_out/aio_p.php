@@ -6,9 +6,6 @@ session_start();
 require '../../conn.php';
 include '../../lib/main.php';
 
-// REMOTE IP ADDRESS
-$ip = $_SERVER['REMOTE_ADDR'];
-
 $method = $_POST['method'];
 
 if ($method == 'out_applicator') {
@@ -18,20 +15,15 @@ if ($method == 'out_applicator') {
     $operator_out = $_SESSION['emp_no'];
     $car_maker = $_SESSION['car_maker'];
     $car_model = $_SESSION['car_model'];
-    $serial_no = '';
-
-    $message = '';
-    $error_status = 0;
-    $error_log_arr = [];
 
     if (empty($location)) {
-        $message = 'Please Select Borrowed By or Remarks';
+        echo 'Please Select Borrowed By or Remarks';
     } else if (is_valid_applicator_no($applicator_no) == false) {
-        $message = 'Invalid Applicator No.';
+        echo 'Invalid Applicator No.';
     } else if (is_valid_terminal_name($terminal_name) == false) {
-        $message = 'Invalid Terminal Name';
+        echo 'Invalid Terminal Name';
     } else if (empty($operator_out)) {
-        $message = 'Session was expired. Please Re-Login your account.';
+        echo 'Session was expired. Please Re-Login your account.';
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
@@ -67,7 +59,7 @@ if ($method == 'out_applicator') {
                     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
                     if (!$row) {
-                        $sql = "SELECT id, serial_no FROM t_applicator_in_out 
+                        $sql = "SELECT id FROM t_applicator_in_out 
                                 WHERE trd_no = ?";
                         $params = [];
                         $params[] = $location;
@@ -86,11 +78,10 @@ if ($method == 'out_applicator') {
                         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
                         if (!$row) {
-                            // $serial_no = date("ymdh");
-                            // $rand = substr(md5(microtime()),rand(0,26),5);
-                            // $serial_no = 'MEI-295-AC-'.$serial_no;
-                            // $serial_no = $serial_no.''.$rand;
-                            $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
+                            $serial_no = date("ymdh");
+                            $rand = substr(md5(microtime()),rand(0,26),5);
+                            $serial_no = 'MEI-295-AC-'.$serial_no;
+                            $serial_no = $serial_no.''.$rand;
 
                             $isTransactionActive = false;
 
@@ -115,49 +106,29 @@ if ($method == 'out_applicator') {
                             
                                 $conn->commit();
                                 $isTransactionActive = false;
-                                $message = 'success';
+                                echo 'success';
                             } catch (Exception $e) {
                                 if ($isTransactionActive) {
                                     $conn->rollBack();
                                     $isTransactionActive = false;
                                 }
-                                $error_status = 1;
-                                $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-
-                                $error_log_arr = [
-                                    'error_status' => $error_status,
-                                    'error_name' => $message,
-                                    'serial_no' => "",
-                                    'scanned_applicator_no' => $applicator_no,
-                                    'scanned_terminal_name' => $terminal_name,
-                                    'scanned_trd_no' => $location,
-                                    'scanned_by_no' => $operator_out,
-                                    'interface' => 'Shop Applicator Out',
-                                    'zaihai_car_maker' => $car_maker,
-                                    'zaihai_car_model' => $car_model,
-                                    'ip' => $ip
-                                ];
-                        
-                                insert_error_log($error_log_arr, $conn);
-                                echo $message;
+                                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
                                 $conn = null;
                                 exit();
                             }
                         } else {
-                            $serial_no = $row['serial_no'];
-                            $error_status = 1;
-                            $message = 'TRD Cart Currently Used';
+                            echo 'TRD Cart Currently Used';
                         }
                     } else {
-                        $message = 'Applicator Already Out';
+                        echo 'Applicator Already Out';
                     }
                 } else if ($status == 'Out') {
-                    $message = 'Applicator Already Out';
+                    echo 'Applicator Already Out';
                 } else {
-                    $message = 'Applicator Still Pending';
+                    echo 'Applicator Still Pending';
                 }
             } else {
-                $message = 'Applicator Scanned On Wrong Zaihai Shop! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
+                echo 'Applicator Scanned On Wrong Zaihai Shop! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
             }
         } else {
             $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ?";
@@ -175,38 +146,16 @@ if ($method == 'out_applicator') {
             $is_terminal_found = $stmt -> fetch(PDO::FETCH_ASSOC);
 
             if (!$is_applicator_found && !$is_terminal_found) {
-                $message = 'Applicator And Terminal Not Found';
+                echo 'Applicator And Terminal Not Found';
             } else if (!$is_applicator_found) {
-                $message = 'Applicator Not Found';
+                echo 'Applicator Not Found';
             } else if (!$is_terminal_found) {
-                $message = 'Terminal Not Found';
+                echo 'Terminal Not Found';
             } else {
-                $message = 'Unmatched Or Record Not Found On Applicator Terminal';
+                echo 'Unmatched Or Record Not Found On Applicator Terminal';
             }
-
-            $error_status = 1;
         }
     }
-
-    if ($message != 'success') {
-        $error_log_arr = [
-            'error_status' => $error_status,
-            'error_name' => $message,
-            'serial_no' => $serial_no,
-            'scanned_applicator_no' => $applicator_no,
-            'scanned_terminal_name' => $terminal_name,
-            'scanned_trd_no' => $location,
-            'scanned_by_no' => $operator_out,
-            'interface' => 'Shop Applicator Out',
-            'zaihai_car_maker' => $car_maker,
-            'zaihai_car_model' => $car_model,
-            'ip' => $ip
-        ];
-
-        insert_error_log($error_log_arr, $conn);
-    }
-
-    echo $message;
 }
 
 if ($method == 'in_applicator') {
@@ -217,20 +166,15 @@ if ($method == 'in_applicator') {
     $operator_in = $_SESSION['emp_no'];
     $car_maker = $_SESSION['car_maker'];
     $car_model = $_SESSION['car_model'];
-    $serial_no = '';
-
-    $message = '';
-    $error_status = 0;
-    $error_log_arr = [];
 
     if (empty($location_before)) {
-        $message = 'Please Select Borrowed By or Remarks';
+        echo 'Please Select Borrowed By or Remarks';
     } else if (is_valid_applicator_no($applicator_no) == false) {
-        $message = 'Invalid Applicator No.';
+        echo 'Invalid Applicator No.';
     } else if (is_valid_terminal_name($terminal_name) == false) {
-        $message = 'Invalid Terminal Name';
+        echo 'Invalid Terminal Name';
     } else if (empty($operator_in)) {
-        $message = 'Session was expired. Please Re-Login your account.';
+        echo 'Session was expired. Please Re-Login your account.';
     } else {
         $terminal_name_split = split_terminal_name($terminal_name);
 
@@ -290,26 +234,7 @@ if ($method == 'in_applicator') {
                             if ($updated_rows === 0) {
                                 // No rows were updated, roll back the transaction
                                 $conn->rollBack();
-                                $error_status = 1;
-                                $message = 'Failed. Please Try Again or Call IT Personnel Immediately!';
-
-                                $error_log_arr = [
-                                    'error_status' => $error_status,
-                                    'error_name' => $message,
-                                    'serial_no' => $serial_no,
-                                    'scanned_applicator_no' => $applicator_no,
-                                    'scanned_terminal_name' => $terminal_name,
-                                    'scanned_trd_no' => $location_before,
-                                    'scanned_by_no' => $operator_in,
-                                    'interface' => 'Shop Applicator In',
-                                    'zaihai_car_maker' => $car_maker,
-                                    'zaihai_car_model' => $car_model,
-                                    'ip' => $ip
-                                ];
-                        
-                                insert_error_log($error_log_arr, $conn);
-                                echo $message;
-                                $conn = null;
+                                echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
                                 exit();
                             }
                         
@@ -323,45 +248,26 @@ if ($method == 'in_applicator') {
                             // Commit the transaction
                             $conn->commit();
                             $isTransactionActive = false;
-                            $message = 'success';
+                            echo 'success';
                         } catch (Exception $e) {
                             if ($isTransactionActive) {
                                 $conn->rollBack();
                                 $isTransactionActive = false;
                             }
-                            $error_status = 1;
-                            $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-
-                            $error_log_arr = [
-                                'error_status' => $error_status,
-                                'error_name' => $message,
-                                'serial_no' => $serial_no,
-                                'scanned_applicator_no' => $applicator_no,
-                                'scanned_terminal_name' => $terminal_name,
-                                'scanned_trd_no' => $location_before,
-                                'scanned_by_no' => $operator_in,
-                                'interface' => 'Shop Applicator In',
-                                'zaihai_car_maker' => $car_maker,
-                                'zaihai_car_model' => $car_model,
-                                'ip' => $ip
-                            ];
-                    
-                            insert_error_log($error_log_arr, $conn);
-                            echo $message;
+                            echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
                             $conn = null;
                             exit();
                         }
                     } else {
-                        $error_status = 1;
-                        $message = 'Unmatched TRD / Cart Location';
+                        echo 'Unmatched TRD / Cart Location';
                     }
                 } else if ($status == 'Pending') {
-                    $message = 'Applicator Already In Pending';
+                    echo 'Applicator Already In Pending';
                 } else {
-                    $message = 'Applicator Currently Ready To Use';
+                    echo 'Applicator Currently Ready To Use';
                 }
             } else {
-                $message = 'Applicator Scanned On Wrong Zaihai Shop! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
+                echo 'Applicator Scanned On Wrong Zaihai Shop! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
             }
         } else {
             $sql = "SELECT id FROM m_applicator_terminal WHERE applicator_no = ?";
@@ -379,38 +285,16 @@ if ($method == 'in_applicator') {
             $is_terminal_found = $stmt -> fetch(PDO::FETCH_ASSOC);
 
             if (!$is_applicator_found && !$is_terminal_found) {
-                $message = 'Applicator And Terminal Not Found';
+                echo 'Applicator And Terminal Not Found';
             } else if (!$is_applicator_found) {
-                $message = 'Applicator Not Found';
+                echo 'Applicator Not Found';
             } else if (!$is_terminal_found) {
-                $message = 'Terminal Not Found';
+                echo 'Terminal Not Found';
             } else {
-                $message = 'Unmatched Or Record Not Found On Applicator Terminal';
+                echo 'Unmatched Or Record Not Found On Applicator Terminal';
             }
-
-            $error_status = 1;
         }
     }
-
-    if ($message != 'success') {
-        $error_log_arr = [
-            'error_status' => $error_status,
-            'error_name' => $message,
-            'serial_no' => $serial_no,
-            'scanned_applicator_no' => $applicator_no,
-            'scanned_terminal_name' => $terminal_name,
-            'scanned_trd_no' => $location_before,
-            'scanned_by_no' => $operator_in,
-            'interface' => 'Shop Applicator In',
-            'zaihai_car_maker' => $car_maker,
-            'zaihai_car_model' => $car_model,
-            'ip' => $ip
-        ];
-
-        insert_error_log($error_log_arr, $conn);
-    }
-
-    echo $message;
 }
 
 $conn = null;

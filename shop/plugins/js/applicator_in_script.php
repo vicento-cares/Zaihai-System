@@ -90,7 +90,7 @@
 	var typingTimerAiApplicatorNoSearch;
 	var typingTimerAiTerminalNameSearch;
     var typingTimerAiLocationSearch;
-    var doneTypingInterval = 250; // Time in ms
+    var doneTypingInterval = 10; // Time in ms
 
     // On keyup, start the countdown
     document.getElementById("ai_applicator_no_search").addEventListener('keyup', e => {

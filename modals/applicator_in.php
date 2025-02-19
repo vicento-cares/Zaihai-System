@@ -32,7 +32,7 @@
           <div class="row mb-2" id="ai_opt_scan_div">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ai_location_before" placeholder="TRD / Cart Location"
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255">
+              oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255">
             </div>
           </div>
           <div class="row mb-2 d-none" id="ai_opt_borrowed_div">
