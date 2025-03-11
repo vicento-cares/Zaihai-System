@@ -44,10 +44,10 @@ if ($method == 'update_access_location') {
     $car_model = trim($_POST['car_model']);
     $ip = trim($_POST['ip']);
 
-    $query = "SELECT id FROM m_access_locations WHERE ip = ?";
+    $query = "SELECT id FROM m_access_locations WHERE car_maker = ? AND car_model = ? AND ip = ?";
 
     $stmt = $conn->prepare($query);
-    $params = array($ip);
+    $params = array($car_maker, $car_model, $ip);
 
     $stmt->execute($params);
 
