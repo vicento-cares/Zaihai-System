@@ -111,7 +111,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-4">
-                                                    <div class="small-box bg-maroon">
+                                                    <div class="small-box" style="background-color:#FF5D79;">
                                                         <div class="inner mb-3">
                                                             <h2 id="total_pending_bm"></h2>
                                                             <h4><b>Total Pending (BM)</b></h4>
