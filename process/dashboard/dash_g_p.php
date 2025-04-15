@@ -51,7 +51,8 @@ if ($method == 'get_current_applicator_list_status_count_chart') {
                 car_model,
                 COUNT(CASE WHEN status = 'Ready To Use' THEN id END) AS total_rtu,
                 COUNT(CASE WHEN status = 'Out' THEN id END) AS total_out,
-                COUNT(CASE WHEN status = 'Pending' THEN id END) AS total_pending
+                COUNT(CASE WHEN status = 'Pending' AND location = 'Zaihai Receiving Area' THEN id END) AS total_pending,
+                COUNT(CASE WHEN status = 'Pending' AND location = 'BM Receiving Area' THEN id END) AS total_pending_bm 
             FROM 
                 t_applicator_list
             GROUP BY 
@@ -79,6 +80,7 @@ if ($method == 'get_current_applicator_list_status_count_chart') {
         $data['ReadyToUse'][] = (int)$row['total_rtu'];
         $data['Out'][] = (int)$row['total_out'];
         $data['Pending'][] = (int)$row['total_pending'];
+        $data['PendingBm'][] = (int)$row['total_pending_bm'];
     }
 
     // Create the final data structure
@@ -94,8 +96,12 @@ if ($method == 'get_current_applicator_list_status_count_chart') {
                 'data' => $data['Out']
             ],
             [
-                'name' => 'Pending',
+                'name' => 'Pending Zaihai',
                 'data' => $data['Pending']
+            ],
+            [
+                'name' => 'Pending BM',
+                'data' => $data['PendingBm']
             ]
         ]
     ];

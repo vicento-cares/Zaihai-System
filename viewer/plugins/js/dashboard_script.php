@@ -67,7 +67,7 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545', '#ff5d79'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
