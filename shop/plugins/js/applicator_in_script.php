@@ -310,7 +310,7 @@
 				document.getElementById("ai_location_before").value = ai_location_before;
 				sessionStorage.setItem('zs_ai_location_before', '');
 			}
-		}, 130);
+		}, 150);
 	});
 
 	document.getElementById("ai_location_before").addEventListener("change", e => {

@@ -310,7 +310,7 @@
 				document.getElementById("ao_location").value = ao_location;
 				sessionStorage.setItem('zs_ao_location', '');
 			}
-		}, 130);
+		}, 150);
 	});
 
 	document.getElementById("ao_location").addEventListener("change", e => {
