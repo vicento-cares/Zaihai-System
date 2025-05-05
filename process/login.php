@@ -139,11 +139,17 @@ if (isset($_POST['login_btn'])) {
                 }
             } else {
                 if ($role_check == 'BM' && $role == 'BM') {
-                    $_SESSION['emp_no'] = $emp_no;
-                    $_SESSION['full_name'] = $full_name;
-                    $_SESSION['role'] = $role;
-                    header('location:/zaihai/bm/applicator_in.php');
-                    exit();
+                    if ($response_arr['can_access'] == true) {
+                        $_SESSION['emp_no'] = $emp_no;
+                        $_SESSION['full_name'] = $full_name;
+                        $_SESSION['role'] = $role;
+                        $_SESSION['car_maker'] = $response_arr['car_maker'];
+                        $_SESSION['car_model'] = $response_arr['car_model'];
+                        header('location:/zaihai/bm/applicator_in.php');
+                        exit();
+                    } else {
+                        echo '<script>alert("Sign In Failed. Unregistered IP: '.$ip.'! Call IT Personnel Immediately!")</script>';
+                    }
                 } else if ($role_check == 'ME' && $role == 'ME') {
                     $_SESSION['emp_no'] = $emp_no;
                     $_SESSION['full_name'] = $full_name;

@@ -211,6 +211,9 @@ if ($method == 'get_applicator_no_datalist_in_search') {
     if (isset($_GET['page']) && ($_GET['page'] == 'shop' || $_GET['page'] == 'checksheet')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
     }
+    if ($role == 'BM') {
+        $sql .= " LEFT JOIN t_applicator_c ac ON aio.serial_no = ac.serial_no";
+    }
 
     $sql .= " LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no 
             WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
@@ -229,7 +232,17 @@ if ($method == 'get_applicator_no_datalist_in_search') {
     
     if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
         if ($role == 'BM') {
-            $sql .= " AND acct.role = '$role'";
+            if (isset($_SESSION['car_maker'])) {
+                $car_maker = $_SESSION['car_maker'];
+                $sql .= " AND a.car_maker = '$car_maker'";
+            }
+        
+            if (isset($_SESSION['car_model'])) {
+                $car_model = $_SESSION['car_model'];
+                $sql .= " AND a.car_model = '$car_model'";
+            }
+
+            $sql .= " AND acct.role = '$role' AND ac.serial_no IS NULL";
         } else if ($role == 'Shop' || $role == 'Inspector') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
@@ -262,6 +275,9 @@ if ($method == 'get_terminal_name_datalist_in_search') {
     if (isset($_GET['page']) && ($_GET['page'] == 'shop' || $_GET['page'] == 'checksheet')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
     }
+    if ($role == 'BM') {
+        $sql .= " LEFT JOIN t_applicator_c ac ON aio.serial_no = ac.serial_no";
+    }
 
     $sql .= " LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no 
             WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
@@ -280,7 +296,17 @@ if ($method == 'get_terminal_name_datalist_in_search') {
     
     if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
         if ($role == 'BM') {
-            $sql .= " AND acct.role = '$role'";
+            if (isset($_SESSION['car_maker'])) {
+                $car_maker = $_SESSION['car_maker'];
+                $sql .= " AND a.car_maker = '$car_maker'";
+            }
+        
+            if (isset($_SESSION['car_model'])) {
+                $car_model = $_SESSION['car_model'];
+                $sql .= " AND a.car_model = '$car_model'";
+            }
+
+            $sql .= " AND acct.role = '$role' AND ac.serial_no IS NULL";
         } else if ($role == 'Shop' || $role == 'Inspector') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
@@ -313,6 +339,9 @@ if ($method == 'get_location_datalist_in_search') {
     if (isset($_GET['page']) && ($_GET['page'] == 'shop' || $_GET['page'] == 'checksheet')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
     }
+    if ($role == 'BM') {
+        $sql .= " LEFT JOIN t_applicator_c ac ON aio.serial_no = ac.serial_no";
+    }
 
     $sql .= " LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no 
             WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
@@ -331,7 +360,17 @@ if ($method == 'get_location_datalist_in_search') {
 
     if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
         if ($role == 'BM') {
-            $sql .= " AND acct.role = '$role'";
+            if (isset($_SESSION['car_maker'])) {
+                $car_maker = $_SESSION['car_maker'];
+                $sql .= " AND a.car_maker = '$car_maker'";
+            }
+        
+            if (isset($_SESSION['car_model'])) {
+                $car_model = $_SESSION['car_model'];
+                $sql .= " AND a.car_model = '$car_model'";
+            }
+            
+            $sql .= " AND acct.role = '$role' AND ac.serial_no IS NULL";
         } else if ($role == 'Shop' || $role == 'Inspector') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];

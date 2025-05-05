@@ -2,40 +2,10 @@
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
 		// get_applicator_history();
-		get_car_maker_dropdown_search();
-		get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
 		get_terminal_name_datalist_search();
 	});
-
-	const get_car_maker_dropdown_search = () => {
-		$.ajax({
-			url: '../process/me/car_maker/cm_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_maker_dropdown_search'
-			},  
-			success: response => {
-				document.getElementById("aioh_car_maker_search").innerHTML = response;
-			}
-		});
-	}
-
-	const get_car_model_dropdown_search = () => {
-		$.ajax({
-			url: '../process/me/car_maker/cm_g_p.php',
-			type: 'GET',
-			cache: false,
-			data: {
-				method: 'get_car_model_dropdown_search'
-			},  
-			success: response => {
-				document.getElementById("aioh_car_model_search").innerHTML = response;
-			}
-		});
-	}
-
+	
 	const get_applicator_no_datalist_search = () => {
 		$.ajax({
 			url: '../process/me/applicator/a_g_p.php',
