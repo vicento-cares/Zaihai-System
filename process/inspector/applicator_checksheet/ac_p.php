@@ -31,6 +31,8 @@ if ($method == 'make_checksheet') {
     $inspected_by_no = $_POST['inspected_by_no'];
     $created_from_itf = 0;
 
+    $create_f_checksheet = false;
+
     $car_maker = "";
     $car_model = "";
     if (isset($_SESSION['car_maker']) && !empty($_SESSION['car_maker'])) {
@@ -94,8 +96,21 @@ if ($method == 'make_checksheet') {
         echo 'Session was expired. Please Re-Login your account.';
     } else {
         if ($role == 'BM') {
+            $sql = "SELECT serial_no FROM t_applicator_c WHERE serial_no = ?";
+            $stmt = $conn -> prepare($sql);
+            $params = array($serial_no);
+            $stmt -> execute($params);
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+                $create_f_checksheet = true;
+            }
+
             $created_from_itf = 1;
-        } 
+        } else if ($adjustment_content != 'Clean') {
+            $created_from_itf = 2;
+        }
 
         $isTransactionActive = false;
 
@@ -104,26 +119,46 @@ if ($method == 'make_checksheet') {
                 $conn->beginTransaction();
                 $isTransactionActive = true;
             }
-        
-            $sql = "INSERT INTO t_applicator_c 
-                (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
-                adjustment_content, adjustment_content_remarks, cross_section_result, inspected_by, inspected_by_no, created_from_itf, 
-                ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
-                ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s,
-                ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $conn -> prepare($sql);
-            $params = array($serial_no, $equipment_no, $applicator_no_split, $terminal_name, $location, $line_address, $inspection_date_time, $inspection_shift, 
-                            $adjustment_content, $adjustment_content_remarks, $cross_section_result, $inspected_by, $inspected_by_no, $created_from_itf, 
-                            $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
-                            $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
-                            $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9]);
-            $stmt -> execute($params);
 
+            if ($create_f_checksheet) {
+                $sql = "UPDATE t_applicator_c
+                        SET f_inspection_date_time = ?, f_inspection_shift = ?, 
+                            f_adjustment_content = ?, f_adjustment_content_remarks = ?, 
+                            f_cross_section_result = ?, checked_by = ?, checked_by_no = ?, created_from_itf = ?, 
+                            fac1 = ?, fac2 = ?, fac3 = ?, fac4 = ?, fac5 = ?, fac6 = ?, fac7 = ?, fac8 = ?, fac9 = ?, fac10 = ?, 
+                            fac1_s = ?, fac2_s = ?, fac3_s = ?, fac4_s = ?, fac5_s = ?, fac6_s = ?, fac7_s = ?, fac8_s = ?, fac9_s = ?, fac10_s = ?, 
+                            fac1_r = ?, fac2_r = ?, fac3_r = ?, fac4_r = ?, fac5_r = ?, fac6_r = ?, fac7_r = ?, fac8_r = ?, fac9_r = ?, fac10_r = ? 
+                        WHERE serial_no = ?";
+                $stmt = $conn -> prepare($sql);
+                $params = array($inspection_date_time, $inspection_shift, 
+                                $adjustment_content, $adjustment_content_remarks, 
+                                $cross_section_result, $inspected_by, $inspected_by_no, $created_from_itf, 
+                                $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
+                                $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
+                                $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9], 
+                                $serial_no);
+                $stmt -> execute($params);
+            } else {
+                $sql = "INSERT INTO t_applicator_c 
+                    (serial_no, equipment_no, machine_no, terminal_name, zaihai_stock_address, line_address, inspection_date_time, inspection_shift, 
+                    adjustment_content, adjustment_content_remarks, cross_section_result, inspected_by, inspected_by_no, created_from_itf, 
+                    ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10,
+                    ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s,
+                    ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 
+                    ?, ?, ?, ?, ?, ?, 
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $conn -> prepare($sql);
+                $params = array($serial_no, $equipment_no, $applicator_no_split, $terminal_name, $location, $line_address, $inspection_date_time, $inspection_shift, 
+                                $adjustment_content, $adjustment_content_remarks, $cross_section_result, $inspected_by, $inspected_by_no, $created_from_itf, 
+                                $ac_arr[0], $ac_arr[1], $ac_arr[2], $ac_arr[3], $ac_arr[4], $ac_arr[5], $ac_arr[6], $ac_arr[7], $ac_arr[8], $ac_arr[9], 
+                                $ac_s_arr[0], $ac_s_arr[1], $ac_s_arr[2], $ac_s_arr[3], $ac_s_arr[4], $ac_s_arr[5], $ac_s_arr[6], $ac_s_arr[7], $ac_s_arr[8], $ac_s_arr[9], 
+                                $ac_r_arr[0], $ac_r_arr[1], $ac_r_arr[2], $ac_r_arr[3], $ac_r_arr[4], $ac_r_arr[5], $ac_r_arr[6], $ac_r_arr[7], $ac_r_arr[8], $ac_r_arr[9]);
+                $stmt -> execute($params);
+            }
+        
             if ($created_from_itf == 0) {
                 $sql = "INSERT INTO t_applicator_in_out_history 
                         (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
@@ -151,6 +186,22 @@ if ($method == 'make_checksheet') {
                         WHERE applicator_no = ?";
                 $stmt = $conn->prepare($sql);
                 $params = array($location, $server_date_time, $applicator_no);
+                $stmt->execute($params);
+            } else if (!$create_f_checksheet) {
+                $location_bm = "BM Receiving Area";
+
+                $sql = "UPDATE t_applicator_in_out 
+                        SET zaihai_stock_address = ? 
+                        WHERE serial_no = ?";
+                $stmt = $conn->prepare($sql);
+                $params = array($location_bm, $serial_no);
+                $stmt->execute($params);
+
+                $sql = "UPDATE t_applicator_list 
+                        SET location = ? 
+                        WHERE applicator_no = ?";
+                $stmt = $conn->prepare($sql);
+                $params = array($location_bm, $applicator_no);
                 $stmt->execute($params);
             }
         

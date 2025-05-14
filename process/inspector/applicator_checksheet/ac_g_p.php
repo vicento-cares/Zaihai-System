@@ -59,8 +59,7 @@ if ($method == 'get_recent_applicator_in_pending') {
             LEFT JOIN m_applicator a ON t1.applicator_no = a.applicator_no
             LEFT JOIN t_applicator_c ac ON t1.serial_no = ac.serial_no
             LEFT JOIN m_accounts acct ON t1.operator_in = acct.emp_no
-            WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL 
-            AND ac.serial_no IS NULL";
+            WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL";
 
     if (!empty($car_maker)) {
         $sql .= " AND a.car_maker='$car_maker'";
@@ -78,9 +77,13 @@ if ($method == 'get_recent_applicator_in_pending') {
         $sql .= " AND t1.trd_no LIKE '%$location%'";
     }
     if ($role == 'BM') {
-        $sql .= " AND acct.role = '$role'";
+        $sql .= " AND 
+                    (
+                        (ac.serial_no IS NOT NULL AND ac.adjustment_content != 'Clean' AND ac.f_adjustment_content IS NULL) OR 
+                        (ac.serial_no IS NULL AND acct.role = '$role')
+                    )";
     } else if ($role == 'Shop' || $role == 'Inspector') {
-        $sql .= " AND acct.role IN ('Shop', 'Inspector')";
+        $sql .= " AND ac.serial_no IS NULL AND acct.role IN ('Shop', 'Inspector')";
     }
 
     $sql .= " ORDER BY t1.date_time_in ASC";
