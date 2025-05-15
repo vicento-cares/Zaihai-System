@@ -43,7 +43,11 @@ if ($method == 'get_applicator_history') {
                 ac.inspected_by, ac.checked_by, ac.confirmed_by, ac.judgement, 
                 ac.ac1, ac.ac2, ac.ac3, ac.ac4, ac.ac5, ac.ac6, ac.ac7, ac.ac8, ac.ac9, ac.ac10, 
                 ac.ac1_s, ac.ac2_s, ac.ac3_s, ac.ac4_s, ac.ac5_s, ac.ac6_s, ac.ac7_s, ac.ac8_s, ac.ac9_s, ac.ac10_s, 
-                ac.ac1_r, ac.ac2_r, ac.ac3_r, ac.ac4_r, ac.ac5_r, ac.ac6_r, ac.ac7_r, ac.ac8_r, ac.ac9_r, ac.ac10_r 
+                ac.ac1_r, ac.ac2_r, ac.ac3_r, ac.ac4_r, ac.ac5_r, ac.ac6_r, ac.ac7_r, ac.ac8_r, ac.ac9_r, ac.ac10_r, 
+                ac.created_from_itf, ac.f_inspection_date_time, ac.f_inspection_shift, ac.f_adjustment_content, ac.f_adjustment_content_remarks, ac.f_cross_section_result, 
+                ac.fac1, ac.fac2, ac.fac3, ac.fac4, ac.fac5, ac.fac6, ac.fac7, ac.fac8, ac.fac9, ac.fac10, 
+                ac.fac1_s, ac.fac2_s, ac.fac3_s, ac.fac4_s, ac.fac5_s, ac.fac6_s, ac.fac7_s, ac.fac8_s, ac.fac9_s, ac.fac10_s, 
+                ac.fac1_r, ac.fac2_r, ac.fac3_r, ac.fac4_r, ac.fac5_r, ac.fac6_r, ac.fac7_r, ac.fac8_r, ac.fac9_r, ac.fac10_r 
             FROM t_applicator_in_out_history aioh";
     
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
@@ -90,11 +94,18 @@ if ($method == 'get_applicator_history') {
 
         $inspection_date = '';
         $inspection_time = '';
+        $f_inspection_date = '';
+        $f_inspection_time = '';
 
         if (!empty($row['inspection_date_time'])) {
             $inspection_date_time = new DateTime($row['inspection_date_time']);
             $inspection_date = $inspection_date_time->format('Y-m-d');
             $inspection_time = $inspection_date_time->format('H:i:s');
+        }
+        if (!empty($row['f_inspection_date_time'])) {
+            $f_inspection_date_time = new DateTime($row['f_inspection_date_time']);
+            $f_inspection_date = $f_inspection_date_time->format('Y-m-d');
+            $f_inspection_time = $f_inspection_date_time->format('H:i:s');
         }
         
         $applicator_no_split = split_applicator_no($row['applicator_no']);
@@ -106,7 +117,11 @@ if ($method == 'get_applicator_history') {
                 $row['inspected_by'].'~!~'.$row['checked_by'].'~!~'.$row['confirmed_by'].'~!~'.$row['judgement'].'~!~'.
                 $row['ac1'].'~!~'.$row['ac2'].'~!~'.$row['ac3'].'~!~'.$row['ac4'].'~!~'.$row['ac5'].'~!~'.$row['ac6'].'~!~'.$row['ac7'].'~!~'.$row['ac8'].'~!~'.$row['ac9'].'~!~'.$row['ac10'].'~!~'.
                 $row['ac1_s'].'~!~'.$row['ac2_s'].'~!~'.$row['ac3_s'].'~!~'.$row['ac4_s'].'~!~'.$row['ac5_s'].'~!~'.$row['ac6_s'].'~!~'.$row['ac7_s'].'~!~'.$row['ac8_s'].'~!~'.$row['ac9_s'].'~!~'.$row['ac10_s'].'~!~'.
-                $row['ac1_r'].'~!~'.$row['ac2_r'].'~!~'.$row['ac3_r'].'~!~'.$row['ac4_r'].'~!~'.$row['ac5_r'].'~!~'.$row['ac6_r'].'~!~'.$row['ac7_r'].'~!~'.$row['ac8_r'].'~!~'.$row['ac9_r'].'~!~'.$row['ac10_r'].'&quot;)">';
+                $row['ac1_r'].'~!~'.$row['ac2_r'].'~!~'.$row['ac3_r'].'~!~'.$row['ac4_r'].'~!~'.$row['ac5_r'].'~!~'.$row['ac6_r'].'~!~'.$row['ac7_r'].'~!~'.$row['ac8_r'].'~!~'.$row['ac9_r'].'~!~'.$row['ac10_r'].'~!~'.
+                $row['created_from_itf'].'~!~'.$f_inspection_date.'~!~'.$f_inspection_time.'~!~'.$row['f_inspection_shift'].'~!~'.$row['f_adjustment_content'].'~!~'.$row['f_adjustment_content_remarks'].'~!~'.$row['f_cross_section_result'].'~!~'.
+                $row['fac1'].'~!~'.$row['fac2'].'~!~'.$row['fac3'].'~!~'.$row['fac4'].'~!~'.$row['fac5'].'~!~'.$row['fac6'].'~!~'.$row['fac7'].'~!~'.$row['fac8'].'~!~'.$row['fac9'].'~!~'.$row['fac10'].'~!~'.
+                $row['fac1_s'].'~!~'.$row['fac2_s'].'~!~'.$row['fac3_s'].'~!~'.$row['fac4_s'].'~!~'.$row['fac5_s'].'~!~'.$row['fac6_s'].'~!~'.$row['fac7_s'].'~!~'.$row['fac8_s'].'~!~'.$row['fac9_s'].'~!~'.$row['fac10_s'].'~!~'.
+                $row['fac1_r'].'~!~'.$row['fac2_r'].'~!~'.$row['fac3_r'].'~!~'.$row['fac4_r'].'~!~'.$row['fac5_r'].'~!~'.$row['fac6_r'].'~!~'.$row['fac7_r'].'~!~'.$row['fac8_r'].'~!~'.$row['fac9_r'].'~!~'.$row['fac10_r'].'&quot;)">';
         echo '<td>'.$c.'</td>';
         echo '<td>'.$row['serial_no'].'</td>';
         echo '<td>'.$row['car_maker'].'</td>';

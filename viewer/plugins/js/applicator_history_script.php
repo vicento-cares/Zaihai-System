@@ -201,6 +201,26 @@
 		return value;
 	}
 
+	function areAllValuesEmpty(arr) {
+		// Check if arr is an array
+		if (!Array.isArray(arr)) {
+			throw new TypeError('Expected an array');
+		}
+
+		return arr.every(value => 
+			value === null || 
+			value === undefined || 
+			(typeof value === 'number' && isNaN(value)) || 
+			value === ''
+		);
+	}
+
+	var created_from_itf = 0;
+	var applicator_history_details_arr = [];
+	var f_applicator_history_details_arr = [];
+
+	let view_f_applicator_details = true;
+
 	const get_ac_details = param => {
         var string = param.split('~!~');
         var serial_no = string[0];
@@ -252,6 +272,75 @@
 		var ac9_r = string[42];
 		var ac10_r = string[43];
 
+		created_from_itf = parseInt(string[44]);
+
+		var f_inspection_date = string[45];
+        var f_inspection_time = string[46];
+        var f_inspection_shift = string[47];
+
+		var f_adjustment_content = string[48];
+		var f_adjustment_content_remarks = string[49];
+		var f_cross_section_result = parseInt(string[50]);
+
+		var fac1 = parseInt(string[51]);
+		var fac2 = parseInt(string[52]);
+		var fac3 = parseInt(string[53]);
+		var fac4 = parseInt(string[54]);
+		var fac5 = parseInt(string[55]);
+		var fac6 = parseInt(string[56]);
+		var fac7 = parseInt(string[57]);
+		var fac8 = parseInt(string[58]);
+		var fac9 = parseInt(string[59]);
+		var fac10 = parseInt(string[60]);
+
+		var fac1_s = string[61];
+		var fac2_s = string[62];
+		var fac3_s = string[63];
+		var fac4_s = string[64];
+		var fac5_s = string[65];
+		var fac6_s = string[66];
+		var fac7_s = string[67];
+		var fac8_s = string[68];
+		var fac9_s = string[69];
+		var fac10_s = string[70];
+
+		var fac1_r = string[71];
+		var fac2_r = string[72];
+		var fac3_r = string[73];
+		var fac4_r = string[74];
+		var fac5_r = string[75];
+		var fac6_r = string[76];
+		var fac7_r = string[77];
+		var fac8_r = string[78];
+		var fac9_r = string[79];
+		var fac10_r = string[80];
+
+		applicator_history_details_arr = [];
+		f_applicator_history_details_arr = [];
+
+		var added_applicator_history_details_arr = [
+			inspection_date, inspection_time, inspection_shift, 
+			adjustment_content, adjustment_content_remarks, cross_section_result, 
+			ac1, ac2, ac3, ac4, ac5, ac6, ac7, ac8, ac9, ac10, 
+			ac1_s, ac2_s, ac3_s, ac4_s, ac5_s, ac6_s, ac7_s, ac8_s, ac9_s, ac10_s, 
+			ac1_r, ac2_r, ac3_r, ac4_r, ac5_r, ac6_r, ac7_r, ac8_r, ac9_r, ac10_r
+		];
+		var merged_applicator_history_arr = applicator_history_details_arr.concat(added_applicator_history_details_arr);
+
+		applicator_history_details_arr = merged_applicator_history_arr;
+
+		added_applicator_history_details_arr = [
+			f_inspection_date, f_inspection_time, f_inspection_shift, 
+			f_adjustment_content, f_adjustment_content_remarks, f_cross_section_result, 
+			fac1, fac2, fac3, fac4, fac5, fac6, fac7, fac8, fac9, fac10, 
+			fac1_s, fac2_s, fac3_s, fac4_s, fac5_s, fac6_s, fac7_s, fac8_s, fac9_s, fac10_s, 
+			fac1_r, fac2_r, fac3_r, fac4_r, fac5_r, fac6_r, fac7_r, fac8_r, fac9_r, fac10_r
+		];
+
+		merged_applicator_history_arr = f_applicator_history_details_arr.concat(added_applicator_history_details_arr);
+
+		f_applicator_history_details_arr = merged_applicator_history_arr;
+
         document.getElementById('serial_no_acv').innerHTML = serial_no;
         document.getElementById('equipment_no_acv').innerHTML = equipment_no;
         document.getElementById('machine_no_acv').innerHTML = applicator_no;
@@ -291,15 +380,82 @@
 		document.getElementById('cont_9s_acv').innerHTML = ac9_s;
 		document.getElementById('cont_10s_acv').innerHTML = ac10_s;
 
-		document.getElementById('cont_1r_acv').innerHTML += ac1_r;
-		document.getElementById('cont_2r_acv').innerHTML += ac2_r;
-		document.getElementById('cont_3r_acv').innerHTML += ac3_r;
-		document.getElementById('cont_4r_acv').innerHTML += ac4_r;
-		document.getElementById('cont_5r_acv').innerHTML += ac5_r;
-		document.getElementById('cont_6r_acv').innerHTML += ac6_r;
-		document.getElementById('cont_7r_acv').innerHTML += ac7_r;
-		document.getElementById('cont_8r_acv').innerHTML += ac8_r;
-		document.getElementById('cont_9r_acv').innerHTML += ac9_r;
-		document.getElementById('cont_10r_acv').innerHTML += ac10_r;
+		document.getElementById('cont_1r_acv').innerHTML = 'Replace Details: ' +  ac1_r;
+		document.getElementById('cont_2r_acv').innerHTML = 'Replace Details: ' +  ac2_r;
+		document.getElementById('cont_3r_acv').innerHTML = 'Replace Details: ' +  ac3_r;
+		document.getElementById('cont_4r_acv').innerHTML = 'Replace Details: ' +  ac4_r;
+		document.getElementById('cont_5r_acv').innerHTML = 'Replace Details: ' +  ac5_r;
+		document.getElementById('cont_6r_acv').innerHTML = 'Replace Details: ' +  ac6_r;
+		document.getElementById('cont_7r_acv').innerHTML = 'Replace Details: ' +  ac7_r;
+		document.getElementById('cont_8r_acv').innerHTML = 'Replace Details: ' +  ac8_r;
+		document.getElementById('cont_9r_acv').innerHTML = 'Replace Details: ' +  ac9_r;
+		document.getElementById('cont_10r_acv').innerHTML = 'Replace Details: ' +  ac10_r;
     }
+
+	const toggle_view_f_applicator_details = () => {
+		var arr = [];
+
+		if (!areAllValuesEmpty(f_applicator_history_details_arr)) {
+			if (view_f_applicator_details) {
+				arr = f_applicator_history_details_arr;
+				document.getElementById('btnToggleAcvDetails').innerHTML = 'View Details';
+			} else {
+				arr = applicator_history_details_arr;
+				document.getElementById('btnToggleAcvDetails').innerHTML = 'View Final Details';
+			}
+
+			document.getElementById('inspection_date_acv').innerHTML = arr[0];
+			document.getElementById('inspection_time_acv').innerHTML = arr[1];
+			document.getElementById('inspection_shift_acv').innerHTML = arr[2];
+
+			document.getElementById('adjustment_content_acv').innerHTML = arr[3];
+			document.getElementById('adjustment_content_remarks_acv').innerHTML = arr[4];
+
+			document.getElementById('cross_section_result_acv').innerHTML = convert_num_to_desc_symbol(arr[5]);
+
+			document.getElementById('ac1_acv').innerHTML = convert_num_to_desc_symbol(arr[6]);
+			document.getElementById('ac2_acv').innerHTML = convert_num_to_desc_symbol(arr[7]);
+			document.getElementById('ac3_acv').innerHTML = convert_num_to_desc_symbol(arr[8]);
+			document.getElementById('ac4_acv').innerHTML = convert_num_to_desc_symbol(arr[9]);
+			document.getElementById('ac5_acv').innerHTML = convert_num_to_desc_symbol(arr[10]);
+			document.getElementById('ac6_acv').innerHTML = convert_num_to_desc_symbol(arr[11]);
+			document.getElementById('ac7_acv').innerHTML = convert_num_to_desc_symbol(arr[12]);
+			document.getElementById('ac8_acv').innerHTML = convert_num_to_desc_symbol(arr[13]);
+			document.getElementById('ac9_acv').innerHTML = convert_num_to_desc_symbol(arr[14]);
+			document.getElementById('ac10_acv').innerHTML = convert_num_to_desc_symbol(arr[15]);
+
+			document.getElementById('cont_1s_acv').innerHTML = arr[16];
+			document.getElementById('cont_2s_acv').innerHTML = arr[17];
+			document.getElementById('cont_3s_acv').innerHTML = arr[18];
+			document.getElementById('cont_4s_acv').innerHTML = arr[19];
+			document.getElementById('cont_5s_acv').innerHTML = arr[20];
+			document.getElementById('cont_6s_acv').innerHTML = arr[21];
+			document.getElementById('cont_7s_acv').innerHTML = arr[22];
+			document.getElementById('cont_8s_acv').innerHTML = arr[23];
+			document.getElementById('cont_9s_acv').innerHTML = arr[24];
+			document.getElementById('cont_10s_acv').innerHTML = arr[25];
+
+			document.getElementById('cont_1r_acv').innerHTML = 'Replace Details: ' +  arr[26];
+			document.getElementById('cont_2r_acv').innerHTML = 'Replace Details: ' +  arr[27];
+			document.getElementById('cont_3r_acv').innerHTML = 'Replace Details: ' +  arr[28];
+			document.getElementById('cont_4r_acv').innerHTML = 'Replace Details: ' +  arr[29];
+			document.getElementById('cont_5r_acv').innerHTML = 'Replace Details: ' +  arr[30];
+			document.getElementById('cont_6r_acv').innerHTML = 'Replace Details: ' +  arr[31];
+			document.getElementById('cont_7r_acv').innerHTML = 'Replace Details: ' +  arr[32];
+			document.getElementById('cont_8r_acv').innerHTML = 'Replace Details: ' +  arr[33];
+			document.getElementById('cont_9r_acv').innerHTML = 'Replace Details: ' +  arr[34];
+			document.getElementById('cont_10r_acv').innerHTML = 'Replace Details: ' +  arr[35];
+
+			// Toggle the state for the next click
+			view_f_applicator_details = !view_f_applicator_details;
+		} else {
+			Swal.fire({
+				icon: 'info',
+				title: 'Applicator Checksheet History',
+				text: 'No Final Applicator Checksheet Details Found',
+				showConfirmButton: false,
+				timer: 1500
+			});
+		}
+	}
 </script>

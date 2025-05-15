@@ -306,16 +306,16 @@
 					document.getElementById('cont_9s_sc').innerHTML = ac9_s;
 					document.getElementById('cont_10s_sc').innerHTML = ac10_s;
 
-					document.getElementById('cont_1r_sc').innerHTML += ac1_r;
-					document.getElementById('cont_2r_sc').innerHTML += ac2_r;
-					document.getElementById('cont_3r_sc').innerHTML += ac3_r;
-					document.getElementById('cont_4r_sc').innerHTML += ac4_r;
-					document.getElementById('cont_5r_sc').innerHTML += ac5_r;
-					document.getElementById('cont_6r_sc').innerHTML += ac6_r;
-					document.getElementById('cont_7r_sc').innerHTML += ac7_r;
-					document.getElementById('cont_8r_sc').innerHTML += ac8_r;
-					document.getElementById('cont_9r_sc').innerHTML += ac9_r;
-					document.getElementById('cont_10r_sc').innerHTML += ac10_r;
+					document.getElementById('cont_1r_sc').innerHTML = 'Replace Details: ' +  ac1_r;
+					document.getElementById('cont_2r_sc').innerHTML = 'Replace Details: ' +  ac2_r;
+					document.getElementById('cont_3r_sc').innerHTML = 'Replace Details: ' +  ac3_r;
+					document.getElementById('cont_4r_sc').innerHTML = 'Replace Details: ' +  ac4_r;
+					document.getElementById('cont_5r_sc').innerHTML = 'Replace Details: ' +  ac5_r;
+					document.getElementById('cont_6r_sc').innerHTML = 'Replace Details: ' +  ac6_r;
+					document.getElementById('cont_7r_sc').innerHTML = 'Replace Details: ' +  ac7_r;
+					document.getElementById('cont_8r_sc').innerHTML = 'Replace Details: ' +  ac8_r;
+					document.getElementById('cont_9r_sc').innerHTML = 'Replace Details: ' +  ac9_r;
+					document.getElementById('cont_10r_sc').innerHTML = 'Replace Details: ' +  ac10_r;
 
 					$("#applicator_checksheet_shop_confirm").modal("show");
 				} else {

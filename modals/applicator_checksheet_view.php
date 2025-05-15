@@ -410,6 +410,9 @@
             </div>
           </div>
         </div>
+        <div class="modal-footer bg-light">
+          <button type="button" id="btnToggleAcvDetails" name="btn_toggle_acv_details" class="btn btn-success" onclick="toggle_view_f_applicator_details()">View Final Details</button>
+        </div>
       </form>
     </div>
     <!-- /.modal-content -->

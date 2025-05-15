@@ -179,16 +179,16 @@
 					document.getElementById('cont_9s_acver').innerHTML = ac9_s;
 					document.getElementById('cont_10s_acver').innerHTML = ac10_s;
 
-					document.getElementById('cont_1r_acver').innerHTML += ac1_r;
-					document.getElementById('cont_2r_acver').innerHTML += ac2_r;
-					document.getElementById('cont_3r_acver').innerHTML += ac3_r;
-					document.getElementById('cont_4r_acver').innerHTML += ac4_r;
-					document.getElementById('cont_5r_acver').innerHTML += ac5_r;
-					document.getElementById('cont_6r_acver').innerHTML += ac6_r;
-					document.getElementById('cont_7r_acver').innerHTML += ac7_r;
-					document.getElementById('cont_8r_acver').innerHTML += ac8_r;
-					document.getElementById('cont_9r_acver').innerHTML += ac9_r;
-					document.getElementById('cont_10r_acver').innerHTML += ac10_r;
+					document.getElementById('cont_1r_acver').innerHTML = 'Replace Details: ' +  ac1_r;
+					document.getElementById('cont_2r_acver').innerHTML = 'Replace Details: ' +  ac2_r;
+					document.getElementById('cont_3r_acver').innerHTML = 'Replace Details: ' +  ac3_r;
+					document.getElementById('cont_4r_acver').innerHTML = 'Replace Details: ' +  ac4_r;
+					document.getElementById('cont_5r_acver').innerHTML = 'Replace Details: ' +  ac5_r;
+					document.getElementById('cont_6r_acver').innerHTML = 'Replace Details: ' +  ac6_r;
+					document.getElementById('cont_7r_acver').innerHTML = 'Replace Details: ' +  ac7_r;
+					document.getElementById('cont_8r_acver').innerHTML = 'Replace Details: ' +  ac8_r;
+					document.getElementById('cont_9r_acver').innerHTML = 'Replace Details: ' +  ac9_r;
+					document.getElementById('cont_10r_acver').innerHTML = 'Replace Details: ' +  ac10_r;
 
 					$("#applicator_checksheet_verify").modal("show");
 				} else {
