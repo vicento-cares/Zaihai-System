@@ -49,6 +49,8 @@ if ($method == 'get_applicator_history') {
                 ac.fac1_s, ac.fac2_s, ac.fac3_s, ac.fac4_s, ac.fac5_s, ac.fac6_s, ac.fac7_s, ac.fac8_s, ac.fac9_s, ac.fac10_s, 
                 ac.fac1_r, ac.fac2_r, ac.fac3_r, ac.fac4_r, ac.fac5_r, ac.fac6_r, ac.fac7_r, ac.fac8_r, ac.fac9_r, ac.fac10_r 
             FROM t_applicator_in_out_history aioh";
+
+    $params = [];
     
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         $sql .= " JOIN m_applicator a ON aioh.applicator_no = a.applicator_no";
@@ -62,32 +64,44 @@ if ($method == 'get_applicator_history') {
     if (!empty($date_time_in_from) && !empty($date_time_in_to)) {
         $date_time_in_from = date('Y-m-d H:i:s',(strtotime($date_time_in_from)));
         $date_time_in_to = date('Y-m-d H:i:s',(strtotime($date_time_in_to)));
-        $sql .= " AND (aioh.date_time_in >= '$date_time_in_from' AND aioh.date_time_in <= '$date_time_in_to')";
+        $sql .= " AND (aioh.date_time_in >= ? AND aioh.date_time_in <= ?)";
+        $params[] = $date_time_in_from;
+        $params[] = $date_time_in_to;
     }
 
     if (!empty($car_maker)) {
-        $sql .= " AND a.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND a.car_model='$car_model'";
+        $sql .= " AND a.car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND aioh.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND aioh.applicator_no LIKE ?";
+        $applicator_no_param = "%" . $applicator_no . "%";
+        $params[] = $applicator_no_param;
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND aioh.terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND aioh.terminal_name LIKE ?";
+        $terminal_name_param = "%" . $terminal_name . "%";
+        $params[] = $terminal_name_param;
     }
     if (!empty($trd_no)) {
-        $sql .= " AND aioh.trd_no LIKE '%$trd_no%'";
+        $sql .= " AND aioh.trd_no LIKE ?";
+        $trd_no_param = "%" . $trd_no . "%";
+        $params[] = $trd_no_param;
     }
     if (!empty($zaihai_stock_address)) {
-        $sql .= " AND aioh.zaihai_stock_address LIKE '%$zaihai_stock_address%'";
+        $sql .= " AND aioh.zaihai_stock_address LIKE ?";
+        $zaihai_stock_address_param = "%" . $zaihai_stock_address . "%";
+        $params[] = $zaihai_stock_address_param;
     }
 
     $sql .= " ORDER BY aioh.date_time_in DESC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
         $c++;

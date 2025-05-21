@@ -48,14 +48,14 @@ if ($method == 'get_car_maker_dropdown_search') {
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (count($results) > 0) {
+    if ($row) {
         echo '<option selected value="">All</option>';
-        foreach ($results as $row) {
+        do {
             echo '<option value="' . htmlspecialchars($row['car_maker']) . '">' . 
                     htmlspecialchars($row['car_maker']) . '</option>';
-        }
+        } while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
     } else {
         echo '<option selected value="">All</option>';
     }
@@ -68,14 +68,14 @@ if ($method == 'get_car_model_dropdown_search') {
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (count($results) > 0) {
+    if ($row) {
         echo '<option selected value="">All</option>';
-        foreach ($results as $row) {
+        do {
             echo '<option value="' . htmlspecialchars($row['car_model']) . '">' . 
                     htmlspecialchars($row['car_model']) . '</option>';
-        }
+        } while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
     } else {
         echo '<option selected value="">All</option>';
     }

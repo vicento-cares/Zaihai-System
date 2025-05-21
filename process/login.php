@@ -58,15 +58,13 @@ if (isset($_POST['login_btn'])) {
         $stmt = $conn_emp_mgt->prepare($check);
         $stmt->execute($params);
 
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	    if (count($results) > 0) {
-            foreach ($results as $row) {
-                $emp_no = $row['emp_no'];
-                $full_name = $row['full_name'];
-                $dept = $row['dept'];
-                $section = $row['section'];
-            }
+        if ($row) {
+            $emp_no = $row['emp_no'];
+            $full_name = $row['full_name'];
+            $dept = $row['dept'];
+            $section = $row['section'];
 
             $is_pd1 = strpos($dept, "PD1");
             $is_fp = strpos($section, "First Process");
@@ -94,14 +92,12 @@ if (isset($_POST['login_btn'])) {
         $stmt = $conn->prepare($check);
         $stmt->execute($params);
 
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (count($results) > 0) {
-            foreach ($results as $row) {
-                $emp_no = $row['emp_no'];
-                $full_name = $row['full_name'];
-                $role_check = $row['role'];
-            }
+        if ($row) {
+            $emp_no = $row['emp_no'];
+            $full_name = $row['full_name'];
+            $role_check = $row['role'];
 
             if ($role_check == 'Shop' || $role_check == 'Inspector') {
                 if ($response_arr['can_access'] == true) {

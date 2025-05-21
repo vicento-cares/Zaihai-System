@@ -4,14 +4,15 @@ require '../../conn.php';
 $method = $_POST['method'];
 
 if ($method == 'add_applicator') {
-	$car_maker = addslashes(trim($_POST['car_maker']));
-    $car_model = addslashes(trim($_POST['car_model']));
-	$applicator_no = addslashes(trim($_POST['applicator_no']));
-	$zaihai_stock_address = addslashes(trim($_POST['zaihai_stock_address']));
+	$car_maker = trim($_POST['car_maker']);
+    $car_model = trim($_POST['car_model']);
+	$applicator_no = trim($_POST['applicator_no']);
+	$zaihai_stock_address = trim($_POST['zaihai_stock_address']);
 	
-	$check = "SELECT id FROM m_applicator WHERE zaihai_stock_address = '$zaihai_stock_address'";
+	$check = "SELECT id FROM m_applicator WHERE zaihai_stock_address = ?";
 	$stmt = $conn->prepare($check);
-	$stmt->execute();
+	$params = array($zaihai_stock_address);
+	$stmt->execute($params);
 
 	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -27,16 +28,18 @@ if ($method == 'add_applicator') {
 			}
 
 			$query = "INSERT INTO m_applicator (car_maker, car_model, applicator_no, zaihai_stock_address) 
-				VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address')";
+				VALUES (?, ?, ?, ?)";
 
 			$stmt = $conn->prepare($query);
-			$stmt->execute();
+			$params = array($car_maker, $car_model, $applicator_no, $zaihai_stock_address);
+			$stmt->execute($params);
 				
 			$query = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) 
-					VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address','Ready To Use')";
+					VALUES (?, ?, ?, ?, ?)";
 
 			$stmt = $conn->prepare($query);
-			$stmt->execute();
+			$params = array($car_maker, $car_model, $applicator_no, $zaihai_stock_address, 'Ready To Use');
+			$stmt->execute($params);
 					
 			$conn->commit();
 			$isTransactionActive = false;
@@ -53,14 +56,15 @@ if ($method == 'add_applicator') {
 
 if ($method == 'update_applicator') {
 	$id = $_POST['id'];
-	$car_maker = addslashes(trim($_POST['car_maker']));
-    $car_model = addslashes(trim($_POST['car_model']));
-	$applicator_no = addslashes(trim($_POST['applicator_no']));
-	$zaihai_stock_address = addslashes(trim($_POST['zaihai_stock_address']));
+	$car_maker = trim($_POST['car_maker']);
+    $car_model = trim($_POST['car_model']);
+	$applicator_no = trim($_POST['applicator_no']);
+	$zaihai_stock_address = trim($_POST['zaihai_stock_address']);
 	
-	$check = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = '$id'";
+	$check = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = ?";
 	$stmt = $conn->prepare($check);
-	$stmt->execute();
+	$params = array($id);
+	$stmt->execute($params);
 
 	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -68,9 +72,10 @@ if ($method == 'update_applicator') {
 		$applicator_no_old = $row['applicator_no'];
 		$zaihai_stock_address_old = $row['zaihai_stock_address'];
 
-		$check = "SELECT id, status FROM t_applicator_list WHERE applicator_no = '$applicator_no_old'";
+		$check = "SELECT id, status FROM t_applicator_list WHERE applicator_no = ?";
         $stmt = $conn->prepare($check);
-        $stmt->execute();
+		$params = array($applicator_no_old);
+        $stmt->execute($params);
 
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -89,32 +94,46 @@ if ($method == 'update_applicator') {
 					}
 
 					$query = "UPDATE t_applicator_list 
-                        	SET car_maker = '$car_maker', 
-								car_model = '$car_model', 
-								applicator_no = '$applicator_no'";
+                        	SET car_maker = ?, 
+								car_model = ?, 
+								applicator_no = ?";
+					$params = [
+						$car_maker, 
+						$car_model,
+						$applicator_no
+					];
 
 					if ($zaihai_stock_address_old != $zaihai_stock_address) {
-						$query .= ", location = '$zaihai_stock_address'";
+						$query .= ", location = ?";
+						$params[] = $zaihai_stock_address;
 					}
 
-					$query .= "WHERE id = '$id_al'";
+					$query .= "WHERE id = ?";
+					$params[] = $id_al;
 					
 					$stmt = $conn->prepare($query);
-					$stmt->execute();
+					$stmt->execute($params);
 
 					$query = "UPDATE m_applicator 
-								SET car_maker = '$car_maker', 
-									car_model = '$car_model', 
-									applicator_no = '$applicator_no'";
+								SET car_maker = ?, 
+									car_model = ?, 
+									applicator_no = ?";
+					$params = [
+						$car_maker, 
+						$car_model,
+						$applicator_no
+					];
 					
 					if ($zaihai_stock_address_old != $zaihai_stock_address) {
-						$query .= ", zaihai_stock_address = '$zaihai_stock_address'";
+						$query .= ", zaihai_stock_address = ?";
+						$params[] = $zaihai_stock_address;
 					}
 
-					$query .= "WHERE id = '$id'";
+					$query .= "WHERE id = ?";
+					$params[] = $id;
 
 					$stmt = $conn->prepare($query);
-					$stmt->execute();
+					$stmt->execute($params);
 							
 					$conn->commit();
 					$isTransactionActive = false;
@@ -139,9 +158,10 @@ if ($method == 'update_applicator') {
 if ($method == 'delete_applicator') {
 	$id = $_POST['id'];
 
-	$sql = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = '$id'";
+	$sql = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = ?";
 	$stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$params = array($id);
+	$stmt->execute($params);
 
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -149,9 +169,10 @@ if ($method == 'delete_applicator') {
 	$zaihai_stock_address = addslashes($row['zaihai_stock_address']);
 
 	$check = "SELECT id, status FROM t_applicator_list 
-				WHERE applicator_no = '$applicator_no'";
+				WHERE applicator_no = ?";
 	$stmt = $conn->prepare($check);
-	$stmt->execute();
+	$params = array($applicator_no);
+	$stmt->execute($params);
 
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -170,13 +191,15 @@ if ($method == 'delete_applicator') {
 					$isTransactionActive = true;
 				}
 
-				$query = "DELETE FROM t_applicator_list WHERE id = '$id_al'";
+				$query = "DELETE FROM t_applicator_list WHERE id = ?";
 				$stmt = $conn->prepare($query);
-				$stmt->execute();
+				$params = array($id_al);
+				$stmt->execute($params);
 
-				$query = "DELETE FROM m_applicator WHERE id = '$id'";
+				$query = "DELETE FROM m_applicator WHERE id = ?";
 				$stmt = $conn->prepare($query);
-				$stmt->execute();
+				$params = array($id);
+				$stmt->execute($params);
 
 				$conn->commit();
 				$isTransactionActive = false;

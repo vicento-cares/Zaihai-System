@@ -278,6 +278,10 @@ if ($method == 'get_current_trd_carts_reuse_count_chart') {
         $data['TotalTrdCartsReuse'][] = (int)$row['total_trd_carts_reuse'];
     }
 
+    if (!isset($data['TotalTrdCartsReuse'])) {
+        $data['TotalTrdCartsReuse'] = [];
+    }
+
     // Create the final data structure
     $finalData = [
         'categories' => $categories,
@@ -546,13 +550,13 @@ if ($method == 'get_month_a_adj_cnt_chart_year_dropdown') {
     $stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option selected value="">Select Year</option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['Year']).'">'.htmlspecialchars($row['Year']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">Select Year</option>';
 	}
@@ -580,13 +584,13 @@ if ($method == 'get_applicator_no_dropdown') {
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute($params);
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option selected value=""></option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['applicator_no']).'">'.htmlspecialchars($row['applicator_no']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value=""></option>';
 	}
@@ -900,13 +904,13 @@ if ($method == 'get_month_term_usage_chart_year_dropdown') {
     $stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option selected value="">Select Year</option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['Year']).'">'.htmlspecialchars($row['Year']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">Select Year</option>';
 	}

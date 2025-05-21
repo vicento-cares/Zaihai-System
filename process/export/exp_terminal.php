@@ -48,23 +48,27 @@ $sql = "SELECT id, car_maker, car_model, terminal_name, line_address, date_updat
 $params = [];
 
 if (!empty($terminal_name)) {
-    $sql .= " AND terminal_name LIKE '$terminal_name%'";
-    $params[] = $terminal_name . '%';
+    $sql .= " AND terminal_name LIKE ?";
+    $terminal_name_param = $terminal_name . '%';
+    $params[] = $terminal_name_param;
 }
 
 if (!empty($car_maker)) {
-    $sql .= " AND car_maker LIKE '$car_maker%'";
-    $params[] = $car_maker . '%';
+    $sql .= " AND car_maker LIKE ?";
+    $car_maker_param = $car_maker . '%';
+    $params[] = $car_maker_param;
 }
 
 if (!empty($car_model)) {
-    $sql .= " AND car_model LIKE '$car_model%'";
-    $params[] = $car_model . '%';
+    $sql .= " AND car_model LIKE ?";
+    $car_model_param = $car_model . '%';
+    $params[] = $car_model_param;
 }
 
 if (!empty($line_address)) {
-    $sql .= " AND line_address LIKE '$line_address%'";
-    $params[] = $line_address . '%';
+    $sql .= " AND line_address LIKE ?";
+    $line_address_param = $line_address . '%';
+    $params[] = $line_address_param;
 }
 
 $sql .= " ORDER BY date_updated DESC";

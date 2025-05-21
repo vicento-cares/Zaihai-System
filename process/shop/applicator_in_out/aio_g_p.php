@@ -20,13 +20,16 @@ if ($method == 'get_car_maker_dropdown_out_search') {
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             WHERE aio.zaihai_stock_address IS NULL AND aio.date_time_in IS NULL
             GROUP BY a.car_maker ORDER BY a.car_maker ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -38,13 +41,16 @@ if ($method == 'get_car_model_dropdown_out_search') {
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             WHERE aio.zaihai_stock_address IS NULL AND aio.date_time_in IS NULL
             GROUP BY a.car_model ORDER BY a.car_model ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -59,23 +65,26 @@ if ($method == 'get_applicator_no_datalist_out_search') {
     }
 
     $sql .= " WHERE aio.zaihai_stock_address IS NULL AND aio.date_time_in IS NULL";
+    $params = [];
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND a.car_maker = '$car_maker'";
+            $sql .= " AND a.car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND a.car_model = '$car_model'";
+            $sql .= " AND a.car_model = ?";
+            $params[] = $car_model;
         }
     }
     
     $sql .= " GROUP BY aio.applicator_no ORDER BY aio.applicator_no ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['applicator_no'].'">';
@@ -85,6 +94,7 @@ if ($method == 'get_applicator_no_datalist_out_search') {
 // Get Terminal Name Datalist Out
 if ($method == 'get_terminal_name_datalist_out_search') {
 	$sql = "SELECT aio.terminal_name FROM t_applicator_in_out aio";
+    $params = [];
 
     if (isset($_GET['page']) && ($_GET['page'] == 'shop')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
@@ -95,19 +105,21 @@ if ($method == 'get_terminal_name_datalist_out_search') {
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND a.car_maker = '$car_maker'";
+            $sql .= " AND a.car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND a.car_model = '$car_model'";
+            $sql .= " AND a.car_model = ?";
+            $params[] = $car_model;
         }
     }
     
     $sql .= " GROUP BY aio.terminal_name ORDER BY aio.terminal_name ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['terminal_name'].'">';
@@ -117,6 +129,7 @@ if ($method == 'get_terminal_name_datalist_out_search') {
 // Get Location Datalist Out
 if ($method == 'get_location_datalist_out_search') {
 	$sql = "SELECT aio.trd_no FROM t_applicator_in_out aio";
+    $params = [];
     
     if (isset($_GET['page']) && ($_GET['page'] == 'shop')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
@@ -127,12 +140,14 @@ if ($method == 'get_location_datalist_out_search') {
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND a.car_maker = '$car_maker'";
+            $sql .= " AND a.car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND a.car_model = '$car_model'";
+            $sql .= " AND a.car_model = ?";
+            $params[] = $car_model;
         }
     }
 
@@ -152,10 +167,12 @@ if ($method == 'get_car_maker_dropdown_in_search') {
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
             WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+    $params = [];
 
     if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
         if ($role == 'BM') {
-            $sql .= " AND acct.role = '$role'";
+            $sql .= " AND acct.role = ?";
+            $params[] = $role;
         } else if ($role == 'Shop' || $role == 'Inspector') {
             $sql .= " AND acct.role IN ('Shop', 'Inspector')";
         }
@@ -163,13 +180,16 @@ if ($method == 'get_car_maker_dropdown_in_search') {
 
     $sql .= " GROUP BY a.car_maker ORDER BY a.car_maker ASC";
 
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+	$stmt = $conn -> prepare($sql);
+	$stmt -> execute($params);
+
+	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+	if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -181,10 +201,12 @@ if ($method == 'get_car_model_dropdown_in_search') {
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             LEFT JOIN m_accounts acct ON aio.operator_in = acct.emp_no
             WHERE aio.zaihai_stock_address IS NOT NULL AND aio.date_time_in IS NOT NULL";
+    $params = [];
 
     if (isset($_GET['page']) && $_GET['page'] == 'checksheet') {
         if ($role == 'BM') {
-            $sql .= " AND acct.role = '$role'";
+            $sql .= " AND acct.role = ?";
+            $params[] = $role;
         } else if ($role == 'Shop' || $role == 'Inspector') {
             $sql .= " AND acct.role IN ('Shop', 'Inspector')";
         }
@@ -192,13 +214,16 @@ if ($method == 'get_car_model_dropdown_in_search') {
 
     $sql .= " GROUP BY a.car_model ORDER BY a.car_model ASC";
 
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
-	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+	$stmt = $conn -> prepare($sql);
+	$stmt -> execute($params);
+
+	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+	if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -207,6 +232,7 @@ if ($method == 'get_car_model_dropdown_in_search') {
 // Get Applicator No. Datalist In
 if ($method == 'get_applicator_no_datalist_in_search') {
 	$sql = "SELECT aio.applicator_no FROM t_applicator_in_out aio";
+    $params = [];
     
     if (isset($_GET['page']) && ($_GET['page'] == 'shop' || $_GET['page'] == 'checksheet')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
@@ -221,12 +247,14 @@ if ($method == 'get_applicator_no_datalist_in_search') {
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND a.car_maker = '$car_maker'";
+            $sql .= " AND a.car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND a.car_model = '$car_model'";
+            $sql .= " AND a.car_model = ?";
+            $params[] = $car_model;
         }
     }
     
@@ -234,24 +262,29 @@ if ($method == 'get_applicator_no_datalist_in_search') {
         if ($role == 'BM') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
-                $sql .= " AND a.car_maker = '$car_maker'";
+                $sql .= " AND a.car_maker = ?";
+                $params[] = $car_maker;
             }
         
             if (isset($_SESSION['car_model'])) {
                 $car_model = $_SESSION['car_model'];
-                $sql .= " AND a.car_model = '$car_model'";
+                $sql .= " AND a.car_model = ?";
+                $params[] = $car_model;
             }
 
-            $sql .= " AND acct.role = '$role' AND ac.serial_no IS NULL";
+            $sql .= " AND acct.role = ? AND ac.serial_no IS NULL";
+            $params[] = $role;
         } else if ($role == 'Shop' || $role == 'Inspector') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
-                $sql .= " AND a.car_maker = '$car_maker'";
+                $sql .= " AND a.car_maker = ?";
+                $params[] = $car_maker;
             }
         
             if (isset($_SESSION['car_model'])) {
                 $car_model = $_SESSION['car_model'];
-                $sql .= " AND a.car_model = '$car_model'";
+                $sql .= " AND a.car_model = ?";
+                $params[] = $car_model;
             }
 
             $sql .= " AND acct.role IN ('Shop', 'Inspector')";
@@ -261,7 +294,7 @@ if ($method == 'get_applicator_no_datalist_in_search') {
     $sql .= " GROUP BY aio.applicator_no ORDER BY aio.applicator_no ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['applicator_no'].'">';
@@ -271,6 +304,7 @@ if ($method == 'get_applicator_no_datalist_in_search') {
 // Get Terminal Name Datalist In
 if ($method == 'get_terminal_name_datalist_in_search') {
 	$sql = "SELECT aio.terminal_name FROM t_applicator_in_out aio";
+    $params = [];
 
     if (isset($_GET['page']) && ($_GET['page'] == 'shop' || $_GET['page'] == 'checksheet')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
@@ -285,12 +319,14 @@ if ($method == 'get_terminal_name_datalist_in_search') {
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND a.car_maker = '$car_maker'";
+            $sql .= " AND a.car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND a.car_model = '$car_model'";
+            $sql .= " AND a.car_model = ?";
+            $params[] = $car_model;
         }
     }
     
@@ -298,24 +334,29 @@ if ($method == 'get_terminal_name_datalist_in_search') {
         if ($role == 'BM') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
-                $sql .= " AND a.car_maker = '$car_maker'";
+                $sql .= " AND a.car_maker = ?";
+                $params[] = $car_maker;
             }
         
             if (isset($_SESSION['car_model'])) {
                 $car_model = $_SESSION['car_model'];
-                $sql .= " AND a.car_model = '$car_model'";
+                $sql .= " AND a.car_model = ?";
+                $params[] = $car_model;
             }
 
-            $sql .= " AND acct.role = '$role' AND ac.serial_no IS NULL";
+            $sql .= " AND acct.role = ? AND ac.serial_no IS NULL";
+            $params[] = $role;
         } else if ($role == 'Shop' || $role == 'Inspector') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
-                $sql .= " AND a.car_maker = '$car_maker'";
+                $sql .= " AND a.car_maker = ?";
+                $params[] = $car_maker;
             }
         
             if (isset($_SESSION['car_model'])) {
                 $car_model = $_SESSION['car_model'];
-                $sql .= " AND a.car_model = '$car_model'";
+                $sql .= " AND a.car_model = ?";
+                $params[] = $car_model;
             }
 
             $sql .= " AND acct.role IN ('Shop', 'Inspector')";
@@ -325,7 +366,7 @@ if ($method == 'get_terminal_name_datalist_in_search') {
     $sql .= " GROUP BY aio.terminal_name ORDER BY aio.terminal_name ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['terminal_name'].'">';
@@ -335,6 +376,7 @@ if ($method == 'get_terminal_name_datalist_in_search') {
 // Get Location Datalist In
 if ($method == 'get_location_datalist_in_search') {
 	$sql = "SELECT aio.trd_no FROM t_applicator_in_out aio";
+    $params = [];
 
     if (isset($_GET['page']) && ($_GET['page'] == 'shop' || $_GET['page'] == 'checksheet')) {
         $sql .= " LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no";
@@ -349,12 +391,14 @@ if ($method == 'get_location_datalist_in_search') {
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND a.car_maker = '$car_maker'";
+            $sql .= " AND a.car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND a.car_model = '$car_model'";
+            $sql .= " AND a.car_model = ?";
+            $params[] = $car_model;
         }
     }
 
@@ -362,24 +406,29 @@ if ($method == 'get_location_datalist_in_search') {
         if ($role == 'BM') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
-                $sql .= " AND a.car_maker = '$car_maker'";
+                $sql .= " AND a.car_maker = ?";
+                $params[] = $car_maker;
             }
         
             if (isset($_SESSION['car_model'])) {
                 $car_model = $_SESSION['car_model'];
-                $sql .= " AND a.car_model = '$car_model'";
+                $sql .= " AND a.car_model = ?";
+                $params[] = $car_model;
             }
             
-            $sql .= " AND acct.role = '$role' AND ac.serial_no IS NULL";
+            $sql .= " AND acct.role = ? AND ac.serial_no IS NULL";
+            $params[] = $role;
         } else if ($role == 'Shop' || $role == 'Inspector') {
             if (isset($_SESSION['car_maker'])) {
                 $car_maker = $_SESSION['car_maker'];
-                $sql .= " AND a.car_maker = '$car_maker'";
+                $sql .= " AND a.car_maker = ?";
+                $params[] = $car_maker;
             }
         
             if (isset($_SESSION['car_model'])) {
                 $car_model = $_SESSION['car_model'];
-                $sql .= " AND a.car_model = '$car_model'";
+                $sql .= " AND a.car_model = ?";
+                $params[] = $car_model;
             }
 
             $sql .= " AND acct.role IN ('Shop', 'Inspector')";
@@ -389,7 +438,7 @@ if ($method == 'get_location_datalist_in_search') {
     $sql .= " GROUP BY aio.trd_no ORDER BY aio.trd_no ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
         echo '<option value="'.$row['trd_no'].'">';
@@ -429,25 +478,36 @@ if ($method == 'get_recent_applicator_out') {
             FROM t_applicator_in_out aio
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             WHERE aio.zaihai_stock_address IS NULL AND aio.date_time_in IS NULL";
+
+    $params = [];
+
     if (!empty($car_maker)) {
-        $sql .= " AND a.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND a.car_model='$car_model'";
+        $sql .= " AND a.car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND aio.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND aio.applicator_no LIKE ?";
+        $applicator_no_param = "%" . $applicator_no . "%";
+        $params[] = $applicator_no_param;
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND aio.terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND aio.terminal_name LIKE ?";
+        $terminal_name_param = "%" . $terminal_name . "%";
+        $params[] = $terminal_name_param;
     }
     if (!empty($location)) {
-        $sql .= " AND aio.trd_no LIKE '%$location%'";
+        $sql .= " AND aio.trd_no LIKE ?";
+        $location_param = "%" . $location . "%";
+        $params[] = $location_param;
     }
     $sql .= " ORDER BY aio.date_time_out ASC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
         $c++;
@@ -601,27 +661,37 @@ if ($method == 'get_recent_applicator_in') {
             AND t1.date_time_in = t2.max_date_time_in
             LEFT JOIN m_applicator a ON t1.applicator_no = a.applicator_no
             WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL";
+    
+    $params = [];
 
     if (!empty($car_maker)) {
-        $sql .= " AND a.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND a.car_model='$car_model'";
+        $sql .= " AND a.car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND t1.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND t1.applicator_no LIKE ?";
+        $applicator_no_param = "%" . $applicator_no . "%";
+        $params[] = $applicator_no_param;
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND t1.terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND t1.terminal_name LIKE ?";
+        $terminal_name_param = "%" . $terminal_name . "%";
+        $params[] = $terminal_name_param;
     }
     if (!empty($location)) {
-        $sql .= " AND t1.trd_no LIKE '%$location%'";
+        $sql .= " AND t1.trd_no LIKE ?";
+        $location_param = "%" . $location . "%";
+        $params[] = $location_param;
     }
 
     $sql .= " ORDER BY t1.date_time_in ASC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
         $c++;

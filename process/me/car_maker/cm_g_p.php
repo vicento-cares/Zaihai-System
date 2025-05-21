@@ -6,13 +6,16 @@ $method = $_GET['method'];
 // Get Car Maker Dropdown
 if ($method == 'get_car_maker_dropdown') {
 	$sql = "SELECT car_maker FROM m_car_maker GROUP BY car_maker ORDER BY car_maker ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">Select Car Maker</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">Select Car Maker</option>';
 	}
@@ -21,13 +24,16 @@ if ($method == 'get_car_maker_dropdown') {
 // Get Car Model Dropdown
 if ($method == 'get_car_model_dropdown') {
 	$sql = "SELECT car_model FROM m_car_maker GROUP BY car_model ORDER BY car_model ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">Select Car Model</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">Select Car Model</option>';
 	}
@@ -36,13 +42,16 @@ if ($method == 'get_car_model_dropdown') {
 // Get Car Maker Dropdown
 if ($method == 'get_car_maker_dropdown_search') {
 	$sql = "SELECT car_maker FROM m_car_maker GROUP BY car_maker ORDER BY car_maker ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -51,13 +60,16 @@ if ($method == 'get_car_maker_dropdown_search') {
 // Get Car Model Dropdown
 if ($method == 'get_car_model_dropdown_search') {
 	$sql = "SELECT car_model FROM m_car_maker GROUP BY car_model ORDER BY car_model ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -76,13 +88,13 @@ if ($method == 'get_borrowed_by_dropdown') {
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 
-	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option disabled selected value="">Select Borrowed By</option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_maker_model']).'">'.htmlspecialchars($row['car_maker_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option disabled selected value="">Select Borrowed By</option>';
 	}

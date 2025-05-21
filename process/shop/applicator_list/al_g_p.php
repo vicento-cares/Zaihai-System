@@ -14,13 +14,13 @@ if ($method == 'get_car_maker_dropdown_search') {
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 
-	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_maker']).'">'.htmlspecialchars($row['car_maker']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -33,13 +33,13 @@ if ($method == 'get_car_model_dropdown_search') {
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 
-	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['car_model']).'">'.htmlspecialchars($row['car_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -61,18 +61,21 @@ if ($method == 'get_applicator_no_datalist_search') {
     }
 
 	$sql = "SELECT applicator_no FROM t_applicator_list WHERE car_maker != ''";
+	$params = [];
 
 	if (!empty($car_maker)) {
-		$sql .= " AND car_maker='$car_maker'";
+		$sql .= " AND car_maker = ?";
+		$params[] = $car_maker;
 	}
 	if (!empty($car_model)) {
-		$sql .= " AND car_model='$car_model'";
+		$sql .= " AND car_model = ?";
+		$params[] = $car_model;
 	}
 
 	$sql .= " GROUP BY applicator_no ORDER BY applicator_no ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		echo '<option value="'.$row['applicator_no'].'">';
@@ -95,18 +98,21 @@ if ($method == 'get_location_datalist_search') {
     }
 
 	$sql = "SELECT location FROM t_applicator_list WHERE car_maker != ''";
+	$params = [];
 
 	if (!empty($car_maker)) {
-		$sql .= " AND car_maker='$car_maker'";
+		$sql .= " AND car_maker = ?";
+		$params[] = $car_maker;
 	}
 	if (!empty($car_model)) {
-		$sql .= " AND car_model='$car_model'";
+		$sql .= " AND car_model = ?";
+		$params[] = $car_model;
 	}
 
 	$sql .= " GROUP BY location ORDER BY location ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		echo '<option value="'.$row['location'].'">';
@@ -164,27 +170,36 @@ if ($method == 'get_recent_applicator_list') {
 				END AS downtime
 			FROM t_applicator_list
             WHERE car_maker != ''";
+	
+	$params = [];
 
     if (!empty($car_maker)) {
-        $sql .= " AND car_maker='$car_maker'";
+        $sql .= " AND car_maker = ?";
+		$params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND car_model='$car_model'";
+        $sql .= " AND car_model = ?";
+		$params[] = $car_model;
     }
     if (!empty($status)) {
-        $sql .= " AND status='$status'";
+        $sql .= " AND status = ?";
+		$params[] = $status;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND applicator_no LIKE ?";
+		$applicator_no_param = "%" . $applicator_no . "%";
+        $params[] = $applicator_no_param;
     }
     if (!empty($location)) {
-        $sql .= " AND location LIKE '%$location%'";
+        $sql .= " AND location LIKE ?";
+		$location_param = "%" . $location . "%";
+        $params[] = $location_param;
     }
 
 	$sql .= " ORDER BY status ASC, date_updated ASC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		$c++;

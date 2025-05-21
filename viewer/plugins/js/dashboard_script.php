@@ -317,8 +317,10 @@
 					current_trd_carts_reuse_count_chart.destroy();
 				}
 
-				current_trd_carts_reuse_count_chart = new ApexCharts(ctx, options);
-				current_trd_carts_reuse_count_chart.render();
+				if (response.categories.length !== 0) {
+					current_trd_carts_reuse_count_chart = new ApexCharts(ctx, options);
+					current_trd_carts_reuse_count_chart.render();
+				}
 			}
 		});
 	}

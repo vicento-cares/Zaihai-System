@@ -19,13 +19,16 @@ if ($method == 'get_car_maker_dropdown_search') {
             WHERE date_started IS NULL AND 
                 (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())
             GROUP BY zaihai_car_maker ORDER BY zaihai_car_maker ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['zaihai_car_maker']).'">'.htmlspecialchars($row['zaihai_car_maker']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -37,13 +40,16 @@ if ($method == 'get_car_model_dropdown_search') {
             WHERE date_started IS NULL AND 
                 (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())
             GROUP BY zaihai_car_model ORDER BY zaihai_car_model ASC";
-	$stmt = $conn -> prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
-	if ($stmt -> rowCount() > 0) {
+
+	$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach($stmt -> fetchAll() as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['zaihai_car_model']).'">'.htmlspecialchars($row['zaihai_car_model']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -53,23 +59,26 @@ if ($method == 'get_car_model_dropdown_search') {
 if ($method == 'get_applicator_no_datalist_search') {
 	$sql = "SELECT scanned_applicator_no FROM t_error_monitoring WHERE date_started IS NULL AND 
                 (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())";
+    $params = [];
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND zaihai_car_maker = '$car_maker'";
+            $sql .= " AND zaihai_car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND zaihai_car_model = '$car_model'";
+            $sql .= " AND zaihai_car_model = ?";
+            $params[] = $car_model;
         }
     }
     
     $sql .= " GROUP BY scanned_applicator_no ORDER BY scanned_applicator_no ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['scanned_applicator_no'].'">';
@@ -80,23 +89,26 @@ if ($method == 'get_applicator_no_datalist_search') {
 if ($method == 'get_terminal_name_datalist_search') {
 	$sql = "SELECT scanned_terminal_name FROM t_error_monitoring WHERE date_started IS NULL AND 
                 (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())";
+    $params = [];
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND zaihai_car_maker = '$car_maker'";
+            $sql .= " AND zaihai_car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND zaihai_car_model = '$car_model'";
+            $sql .= " AND zaihai_car_model = ?";
+            $params[] = $car_model;
         }
     }
     
     $sql .= " GROUP BY scanned_terminal_name ORDER BY scanned_terminal_name ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['scanned_terminal_name'].'">';
@@ -107,23 +119,26 @@ if ($method == 'get_terminal_name_datalist_search') {
 if ($method == 'get_location_datalist_search') {
 	$sql = "SELECT scanned_trd_no FROM t_error_monitoring WHERE date_started IS NULL AND 
                 (date_recorded >= DATEADD(DAY, -7, GETDATE()) AND date_recorded <= GETDATE())";
+    $params = [];
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
         if (isset($_SESSION['car_maker'])) {
             $car_maker = $_SESSION['car_maker'];
-            $sql .= " AND zaihai_car_maker = '$car_maker'";
+            $sql .= " AND zaihai_car_maker = ?";
+            $params[] = $car_maker;
         }
     
         if (isset($_SESSION['car_model'])) {
             $car_model = $_SESSION['car_model'];
-            $sql .= " AND zaihai_car_model = '$car_model'";
+            $sql .= " AND zaihai_car_model = ?";
+            $params[] = $car_model;
         }
     }
 
     $sql .= " GROUP BY scanned_trd_no ORDER BY scanned_trd_no ASC";
 
 	$stmt = $conn -> prepare($sql);
-	$stmt -> execute();
+	$stmt -> execute($params);
 
     while ($row = $stmt -> fetch(PDO::FETCH_ASSOC)) {
 		echo '<option value="'.$row['scanned_trd_no'].'">';
@@ -140,13 +155,13 @@ if ($method == 'get_error_name_dropdown_search') {
 	$stmt = $conn -> prepare($sql);
 	$stmt -> execute();
 
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-	if (count($results) > 0) {
+    if ($row) {
 		echo '<option selected value="">All</option>';
-		foreach ($results as $row) {
+		do {
 			echo '<option value="'.htmlspecialchars($row['error_name']).'">'.htmlspecialchars($row['error_name']).'</option>';
-		}
+		} while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
 	} else {
 		echo '<option selected value="">All</option>';
 	}
@@ -187,28 +202,39 @@ if ($method == 'get_recent_applicator_err_mon') {
             WHERE 
                 em.date_started IS NULL AND 
                 (em.date_recorded >= DATEADD(DAY, -7, GETDATE()) AND em.date_recorded <= GETDATE())";
+    $params = [];
+
     if (!empty($car_maker)) {
-        $sql .= " AND em.zaihai_car_maker='$car_maker'";
+        $sql .= " AND em.zaihai_car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND em.zaihai_car_model='$car_model'";
+        $sql .= " AND em.zaihai_car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND em.scanned_applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND em.scanned_applicator_no LIKE ?";
+        $applicator_no_param = "%" . $applicator_no . "%";
+        $params[] = $applicator_no_param;
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND em.scanned_terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND em.scanned_terminal_name LIKE ?";
+        $terminal_name_param = "%" . $terminal_name . "%";
+        $params[] = $terminal_name_param;
     }
     if (!empty($location)) {
-        $sql .= " AND em.scanned_trd_no LIKE '%$location%'";
+        $sql .= " AND em.scanned_trd_no LIKE ?";
+        $location_param = "%" . $location . "%";
+        $params[] = $location_param;
     }
     if (!empty($error_name)) {
-        $sql .= " AND err.error_name='$error_name'";
+        $sql .= " AND err.error_name = ?";
+        $params[] = $error_name;
     }
     $sql .= " ORDER BY em.date_recorded ASC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
         $c++;
