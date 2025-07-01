@@ -14,7 +14,8 @@
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ai_bm_applicator_no_new" placeholder="Applicator No. New"
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" required>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255"
+                ondrop="event.preventDefault();" required>
             </div>
           </div>
           <div class="row mb-2">

@@ -18,7 +18,8 @@
             </div>
             <div class="col-lg-3 col-sm-12">
               <div class="form-group mb-0">
-                <input type="radio" id="ao_opt_scan" name="ao_opt" value="1" onclick="toggle_opt_divs()" required checked>
+                <input type="radio" id="ao_opt_scan" name="ao_opt" value="1" onclick="toggle_opt_divs()" required
+                  checked>
                 <label class="h5" for="ao_opt_scan">Scan</label>
               </div>
             </div>
@@ -32,7 +33,7 @@
           <div class="row mb-2" id="ao_opt_scan_div">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ao_location" placeholder="Location" oncopy="return false"
-                onpaste="return false" autocomplete="off" maxlength="255">
+                onpaste="return false" autocomplete="off" maxlength="255" ondrop="event.preventDefault();">
             </div>
           </div>
           <div class="row mb-2 d-none" id="ao_opt_borrowed_div">
@@ -52,13 +53,15 @@
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ao_applicator_no" placeholder="Applicator No."
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255"
+                ondrop="event.preventDefault();" disabled>
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ao_terminal_name" placeholder="Terminal Name"
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255"
+                ondrop="event.preventDefault();" disabled>
             </div>
           </div>
           <div class="row mb-2">
