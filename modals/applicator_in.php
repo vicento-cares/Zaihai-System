@@ -18,7 +18,8 @@
             </div>
             <div class="col-lg-3 col-sm-12">
               <div class="form-group mb-0">
-                <input type="radio" id="ai_opt_scan" name="ai_opt" value="1" onclick="toggle_opt_divs()" required checked>
+                <input type="radio" id="ai_opt_scan" name="ai_opt" value="1" onclick="toggle_opt_divs()" required
+                  checked>
                 <label class="h5" for="ai_opt_scan">Scan</label>
               </div>
             </div>
@@ -32,7 +33,8 @@
           <div class="row mb-2" id="ai_opt_scan_div">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ai_location_before" placeholder="TRD / Cart Location"
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255">
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255"
+                ondrop="event.preventDefault();">
             </div>
           </div>
           <div class="row mb-2 d-none" id="ai_opt_borrowed_div">
@@ -52,13 +54,15 @@
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ai_applicator_no" placeholder="Applicator No."
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255"
+                ondrop="event.preventDefault();" disabled>
             </div>
           </div>
           <div class="row mb-2">
             <div class="col-sm-12">
               <input type="text" class="form-control" id="ai_terminal_name" placeholder="Terminal Name"
-                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255" disabled>
+                oncopy="return false" onpaste="return false" autocomplete="off" maxlength="255"
+                ondrop="event.preventDefault();" disabled>
             </div>
           </div>
           <div class="row mb-2">
