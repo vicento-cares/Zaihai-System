@@ -96,8 +96,13 @@ if ($method == 'get_recent_applicator_in_pending') {
             $row_class = 'bg-danger';
         }
 
+        // Add Slashes if has Slashes Symbol Existed
+        $terminal_name = addslashes($row['terminal_name']);
+        // Add Slashes after if has backticks (Resolve get_applicator_in_pending_details function error)
+        $terminal_name = htmlspecialchars(str_replace("`", "\\`", $terminal_name));
+
         echo '<tr style="cursor:pointer;" class="modal-trigger '.$row_class.'" 
-                onclick="get_applicator_in_pending_details(&#96;'.htmlspecialchars($row['applicator_no']).'~!~'.htmlspecialchars(addslashes($row['terminal_name'])).'&#96;)">';
+                onclick="get_applicator_in_pending_details(&#96;'.htmlspecialchars($row['applicator_no']).'~!~'.$terminal_name.'&#96;)">';
         echo '<td>'.$c.'</td>';
         echo '<td>'.$row['serial_no'].'</td>';
         echo '<td>'.$row['car_maker'].'</td>';
