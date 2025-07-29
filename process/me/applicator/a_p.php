@@ -40,6 +40,7 @@ if ($method == 'add_applicator') {
 					
 			$conn->commit();
 			$isTransactionActive = false;
+			echo 'success';
 		} catch (Exception $e) {
 			if ($isTransactionActive) {
 				$conn->rollBack();
