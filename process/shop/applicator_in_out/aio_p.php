@@ -15,10 +15,16 @@ if ($method == 'out_applicator') {
     $location = trim($_POST['location']);
     $applicator_no = trim($_POST['applicator_no']);
     $terminal_name = trim($_POST['terminal_name']);
-    $operator_out = $_SESSION['emp_no'];
-    $car_maker = $_SESSION['car_maker'];
-    $car_model = $_SESSION['car_model'];
+    $operator_out = '';
+    $car_maker = '';
+    $car_model = '';
     $serial_no = '';
+
+    if (isset($_SESSION['car_maker']) || isset($_SESSION['car_model']) || isset($_SESSION['emp_no'])) {
+        $operator_out = $_SESSION['emp_no'];
+        $car_maker = $_SESSION['car_maker'];
+        $car_model = $_SESSION['car_model'];
+    }
 
     $message = '';
     $error_status = 0;
@@ -216,10 +222,16 @@ if ($method == 'in_applicator') {
     $location = "Zaihai Receiving Area";
     $applicator_no = trim($_POST['applicator_no']);
     $terminal_name = trim($_POST['terminal_name']);
-    $operator_in = $_SESSION['emp_no'];
-    $car_maker = $_SESSION['car_maker'];
-    $car_model = $_SESSION['car_model'];
+    $operator_in = '';
+    $car_maker = '';
+    $car_model = '';
     $serial_no = '';
+
+    if (isset($_SESSION['car_maker']) || isset($_SESSION['car_model']) || isset($_SESSION['emp_no'])) {
+        $operator_in = $_SESSION['emp_no'];
+        $car_maker = $_SESSION['car_maker'];
+        $car_model = $_SESSION['car_model'];
+    }
 
     $message = '';
     $error_status = 0;

@@ -14,9 +14,13 @@ $method = $_POST['method'];
 if ($method == 'in_applicator') {
     $id = $_POST['id'];
     $location = "BM Receiving Area";
-    $operator_bm = $_SESSION['emp_no'];
+    $operator_bm = '';
     $applicator_no_new = trim($_POST['applicator_no_new']);
     $serial_no = '';
+
+    if (isset($_SESSION['emp_no'])) {
+        $operator_bm = $_SESSION['emp_no'];
+    }
 
     $message = '';
     $error_status = 0;

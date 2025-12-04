@@ -87,8 +87,13 @@ if ($method == 'make_checksheet') {
         }
     }
 
-    $inspector = $_SESSION['emp_no'];
-    $role = $_SESSION['role'];
+    $inspector = '';
+    $role = '';
+
+    if (isset($_SESSION['emp_no']) || isset($_SESSION['role'])) {
+        $inspector = $_SESSION['emp_no'];
+        $role = $_SESSION['role'];
+    }
 
     if (empty($inspector)) {
         echo 'Session was expired. Please Re-Login your account.';
@@ -195,11 +200,19 @@ if ($method == 'make_checksheet') {
 if ($method == 'shop_confirm_checksheet') {
     $serial_no = $_POST['serial_no'];
 
-    $shop_confirmed_by = $_SESSION['full_name'];
-    $shop_confirmed_by_no = $_SESSION['emp_no'];
+    $shop_confirmed_by = '';
+    $shop_confirmed_by_no = '';
 
-    $car_maker = $_SESSION['car_maker'];
-    $car_model = $_SESSION['car_model'];
+    $car_maker = '';
+    $car_model = '';
+
+    if (isset($_SESSION['emp_no'])) {
+        $shop_confirmed_by = $_SESSION['full_name'];
+        $shop_confirmed_by_no = $_SESSION['emp_no'];
+
+        $car_maker = $_SESSION['car_maker'];
+        $car_model = $_SESSION['car_model'];
+    }
 
     if (empty($shop_confirmed_by)) {
         echo 'Session was expired. Please Re-Login your account.';

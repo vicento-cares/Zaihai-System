@@ -11,8 +11,17 @@ $method = $_POST['method'];
 if ($method == 'verify_checksheet') {
     $serial_no = $_POST['serial_no'];
 
-    $pd_verified_by = $_SESSION['full_name'];
-    $pd_verified_by_id_no = $_SESSION['emp_no'];
+    $pd_verified_by = '';
+    $pd_verified_by_id_no = '';
+
+    if (isset($_SESSION['emp_no']) && isset($_SESSION['full_name'])) {
+        $pd_verified_by = $_SESSION['full_name'];
+        $pd_verified_by_id_no = $_SESSION['emp_no'];
+    } else {
+        $conn = null;
+        echo 'Session was expired. Please Re-Login your account.';
+        exit();
+    }
 
     $isTransactionActive = false;
 
@@ -37,7 +46,10 @@ if ($method == 'verify_checksheet') {
             $conn->rollBack();
             $isTransactionActive = false;
         }
+        $conn = null;
         echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
         exit();
     }
 }
+
+$conn = null;

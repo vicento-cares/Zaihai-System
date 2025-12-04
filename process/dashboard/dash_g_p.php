@@ -272,16 +272,20 @@ if ($method == 'get_current_trd_carts_reuse_count_chart') {
         $data['TotalTrdCartsReuse'][] = (int)$row['total_trd_carts_reuse'];
     }
 
-    // Create the final data structure
+    // Assume $categories and $data are already defined earlier in the script
     $finalData = [
         'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'TRD Carts Reuse',
-                'data' => $data['TotalTrdCartsReuse']
-            ]
-        ]
+        'data' => [] // Start with an empty 'data' array
     ];
+
+    // Check if the specific source data array is NOT empty
+    if (!empty($data['TotalTrdCartsReuse'])) {
+        // If it is not empty, push the structured item into the 'data' array
+        $finalData['data'][] = [
+            'name' => 'TRD Carts Reuse',
+            'data' => $data['TotalTrdCartsReuse']
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);

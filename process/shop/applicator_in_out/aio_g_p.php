@@ -506,7 +506,7 @@ if ($method == 'get_applicator_in_pending_details') {
             }
         }
     } else {
-        $message = 'Session Timeout';
+        $message = 'Session was expired. Please Re-Login your account.';
     }
 
     $message_arr = array(
