@@ -44,8 +44,8 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <input type="hidden" id="ao_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
-                <input type="hidden" id="ao_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
+                <input type="hidden" id="ao_car_maker_search" value="<?= isset($_SESSION['car_maker']) ? htmlspecialchars($_SESSION['car_maker']) : ''; ?>">
+                <input type="hidden" id="ao_car_model_search" value="<?= isset($_SESSION['car_model']) ? htmlspecialchars($_SESSION['car_model']) : ''; ?>">
                 <div class="col-sm-3">
                     <label>Location</label>
                     <input list="ao_location_search_list" class="form-control" id="ao_location_search">

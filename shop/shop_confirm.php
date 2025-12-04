@@ -39,8 +39,8 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <input type="hidden" id="ai_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
-                <input type="hidden" id="ai_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
+                <input type="hidden" id="ai_car_maker_search" value="<?= isset($_SESSION['car_maker']) ? htmlspecialchars($_SESSION['car_maker']) : ''; ?>">
+                <input type="hidden" id="ai_car_model_search" value="<?= isset($_SESSION['car_model']) ? htmlspecialchars($_SESSION['car_model']) : ''; ?>">
                 <div class="col-sm-3">
                   <label>Location</label>
                   <input list="ai_location_search_list" class="form-control" id="ai_location_search">

@@ -13,7 +13,7 @@
         <img src="../dist/img/user.png" class="img-circle elevation-2" alt="User Image">
       </div>
       <div class="info">
-        <a href="applicator_in.php" class="d-block"><?= htmlspecialchars($_SESSION['full_name']); ?></a>
+        <a href="applicator_in.php" class="d-block"><?= isset($_SESSION['full_name']) ? htmlspecialchars($_SESSION['full_name']) : 'Please Re-Login Account!'; ?></a>
       </div>
     </div>
 

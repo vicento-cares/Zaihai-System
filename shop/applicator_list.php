@@ -39,8 +39,8 @@
             <!-- /.card-header -->
             <div class="card-body">
               <div class="row mb-4">
-                <input type="hidden" id="al_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
-                <input type="hidden" id="al_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
+                <input type="hidden" id="al_car_maker_search" value="<?= isset($_SESSION['car_maker']) ? htmlspecialchars($_SESSION['car_maker']) : ''; ?>">
+                <input type="hidden" id="al_car_model_search" value="<?= isset($_SESSION['car_model']) ? htmlspecialchars($_SESSION['car_model']) : ''; ?>">
                 <div class="col-sm-3">
                   <label>Status</label>
                   <select id="al_status_search" class="form-control" onchange="get_recent_applicator_list()">

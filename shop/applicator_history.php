@@ -60,8 +60,8 @@
                   </div>
                 </div>
                 <div class="row mb-2">
-                  <input type="hidden" id="aioh_car_maker_search" value="<?= htmlspecialchars($_SESSION['car_maker']); ?>">
-                  <input type="hidden" id="aioh_car_model_search" value="<?= htmlspecialchars($_SESSION['car_model']); ?>">
+                  <input type="hidden" id="aioh_car_maker_search" value="<?= isset($_SESSION['car_maker']) ? htmlspecialchars($_SESSION['car_maker']) : ''; ?>">
+                  <input type="hidden" id="aioh_car_model_search" value="<?= isset($_SESSION['car_model']) ? htmlspecialchars($_SESSION['car_model']) : ''; ?>">
                   <div class="col-sm-3">
                     <label>TRD No. Location</label>
                     <input type="text" class="form-control" id="aioh_trd_no_search" autocomplete="off" maxlength="255">
