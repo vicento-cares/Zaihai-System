@@ -4,6 +4,48 @@ include '../../lib/main.php';
 
 $method = $_GET['method'];
 
+if ($method == 'verify_emp_no') {
+    $data = [];
+
+    include '../../conn_emp_mgt.php';
+
+    $check = "SELECT emp_no, full_name, line_no FROM m_employees 
+                WHERE emp_no = ? COLLATE SQL_Latin1_General_CP1_CS_AS";
+    $params[] = $emp_no;
+
+    $stmt = $conn_emp_mgt->prepare($check);
+    $stmt->execute($params);
+
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($results) > 0) {
+        $line_no = '';
+
+        foreach ($results as $row) {
+            $emp_no = $row['emp_no'];
+            $full_name = $row['full_name'];
+            $line_no = $row['line_no'];
+        }
+
+        $is_fp = strpos($line_no, "First Process");
+        $is_sp = strpos($line_no, "Secondary Process");
+
+        if ($is_fp !== false || $is_sp !== false) {
+            $data = [
+                'emp_no' => $row['emp_no'],
+                'full_name' => $row['full_name'],
+                'message' => 'success'
+            ];
+        } else {
+            $data = ['message' => 'Only First and Secondary Process On Any Section Allowed'];
+        }
+    }
+
+    echo json_encode($data);
+
+    $conn_emp_mgt = null;
+}
+
 if ($method == 'get_ac_details') {
     $applicator_no = $_GET['applicator_no'];
 

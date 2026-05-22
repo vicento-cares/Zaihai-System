@@ -50,6 +50,12 @@
                             <li><a href="applicator_history.php" class="dropdown-item">Applicator History</a></li>
                             <?php } ?>
 
+                            <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/applicator_pd_verification.php") { ?>
+                            <li><a href="applicator_pd_verification.php" class="dropdown-item active">Applicator PD Verification</a></li>
+                            <?php } else { ?>
+                            <li><a href="applicator_pd_verification.php" class="dropdown-item">Applicator PD Verification</a></li>
+                            <?php } ?>
+
                             <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/applicator_err_mon.php") { ?>
                             <li class="d-none"><a href="applicator_err_mon.php" class="dropdown-item active">Applicator Error Monitoring</a></li>
                             <?php } else { ?>
