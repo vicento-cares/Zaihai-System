@@ -3,6 +3,113 @@ session_set_cookie_params(0, "/zaihai");
 session_name("zaihai");
 session_start();
 
+function bm_in_applicator($conn, $bm_in_applicator_arr) {
+    $isTransactionActive = false;
+
+    try {
+        if (!$isTransactionActive) {
+            $conn->beginTransaction();
+            $isTransactionActive = true;
+        }
+
+        $id = $bm_in_applicator_arr['row_id'];
+    
+        // Applicator In Pending (BM)
+        $sql = "UPDATE t_applicator_in_out 
+                SET zaihai_stock_address = ?, operator_in = ?, date_time_in = ?
+                WHERE id = ?";
+        $stmt = $conn -> prepare($sql);
+        $params = array($bm_in_applicator_arr['location'], $bm_in_applicator_arr['operator_bm'], $bm_in_applicator_arr['server_date_time'], $id);
+        $stmt -> execute($params);
+
+        // Check the count of updated rows
+        $updated_rows = $stmt->rowCount();
+
+        if ($updated_rows === 0) {
+            // No rows were updated, roll back the transaction
+            $conn->rollBack();
+            $error_status = 1;
+            $message = 'Failed. Please Try Again or Call IT Personnel Immediately!';
+
+            $error_log_arr = [
+                'error_status' => $error_status,
+                'error_name' => $message,
+                'serial_no' => '',
+                'scanned_applicator_no' => $bm_in_applicator_arr['applicator_no'],
+                'scanned_terminal_name' => $bm_in_applicator_arr['terminal_name'],
+                'scanned_trd_no' => $bm_in_applicator_arr['location'],
+                'scanned_by_no' => $bm_in_applicator_arr['operator_bm'],
+                'interface' => 'BM Applicator In',
+                'zaihai_car_maker' => $bm_in_applicator_arr['car_maker'],
+                'zaihai_car_model' => $bm_in_applicator_arr['car_model'],
+                'ip' => $bm_in_applicator_arr['ip'] 
+            ];
+    
+            insert_error_log($error_log_arr, $conn);
+            echo $message;
+            $conn = null;
+            exit();
+        }
+
+        $sql = "UPDATE t_applicator_list 
+            SET location = ?, status = 'Pending', date_updated = ?
+            WHERE applicator_no = ?";
+        $stmt = $conn->prepare($sql);
+        $params = array($bm_in_applicator_arr['location'], $bm_in_applicator_arr['server_date_time'], $bm_in_applicator_arr['applicator_no']);
+        $stmt->execute($params);
+
+        // Applicator New Out (BM)
+        // $serial_no = date("ymdh");
+        // $rand = substr(md5(microtime()),rand(0,26),5);
+        // $serial_no = 'MEI-295-AC-'.$serial_no;
+        // $serial_no = $serial_no.''.$rand;
+        $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
+
+        $sql = "INSERT INTO t_applicator_in_out (serial_no, applicator_no, terminal_name, trd_no, operator_out) 
+                VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn -> prepare($sql);
+        $params = array($serial_no, $bm_in_applicator_arr['applicator_no_new'], $bm_in_applicator_arr['terminal_name'], $bm_in_applicator_arr['location_new'], $bm_in_applicator_arr['operator_bm']);
+        $stmt -> execute($params);
+
+        $sql = "UPDATE t_applicator_list 
+                SET location = ?, status = 'Out', date_updated = ?
+                WHERE applicator_no = ?";
+        $stmt = $conn->prepare($sql);
+        $params = array($bm_in_applicator_arr['location_new'], $bm_in_applicator_arr['server_date_time'], $bm_in_applicator_arr['applicator_no_new']);
+        $stmt->execute($params);
+    
+        $conn->commit();
+        $isTransactionActive = false;
+        return 'success';
+    } catch (Exception $e) {
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
+        $error_status = 1;
+        $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+
+        $error_log_arr = [
+            'error_status' => $error_status,
+            'error_name' => $message,
+            'serial_no' => $serial_no,
+            'scanned_applicator_no' => $bm_in_applicator_arr['applicator_no'],
+            'scanned_terminal_name' => $bm_in_applicator_arr['terminal_name'],
+            'scanned_trd_no' => $bm_in_applicator_arr['location'],
+            'scanned_by_no' => $bm_in_applicator_arr['operator_bm'],
+            'interface' => 'BM Applicator In',
+            'zaihai_car_maker' => $bm_in_applicator_arr['car_maker'],
+            'zaihai_car_model' => $bm_in_applicator_arr['car_model'],
+            'ip' => $bm_in_applicator_arr['ip']
+        ];
+
+        insert_error_log($error_log_arr, $conn);
+        echo $message;
+        $conn = null;
+        exit();
+    }
+}
+
 require '../../conn.php';
 include '../../lib/main.php';
 
@@ -94,109 +201,95 @@ if ($method == 'in_applicator') {
                     if ($car_maker != $row['car_maker'] && $car_model != $row['car_model']) {
                         $message = 'Unmatched Applicator New and Applicator Old on Car Maker / Car Model! Car Maker: ' . $row['car_maker'] . ' Car Model: ' . $row['car_model'];
                     } else {
-                        $isTransactionActive = false;
+                        $bm_in_applicator_arr = [
+                            'row_id' => $row['id'],
+                            'location' => $location,
+                            'operator_bm' => $operator_bm,
+                            'server_date_time' => $server_date_time,
+                            'applicator_no' => $applicator_no,
+                            'terminal_name' => $terminal_name,
+                            'car_maker' => $car_maker,
+                            'car_model' => $car_model,
+                            'ip' => $ip,
+                            'applicator_no_new' => $applicator_no_new,
+                            'location_new' => $location_new
+                        ];
 
-                        try {
-                            if (!$isTransactionActive) {
-                                $conn->beginTransaction();
-                                $isTransactionActive = true;
+                        // Gathered CCIS Data Checking Applicator Shot Count
+                        $sql = "SELECT 
+                                    CASE 
+                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_u_ee_status,
+                                    CASE 
+                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_d_ee_status,
+                                    CASE 
+                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_i_u_ee_status,
+                                    CASE 
+                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_i_d_ee_status,
+                                    CASE 
+                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_c_ee_status,
+                                    JSON_VALUE(j.[value], '$.UNUSABLE') AS UNUSABLE 
+                                FROM t_applicator_shots_temp m 
+                                CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j 
+                                LEFT JOIN t_applicator_shots s 
+                                ON JSON_VALUE(j.[value], '$.APPLICATOR_NO') = s.[applicator_no] 
+                                WHERE 
+                                    m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp) AND 
+                                    s.applicator_no = ?";
+
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute([$applicator_no]);
+
+                        $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+                        if ($row) {
+                            $shotcnt_u_ee_status = $row['shotcnt_u_ee_status'];
+                            $shotcnt_d_ee_status = $row['shotcnt_d_ee_status'];
+                            $shotcnt_i_u_ee_status = $row['shotcnt_i_u_ee_status'];
+                            $shotcnt_i_d_ee_status = $row['shotcnt_i_d_ee_status'];
+                            $shotcnt_c_ee_status = $row['shotcnt_c_ee_status'];
+                            $applicator_unusable = intval($row['UNUSABLE']);
+
+                            // for every additional 100k shots, applicator out cannot proceed. technician must maintenance and fill out date maintenanced and pic
+                            if (
+                                $shotcnt_u_ee_status == 'Exceeded' || 
+                                $shotcnt_d_ee_status == 'Exceeded' || 
+                                $shotcnt_i_u_ee_status == 'Exceeded' || 
+                                $shotcnt_i_d_ee_status == 'Exceeded' || 
+                                $shotcnt_c_ee_status == 'Exceeded' || 
+                                $applicator_unusable = 1
+                            ) {
+                                $message = 'Applicator Shot Count Exceeded';
+
+                                $sql = "IF NOT EXISTS (
+                                            SELECT 1 FROM t_applicator_shots_mc 
+                                            WHERE applicator_no = ? 
+                                        )
+                                        BEGIN
+                                            INSERT INTO t_applicator_shots_mc (applicator_no, detected_by) 
+                                            VALUES (?, ?);
+                                        END";
+                                $stmt = $conn -> prepare($sql);
+                                $stmt -> execute([$applicator_no, $applicator_no, $operator_out]);
+                            } else {
+                                $message = bm_in_applicator($conn, $bm_in_applicator_arr);
                             }
-
-                            $id = $row['id'];
-                        
-                            // Applicator In Pending (BM)
-                            $sql = "UPDATE t_applicator_in_out 
-                                    SET zaihai_stock_address = ?, operator_in = ?, date_time_in = ?
-                                    WHERE id = ?";
-                            $stmt = $conn -> prepare($sql);
-                            $params = array($location, $operator_bm, $server_date_time, $id);
-                            $stmt -> execute($params);
-    
-                            // Check the count of updated rows
-                            $updated_rows = $stmt->rowCount();
-    
-                            if ($updated_rows === 0) {
-                                // No rows were updated, roll back the transaction
-                                $conn->rollBack();
-                                $error_status = 1;
-                                $message = 'Failed. Please Try Again or Call IT Personnel Immediately!';
-
-                                $error_log_arr = [
-                                    'error_status' => $error_status,
-                                    'error_name' => $message,
-                                    'serial_no' => $serial_no,
-                                    'scanned_applicator_no' => $applicator_no,
-                                    'scanned_terminal_name' => $terminal_name,
-                                    'scanned_trd_no' => $location,
-                                    'scanned_by_no' => $operator_bm,
-                                    'interface' => 'BM Applicator In',
-                                    'zaihai_car_maker' => $car_maker,
-                                    'zaihai_car_model' => $car_model,
-                                    'ip' => $ip
-                                ];
-                        
-                                insert_error_log($error_log_arr, $conn);
-                                echo $message;
-                                $conn = null;
-                                exit();
-                            }
-
-                            $sql = "UPDATE t_applicator_list 
-                                SET location = ?, status = 'Pending', date_updated = ?
-                                WHERE applicator_no = ?";
-                            $stmt = $conn->prepare($sql);
-                            $params = array($location, $server_date_time, $applicator_no);
-                            $stmt->execute($params);
-
-                            // Applicator New Out (BM)
-                            // $serial_no = date("ymdh");
-                            // $rand = substr(md5(microtime()),rand(0,26),5);
-                            // $serial_no = 'MEI-295-AC-'.$serial_no;
-                            // $serial_no = $serial_no.''.$rand;
-                            $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
-
-                            $sql = "INSERT INTO t_applicator_in_out (serial_no, applicator_no, terminal_name, trd_no, operator_out) 
-                                    VALUES (?, ?, ?, ?, ?)";
-                            $stmt = $conn -> prepare($sql);
-                            $params = array($serial_no, $applicator_no_new, $terminal_name, $location_new, $operator_bm);
-                            $stmt -> execute($params);
-
-                            $sql = "UPDATE t_applicator_list 
-                                    SET location = ?, status = 'Out', date_updated = ?
-                                    WHERE applicator_no = ?";
-                            $stmt = $conn->prepare($sql);
-                            $params = array($location_new, $server_date_time, $applicator_no_new);
-                            $stmt->execute($params);
-                        
-                            $conn->commit();
-                            $isTransactionActive = false;
-                            $message = 'success';
-                        } catch (Exception $e) {
-                            if ($isTransactionActive) {
-                                $conn->rollBack();
-                                $isTransactionActive = false;
-                            }
-                            $error_status = 1;
-                            $message = 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-
-                            $error_log_arr = [
-                                'error_status' => $error_status,
-                                'error_name' => $message,
-                                'serial_no' => $serial_no,
-                                'scanned_applicator_no' => $applicator_no,
-                                'scanned_terminal_name' => $terminal_name,
-                                'scanned_trd_no' => $location,
-                                'scanned_by_no' => $operator_bm,
-                                'interface' => 'BM Applicator In',
-                                'zaihai_car_maker' => $car_maker,
-                                'zaihai_car_model' => $car_model,
-                                'ip' => $ip
-                            ];
-                    
-                            insert_error_log($error_log_arr, $conn);
-                            echo $message;
-                            $conn = null;
-                            exit();
+                        } else {
+                            $message = bm_in_applicator($conn, $bm_in_applicator_arr);
                         }
                     }
                 } else if ($status == 'Pending' && $status2 == 'Out') {

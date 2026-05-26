@@ -39,6 +39,11 @@ function split_applicator_no($applicator_no) {
     return $applicator_no_arr[1];
 }
 
+function split_applicator_unique_no($applicator_no) {
+    $applicator_no_arr = explode("/", $applicator_no);
+    return $applicator_no_arr[0];
+}
+
 function split_terminal_name($terminal_name) {
     $terminal_name_arr = explode("*", $terminal_name);
     return $terminal_name_arr[0];

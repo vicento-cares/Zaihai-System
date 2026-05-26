@@ -44,7 +44,7 @@ const timerIncrement = () => {
       default:
     }
 
-    if (url_path != "/zaihai/viewer/dashboard.php" && url_path != "/zaihai/viewer/applicator_history.php" && url_path != "/zaihai/viewer/applicator_pd_verification.php" && url_path != "/zaihai/viewer/applicator_list.php") {
+    if (url_path != "/zaihai/viewer/dashboard.php" && url_path != "/zaihai/viewer/applicator_history.php" && url_path != "/zaihai/viewer/applicator_pd_verification.php" && url_path != "/zaihai/viewer/applicator_list.php" && url_path != "/zaihai/viewer/applicator_shots.php") {
       window.location.href = '../index.php';
     }
   }

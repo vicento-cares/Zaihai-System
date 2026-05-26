@@ -26,6 +26,12 @@
                             <li><a href="dashboard.php" class="dropdown-item">Dashboard</a></li>
                             <?php } ?>
 
+                            <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/applicator_shots.php") { ?>
+                            <li><a href="applicator_shots.php" class="dropdown-item active">Applicator Shots</a></li>
+                            <?php } else { ?>
+                            <li><a href="applicator_shots.php" class="dropdown-item">Applicator Shots</a></li>
+                            <?php } ?>
+
                             <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/applicator_list.php") { ?>
                             <li><a href="applicator_list.php" class="dropdown-item active">Applicator List</a></li>
                             <?php } else { ?>
