@@ -94,6 +94,30 @@
             </p>
           </a>
         </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/applicator_shots.php") { ?>
+          <a href="applicator_shots.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_shots.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-list"></i>
+            <p>
+              Applicator Shots
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/applicator_shots_mc.php") { ?>
+          <a href="applicator_shots_mc.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_shots_mc.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>
+              Applicator Maintenance Logging
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>

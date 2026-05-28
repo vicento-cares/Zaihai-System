@@ -25,6 +25,14 @@ const timerIncrement = () => {
     // }
     
     switch (url_path) {
+        case "/zaihai/shop/applicator_shots.php":
+            // Applicator Shots Interval
+            clearInterval(realtime_get_recent_applicator_shots);
+            break;
+        case "/zaihai/shop/applicator_shots_mc.php":
+            // Applicator Shots MC Interval
+            clearInterval(realtime_get_recent_applicator_shots_mc);
+            break;
         case "/zaihai/shop/applicator_list.php":
             // Applicator List Interval
             clearInterval(realtime_get_recent_applicator_list);

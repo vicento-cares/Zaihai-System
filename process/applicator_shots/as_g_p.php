@@ -257,4 +257,80 @@ if ($method == 'get_recent_applicator_shots') {
     }
 }
 
+if ($method == 'get_recent_applicator_shots_mc') {
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $applicator_no = $_GET['applicator_no'];
+
+    $c = 0;
+
+    $sql = "SELECT 
+                asmc.*,
+                -- Conditional formatting for elapsed time
+				CASE 
+					WHEN DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) < 1 THEN '< 1 min' 
+					ELSE 
+						-- Build the elapsed time string conditionally
+						LTRIM(
+							CASE 
+								WHEN DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) / 1440 > 0 THEN 
+									CAST(DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) / 1440 AS VARCHAR(10)) + ' day' + 
+									CASE WHEN DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) / 1440 <> 1 THEN 's' ELSE '' END + 
+									CASE WHEN (DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 1440) / 60 > 0 OR DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+								ELSE '' 
+							END +
+							CASE 
+								WHEN (DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 1440) / 60 > 0 THEN 
+									CAST((DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 1440) / 60 AS VARCHAR(10)) + ' hour' + 
+									CASE WHEN (DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 1440) / 60 <> 1 THEN 's' ELSE '' END + 
+									CASE WHEN DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 60 > 0 THEN ', ' ELSE '' END
+								ELSE '' 
+							END +
+							CASE 
+								WHEN DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 60 > 0 THEN 
+									CAST(DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 60 AS VARCHAR(10)) + ' min' + 
+									CASE WHEN DATEDIFF(MINUTE, asmc.scan_date_detected, GETDATE()) % 60 <> 1 THEN 's' ELSE '' END 
+								ELSE '' 
+							END
+						) 
+				END AS elapsed_time
+            FROM 
+                t_applicator_shots_mc asmc 
+            LEFT JOIN 
+                t_applicator_list ON al.applicator_no = asmc.applicator_no 
+            WHERE 
+                al.applicator_no IS NOT NULL";
+
+    if (!empty($car_maker)) {
+        $sql .= " AND al.car_maker = '$car_maker'";
+    }
+    if (!empty($car_model)) {
+        $sql .= " AND al.car_model = '$car_model'";
+    }
+    if (!empty($applicator_no)) {
+        $sql .= " AND al.applicator_no LIKE '%$applicator_no%'";
+    }
+
+    $stmt = $conn->prepare($sql);
+	$stmt->execute();
+
+	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+		$c++;
+
+		$row_class = '';
+		// if (intval($row['downtime']) == 1 && $row['status'] != 'Ready To Use') {
+		// 	$row_class = 'bg-danger';
+		// }
+		echo '<tr class="'.$row_class.'">';
+
+		echo '<td>'.$c.'</td>';
+		echo '<td>'.$row['applicator_no'].'</td>';
+		echo '<td>'.$row['status'].'</td>';
+		echo '<td>'.$row['detected_by'].'</td>';
+		echo '<td>'.$row['elapsed_time'].'</td>';
+        echo '<td>'.$row['scan_date_detected'].'</td>';
+		echo '</tr>';
+    }
+}
+
 $conn = null;
