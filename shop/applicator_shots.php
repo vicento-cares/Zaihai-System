@@ -116,7 +116,7 @@
                       <th>Shot Limit Status EE (Insulation Anvil)</th>
                       <th>Shot Limit Status QA (Insulation Anvil)</th>
                       <th>Shot Count (Slide Cutter)</th>
-                      <th>Shot Limit EE (Slide Cutterr)</th>
+                      <th>Shot Limit EE (Slide Cutter)</th>
                       <th>Shot Limit QA (Slide Cutter)</th>
                       <th>Shot Limit Status EE (Slide Cutter)</th>
                       <th>Shot Limit Status QA (Slide Cutter)</th>

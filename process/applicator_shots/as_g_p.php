@@ -193,32 +193,53 @@ if ($method == 'get_recent_applicator_shots') {
         }
     }
 
+    $params = [];
+
     if (!empty($car_maker)) {
-        $sql .= " AND car_maker = '$car_maker'";
+        $sql .= " AND car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND car_model = '$car_model'";
+        $sql .= " AND car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($status)) {
-        $sql .= " AND status = '$status'";
+        $sql .= " AND status = ?";
+        $params[] = $status;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND applicator_no LIKE ?";
+        $params[] = "%" . $applicator_no . "%";
     }
     if (!empty($location)) {
-        $sql .= " AND location LIKE '%$location%'";
+        $sql .= " AND location LIKE ?";
+        $params[] = "%" . $location . "%";
     }
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		$c++;
 
 		$row_class = '';
-		// if (intval($row['downtime']) == 1 && $row['status'] != 'Ready To Use') {
-		// 	$row_class = 'bg-danger';
-		// }
+		if (
+            $row['shotcnt_u_ee_status'] == 'Exceeded' || 
+            $row['shotcnt_d_ee_status'] == 'Exceeded' || 
+            $row['shotcnt_i_u_ee_status'] == 'Exceeded' || 
+            $row['shotcnt_i_d_ee_status'] == 'Exceeded' || 
+            $row['shotcnt_c_ee_status'] == 'Exceeded'
+        ) {
+			$row_class = 'bg-danger';
+		} else if (
+            $row['shotcnt_u_qa_status'] == 'Exceeded' || 
+            $row['shotcnt_d_qa_status'] == 'Exceeded' || 
+            $row['shotcnt_i_u_qa_status'] == 'Exceeded' || 
+            $row['shotcnt_i_d_qa_status'] == 'Exceeded' || 
+            $row['shotcnt_c_qa_status'] == 'Exceeded'
+        ) {
+            $row_class = 'bg-warning';
+        }
 		echo '<tr class="'.$row_class.'">';
 
 		echo '<td>'.$c.'</td>';
@@ -297,22 +318,27 @@ if ($method == 'get_recent_applicator_shots_mc') {
             FROM 
                 t_applicator_shots_mc asmc 
             LEFT JOIN 
-                t_applicator_list ON al.applicator_no = asmc.applicator_no 
+                t_applicator_list al ON al.applicator_no = asmc.applicator_no 
             WHERE 
                 al.applicator_no IS NOT NULL";
 
+    $params = [];
+
     if (!empty($car_maker)) {
-        $sql .= " AND al.car_maker = '$car_maker'";
+        $sql .= " AND al.car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND al.car_model = '$car_model'";
+        $sql .= " AND al.car_model = ?";
+        $params[] = $car_maker;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND al.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND al.applicator_no LIKE ?";
+        $params[] = "%" . $applicator_no . "%";
     }
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		$c++;
@@ -321,7 +347,8 @@ if ($method == 'get_recent_applicator_shots_mc') {
 		// if (intval($row['downtime']) == 1 && $row['status'] != 'Ready To Use') {
 		// 	$row_class = 'bg-danger';
 		// }
-		echo '<tr class="'.$row_class.'">';
+		echo '<tr style="cursor:pointer;" class="modal-trigger '.$row_class.'" data-toggle="modal" data-target="#log_applicator_maintenance" 
+                    onclick="get_applicator_shot_mc_details(&quot;'.$row['id'].'~!~'.$row['applicator_no'].'&quot;)">';
 
 		echo '<td>'.$c.'</td>';
 		echo '<td>'.$row['applicator_no'].'</td>';

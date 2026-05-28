@@ -219,6 +219,7 @@ if ($method == 'out_applicator') {
                                     $shotcnt_c_ee_status == 'Exceeded' || 
                                     $applicator_unusable = 1
                                 ) {
+                                    $error_status = 1;
                                     $message = 'Applicator Shot Count Exceeded';
 
                                     $sql = "IF NOT EXISTS (

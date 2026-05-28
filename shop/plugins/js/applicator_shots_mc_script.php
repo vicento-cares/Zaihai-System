@@ -7,7 +7,6 @@
 		// get_car_maker_dropdown_search();
 		// get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
-		get_location_datalist_search();
 		get_recent_applicator_shots_mc();
 		realtime_get_recent_applicator_shots_mc = setInterval(get_recent_applicator_shots_mc, 30000);
 	});
@@ -144,5 +143,68 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+	const clear_log_applicator_maintenance_details = () => {
+        document.getElementById('asmc_maitenance_by').value = '';
+        document.getElementById('asmc_maitenance_date').value = '';
+    }
+
+	$("#log_applicator_maintenance").on('hidden.bs.modal', e => {
+        clear_log_applicator_maintenance_details();
+    });
+
+    const get_applicator_shot_mc_details = param => {
+		var string = param.split('~!~');
+        var id = string[0];
+        var applicator_no = string[1];
+
+        document.getElementById('asmc_id').value = id;
+        document.getElementById('asmc_applicator_no').value = applicator_no;
+	}
+
+    document.getElementById('log_applicator_maintenance_form').addEventListener('submit', e => {
+        e.preventDefault();
+        log_applicator_maintenance();
+    });
+
+    const log_applicator_maintenance = () => {
+        let id = document.getElementById('asmc_id').value;
+        let applicator_no = document.getElementById('asmc_applicator_no').value;
+        let maintenance_by = document.getElementById('asmc_maitenance_by').value;
+        let maintenance_date = document.getElementById('asmc_maitenance_date').value;
+
+        $.ajax({
+            url: '../process/applicator_shots/as_p.php',
+            type: 'POST',
+            cache: false,
+            data: {
+                method: 'log_applicator_maintenance',
+                id: id,
+                applicator_no: applicator_no,
+                maintenance_by: maintenance_by,
+                maintenance_date: maintenance_date
+            }, success: function (response) {
+                if (response == 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Succesfully Recorded!!!',
+                        text: 'Success',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                    get_recent_applicator_shots_mc();
+                    $('#log_applicator_maintenance').modal('hide');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error !!!',
+                        text: 'Error',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            }
+        });
     }
 </script>

@@ -13,6 +13,7 @@ include '../modals/applicator_in.php';
 include '../modals/applicator_checksheet.php';
 include '../modals/applicator_checksheet_shop_confirm.php';
 include '../modals/applicator_checksheet_view.php';
+include '../modals/log_applicator_maintenance.php';
 ?>
 <!-- jQuery -->
 <script src="../plugins/jquery/dist/jquery.min.js"></script>
