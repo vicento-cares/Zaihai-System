@@ -148,6 +148,13 @@
 	const clear_log_applicator_maintenance_details = () => {
         document.getElementById('asmc_maitenance_by').value = '';
         document.getElementById('asmc_maitenance_date').value = '';
+        document.getElementById('asmc_applicator_no_label').innerHTML = '';
+
+        document.getElementById('asmc_shotcnt_u_ee_status_label').innerHTML = '';
+        document.getElementById('asmc_shotcnt_d_ee_status_label').innerHTML = '';
+        document.getElementById('asmc_shotcnt_i_u_ee_status_label').innerHTML = '';
+        document.getElementById('asmc_shotcnt_i_d_ee_status_label').innerHTML = '';
+        document.getElementById('asmc_shotcnt_c_ee_status_label').innerHTML = '';
     }
 
 	$("#log_applicator_maintenance").on('hidden.bs.modal', e => {
@@ -159,8 +166,21 @@
         var id = string[0];
         var applicator_no = string[1];
 
+        var shotcnt_u_ee_status = string[2];
+        var shotcnt_d_ee_status = string[3];
+        var shotcnt_i_u_ee_status = string[4];
+        var shotcnt_i_d_ee_status = string[5];
+        var shotcnt_c_ee_status = string[6];
+
         document.getElementById('asmc_id').value = id;
         document.getElementById('asmc_applicator_no').value = applicator_no;
+        document.getElementById('asmc_applicator_no_label').innerHTML = applicator_no;
+
+        document.getElementById('asmc_shotcnt_u_ee_status_label').innerHTML = shotcnt_u_ee_status;
+        document.getElementById('asmc_shotcnt_d_ee_status_label').innerHTML = shotcnt_d_ee_status;
+        document.getElementById('asmc_shotcnt_i_u_ee_status_label').innerHTML = shotcnt_i_u_ee_status;
+        document.getElementById('asmc_shotcnt_i_d_ee_status_label').innerHTML = shotcnt_i_d_ee_status;
+        document.getElementById('asmc_shotcnt_c_ee_status_label').innerHTML = shotcnt_c_ee_status;
 	}
 
     document.getElementById('log_applicator_maintenance_form').addEventListener('submit', e => {

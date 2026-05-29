@@ -15,6 +15,42 @@
         <div class="modal-body">
           <div class="row mb-2">
             <div class="col-12">
+              <label class="mr-2">Applicator No:</label>
+              <span id="asqa_applicator_no_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status QA (Wire Crimper):</label>
+              <span id="asqa_shotcnt_u_qa_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status QA (Wire Anvil):</label>
+              <span id="asqa_shotcnt_d_qa_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status QA (Insulation Crimper):</label>
+              <span id="asqa_shotcnt_i_u_qa_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status QA (Insulation Anvil):</label>
+              <span id="asqa_shotcnt_i_d_qa_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status QA (Slide Cutter):</label>
+              <span id="asqa_shotcnt_c_qa_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
               <label>Inspected By</label><label style="color: red;">*</label>
               <input type="text" id="asqa_inspected_by" class="form-control" maxlength="100" autocomplete="off" required>
             </div>

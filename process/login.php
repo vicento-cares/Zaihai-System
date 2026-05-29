@@ -155,7 +155,7 @@ if (isset($_POST['login_btn'])) {
                     $_SESSION['emp_no'] = $emp_no;
                     $_SESSION['full_name'] = $full_name;
                     $_SESSION['role'] = $role;
-                    header('location:/zaihai/qa/applicator_shots_mc.php');
+                    header('location:/zaihai/qa/applicator_shots_qa.php');
                     exit();
                 } else {
                     echo '<script>alert("Incorrect or Unmatched Role Selected on Sign In!!!")</script>';

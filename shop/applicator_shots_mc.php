@@ -70,6 +70,21 @@
                       <th>Detected By</th>
                       <th>Elapsed Time</th>
                       <th>Scan Date Detected</th>
+                      <th>Shot Count (Wire Crimper)</th>
+                      <th>Shot Limit EE (Wire Crimper)</th>
+                      <th>Shot Limit Status EE (Wire Crimper)</th>
+                      <th>Shot Count (Wire Anvil)</th>
+                      <th>Shot Limit EE (Wire Anvil)</th>
+                      <th>Shot Limit Status EE (Wire Anvil)</th>
+                      <th>Shot Count (Insulation Crimper)</th>
+                      <th>Shot Limit EE (Insulation Crimper)</th>
+                      <th>Shot Limit Status EE (Insulation Crimper)</th>
+                      <th>Shot Count (Insulation Anvil)</th>
+                      <th>Shot Limit EE (Insulation Anvil)</th>
+                      <th>Shot Limit Status EE (Insulation Anvil)</th>
+                      <th>Shot Count (Slide Cutter)</th>
+                      <th>Shot Limit EE (Slide Cutter)</th>
+                      <th>Shot Limit Status EE (Slide Cutter)</th>
                     </tr>
                   </thead>
                   <tbody id="recentApplicatorShotsMcData" style="text-align: center;"></tbody>

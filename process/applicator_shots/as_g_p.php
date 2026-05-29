@@ -314,13 +314,53 @@ if ($method == 'get_recent_applicator_shots_mc') {
 								ELSE '' 
 							END
 						) 
-				END AS elapsed_time
-            FROM 
-                t_applicator_shots_mc asmc 
-            LEFT JOIN 
-                t_applicator_list al ON al.applicator_no = asmc.applicator_no 
-            WHERE 
-                al.applicator_no IS NOT NULL";
+				END AS elapsed_time,
+                JSON_VALUE(j.[value], '$.SHOTCNT_U') AS SHOTCNT_U,
+                s.shotcnt_u_limit_ee,
+                CASE 
+                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_ee 
+                    THEN 'Exceeded' 
+                    ELSE 'Good' 
+                END AS shotcnt_u_ee_status,
+                JSON_VALUE(j.[value], '$.SHOTCNT_D') AS SHOTCNT_D,
+                s.shotcnt_d_limit_ee,
+                CASE 
+                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_ee 
+                    THEN 'Exceeded' 
+                    ELSE 'Good' 
+                END AS shotcnt_d_ee_status,
+                JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS SHOTCNT_I_U,
+                s.shotcnt_i_u_limit_ee,
+                CASE 
+                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_ee 
+                    THEN 'Exceeded' 
+                    ELSE 'Good' 
+                END AS shotcnt_i_u_ee_status,
+                JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS SHOTCNT_I_D,
+                s.shotcnt_i_d_limit_ee,
+                CASE 
+                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_ee 
+                    THEN 'Exceeded' 
+                    ELSE 'Good' 
+                END AS shotcnt_i_d_ee_status,
+                JSON_VALUE(j.[value], '$.SHOTCNT_C') AS SHOTCNT_C,
+                s.shotcnt_c_limit_ee,
+                CASE 
+                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_ee 
+                    THEN 'Exceeded' 
+                    ELSE 'Good' 
+                END AS shotcnt_c_ee_status,
+                JSON_VALUE(j.[value], '$.C_SISKSNUSER') AS C_SISKSNUSER 
+            FROM t_applicator_shots_mc asmc 
+            LEFT JOIN t_applicator_shots_temp m 
+                CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j 
+                ON asmc.applicator_no = JSON_VALUE(j.[value], '$.APPLICATOR_NO') 
+            LEFT JOIN t_applicator_shots s 
+                ON asmc.applicator_no = s.applicator_no 
+            LEFT JOIN t_applicator_list al 
+                ON asmc.applicator_no = al.applicator_no 
+			WHERE 
+                m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp)";
 
     $params = [];
 
@@ -330,7 +370,7 @@ if ($method == 'get_recent_applicator_shots_mc') {
     }
     if (!empty($car_model)) {
         $sql .= " AND al.car_model = ?";
-        $params[] = $car_maker;
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
         $sql .= " AND al.applicator_no LIKE ?";
@@ -343,12 +383,15 @@ if ($method == 'get_recent_applicator_shots_mc') {
 	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 		$c++;
 
-		$row_class = '';
-		// if (intval($row['downtime']) == 1 && $row['status'] != 'Ready To Use') {
-		// 	$row_class = 'bg-danger';
-		// }
-		echo '<tr style="cursor:pointer;" class="modal-trigger '.$row_class.'" data-toggle="modal" data-target="#log_applicator_maintenance" 
-                    onclick="get_applicator_shot_mc_details(&quot;'.$row['id'].'~!~'.$row['applicator_no'].'&quot;)">';
+		echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#log_applicator_maintenance" 
+                    onclick="get_applicator_shot_mc_details(&quot;'.
+                    $row['id'].'~!~'.
+                    $row['applicator_no'].'~!~'.
+                    $row['shotcnt_u_ee_status'].'~!~'.
+                    $row['shotcnt_d_ee_status'].'~!~'.
+                    $row['shotcnt_i_u_ee_status'].'~!~'.
+                    $row['shotcnt_i_d_ee_status'].'~!~'.
+                    $row['shotcnt_c_ee_status'].'&quot;)">';
 
 		echo '<td>'.$c.'</td>';
 		echo '<td>'.$row['applicator_no'].'</td>';
@@ -356,6 +399,21 @@ if ($method == 'get_recent_applicator_shots_mc') {
 		echo '<td>'.$row['detected_by'].'</td>';
 		echo '<td>'.$row['elapsed_time'].'</td>';
         echo '<td>'.$row['scan_date_detected'].'</td>';
+        echo '<td>'.$row['SHOTCNT_U'].'</td>';
+        echo '<td>'.$row['shotcnt_u_limit_ee'].'</td>';
+        echo '<td class="'.(($row['shotcnt_u_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_u_ee_status'].'</td>';
+        echo '<td>'.$row['SHOTCNT_D'].'</td>';
+        echo '<td>'.$row['shotcnt_d_limit_ee'].'</td>';
+        echo '<td class="'.(($row['shotcnt_d_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_d_ee_status'].'</td>';
+        echo '<td>'.$row['SHOTCNT_I_U'].'</td>';
+        echo '<td>'.$row['shotcnt_i_u_limit_ee'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_u_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_i_u_ee_status'].'</td>';
+        echo '<td>'.$row['SHOTCNT_I_D'].'</td>';
+        echo '<td>'.$row['shotcnt_i_d_limit_ee'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_d_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_i_d_ee_status'].'</td>';
+        echo '<td>'.$row['SHOTCNT_C'].'</td>';
+        echo '<td>'.$row['shotcnt_c_limit_ee'].'</td>';
+        echo '<td class="'.(($row['shotcnt_c_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_c_ee_status'].'</td>';
 		echo '</tr>';
     }
 }
@@ -520,7 +578,13 @@ if ($method == 'get_recent_applicator_shots_qa') {
         ) {
             $row_class = 'bg-warning';
             echo '<tr style="cursor:pointer;" class="modal-trigger '.$row_class.'" data-toggle="modal" data-target="#log_applicator_appearance" 
-                    onclick="get_applicator_shot_qa_details(&quot;'.$row['applicator_no'].'&quot;)">';
+                    onclick="get_applicator_shot_qa_details(&quot;'.
+                    $row['applicator_no'].'~!~'.
+                    $row['shotcnt_u_qa_status'].'~!~'.
+                    $row['shotcnt_d_qa_status'].'~!~'.
+                    $row['shotcnt_i_u_qa_status'].'~!~'.
+                    $row['shotcnt_i_d_qa_status'].'~!~'.
+                    $row['shotcnt_c_qa_status'].'&quot;)">';
         } else {
             echo '<tr>';
         }
@@ -534,19 +598,19 @@ if ($method == 'get_recent_applicator_shots_qa') {
 		echo '<td>'.$row['elapsed_time'].'</td>';
 		echo '<td>'.$row['SHOTCNT_U'].'</td>';
         echo '<td>'.$row['shotcnt_u_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_u_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_u_qa_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_u_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_D'].'</td>';
         echo '<td>'.$row['shotcnt_d_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_d_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_d_qa_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_d_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_I_U'].'</td>';
         echo '<td>'.$row['shotcnt_i_u_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_i_u_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_u_qa_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_i_u_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_I_D'].'</td>';
         echo '<td>'.$row['shotcnt_i_d_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_i_d_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_d_qa_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_i_d_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_C'].'</td>';
         echo '<td>'.$row['shotcnt_c_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_c_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_c_qa_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_c_qa_status'].'</td>';
 		echo '</tr>';
     }
 }

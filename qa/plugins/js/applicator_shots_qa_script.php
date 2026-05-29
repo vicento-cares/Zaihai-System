@@ -194,19 +194,37 @@
 	const clear_log_applicator_appearance_details = () => {
         document.getElementById('asqa_inspected_by').value = '';
         document.getElementById('asqa_inspection_date').value = '';
+		document.getElementById('asqa_applicator_no_label').innerHTML = '';
+
+		document.getElementById('asqa_shotcnt_u_qa_status_label').innerHTML = '';
+        document.getElementById('asqa_shotcnt_d_qa_status_label').innerHTML = '';
+        document.getElementById('asqa_shotcnt_i_u_qa_status_label').innerHTML = '';
+        document.getElementById('asqa_shotcnt_i_d_qa_status_label').innerHTML = '';
+        document.getElementById('asqa_shotcnt_c_qa_status_label').innerHTML = '';
     }
 
 	$("#log_applicator_appearance").on('hidden.bs.modal', e => {
         clear_log_applicator_appearance_details();
     });
 
-    const get_applicator_shot_mc_details = param => {
+    const get_applicator_shot_qa_details = param => {
 		var string = param.split('~!~');
-        var id = string[0];
-        var applicator_no = string[1];
+        var applicator_no = string[0];
 
-        document.getElementById('asqa_id').value = id;
+		var shotcnt_u_qa_status = string[1];
+        var shotcnt_d_qa_status = string[2];
+        var shotcnt_i_u_qa_status = string[3];
+        var shotcnt_i_d_qa_status = string[4];
+        var shotcnt_c_qa_status = string[5];
+
         document.getElementById('asqa_applicator_no').value = applicator_no;
+		document.getElementById('asqa_applicator_no_label').innerHTML = applicator_no;
+
+		document.getElementById('asqa_shotcnt_u_qa_status_label').innerHTML = shotcnt_u_qa_status;
+        document.getElementById('asqa_shotcnt_d_qa_status_label').innerHTML = shotcnt_d_qa_status;
+        document.getElementById('asqa_shotcnt_i_u_qa_status_label').innerHTML = shotcnt_i_u_qa_status;
+        document.getElementById('asqa_shotcnt_i_d_qa_status_label').innerHTML = shotcnt_i_d_qa_status;
+        document.getElementById('asqa_shotcnt_c_qa_status_label').innerHTML = shotcnt_c_qa_status;
 	}
 
     document.getElementById('log_applicator_appearance_form').addEventListener('submit', e => {

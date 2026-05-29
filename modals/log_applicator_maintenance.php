@@ -16,6 +16,42 @@
         <div class="modal-body">
           <div class="row mb-2">
             <div class="col-12">
+              <label class="mr-2">Applicator No:</label>
+              <span id="asmc_applicator_no_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status EE (Wire Crimper):</label>
+              <span id="asmc_shotcnt_u_ee_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status EE (Wire Anvil):</label>
+              <span id="asmc_shotcnt_d_ee_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status EE (Insulation Crimper):</label>
+              <span id="asmc_shotcnt_i_u_ee_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status EE (Insulation Anvil):</label>
+              <span id="asmc_shotcnt_i_d_ee_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
+              <label class="mr-2">Shot Limit Status EE (Slide Cutter):</label>
+              <span id="asmc_shotcnt_c_ee_status_label"></span>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-12">
               <label>Maintenance By</label><label style="color: red;">*</label>
               <input type="text" id="asmc_maitenance_by" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
