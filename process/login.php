@@ -35,15 +35,9 @@ function get_access_location_by_ip($ip, $conn) {
 
 if (isset($_POST['login_btn'])) {
 
-    // REMOTE IP ADDRESS
-    $ip = $_SERVER['REMOTE_ADDR'];
-
     $emp_no = addslashes($_POST['emp_no']);
     $role = $_POST['role'];
 
-    // CHECK IP
-    $response_arr = get_access_location_by_ip($ip, $conn);
-    
     $role_check = '';
 
     if (empty($emp_no)) {
@@ -105,6 +99,12 @@ if (isset($_POST['login_btn'])) {
             }
 
             if ($role_check == 'Shop' || $role_check == 'Inspector') {
+                // REMOTE IP ADDRESS
+                $ip = $_SERVER['REMOTE_ADDR'];
+
+                // CHECK IP
+                $response_arr = get_access_location_by_ip($ip, $conn);
+
                 if ($response_arr['can_access'] == true) {
                     if ($role_check == 'Shop' && ($role == 'Shop' || $role == 'Inspector')) {
                         $_SESSION['emp_no'] = $emp_no;
@@ -150,6 +150,12 @@ if (isset($_POST['login_btn'])) {
                     $_SESSION['full_name'] = $full_name;
                     $_SESSION['role'] = $role;
                     header('location:/zaihai/me/accounts.php');
+                    exit();
+                } else if ($role_check == 'QA' && $role == 'QA') {
+                    $_SESSION['emp_no'] = $emp_no;
+                    $_SESSION['full_name'] = $full_name;
+                    $_SESSION['role'] = $role;
+                    header('location:/zaihai/qa/applicator_shots_mc.php');
                     exit();
                 } else {
                     echo '<script>alert("Incorrect or Unmatched Role Selected on Sign In!!!")</script>';

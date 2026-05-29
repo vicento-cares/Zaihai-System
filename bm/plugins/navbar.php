@@ -12,6 +12,8 @@ if (!isset($_SESSION['emp_no'])) {
   header('location:/zaihai/me/accounts.php');
 } else if ($_SESSION['role'] == 'PD') {
   header('location:/zaihai/pd/verify_checksheet.php');
+} else if ($_SESSION['role'] == 'QA') {
+  header('location:/zaihai/qa/applicator_shots_qa.php');
 }
 ?>  
 <!DOCTYPE html>

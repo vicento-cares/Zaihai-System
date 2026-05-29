@@ -32,6 +32,7 @@
                 <option value="Inspector">Inspector</option>
                 <option value="BM">BM</option>
                 <option value="ME">ME</option>
+                <option value="QA">QA</option>
               </select>
             </div>
           </div>

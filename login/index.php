@@ -11,6 +11,8 @@ if (isset($_SESSION['emp_no'])) {
     header('location:/zaihai/me/accounts.php');
   } else if ($_SESSION['role'] == 'PD') {
     header('location:/zaihai/pd/verify_checksheet.php');
+  } else if ($_SESSION['role'] == 'QA') {
+    header('location:/zaihai/qa/applicator_shots_mc.php');
   }
 }
 ?>
@@ -51,6 +53,7 @@ if (isset($_SESSION['emp_no'])) {
               <option value="BM">BM</option>
               <option value="ME">ME</option>
               <option value="PD">PD</option>
+              <option value="QA">QA</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">
