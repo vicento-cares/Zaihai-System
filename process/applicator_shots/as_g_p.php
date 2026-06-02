@@ -615,4 +615,124 @@ if ($method == 'get_recent_applicator_shots_qa') {
     }
 }
 
+if ($method == 'get_applicator_shots_mch') {
+    $maintenance_date_from = $_GET['maintenance_date_from'];
+    $maintenance_date_to = $_GET['maintenance_date_to'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $applicator_no = $_GET['applicator_no'];
+
+    $c = 0;
+
+    $sql = "SELECT 
+                l.car_maker,
+                l.car_model,
+                l.applicator_no,
+                mch.detected_by,
+                mch.scan_date_detected,
+                mch.maintenance_by,
+                mch.maintenance_date
+            FROM 
+                t_applicator_shots_mch mch 
+            LEFT JOIN 
+                t_applicator_list l ON mch.applicator_no = l.applicator_no 
+            WHERE 
+                (mch.maintenance_date >= ? AND mch.maintenance_date <= ?) AND 
+                l.applicator_no IS NOT NULL";
+
+    $params = [
+        $maintenance_date_from, 
+        $maintenance_date_to 
+    ];
+
+    if (!empty($car_maker)) {
+        $sql .= " AND l.car_maker = ?";
+        $params[] = $car_maker;
+    }
+    if (!empty($car_model)) {
+        $sql .= " AND l.car_model = ?";
+        $params[] = $car_model;
+    }
+    if (!empty($applicator_no)) {
+        $sql .= " AND l.applicator_no LIKE ?";
+        $params[] = "%" . $applicator_no . "%";
+    }
+
+    $stmt = $conn->prepare($sql);
+	$stmt->execute($params);
+
+	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+		$c++;
+
+        echo '<tr>';
+		echo '<td>'.$c.'</td>';
+		echo '<td>'.$row['car_maker'].'</td>';
+		echo '<td>'.$row['car_model'].'</td>';
+		echo '<td>'.$row['applicator_no'].'</td>';
+        echo '<td>'.$row['detected_by'].'</td>';
+		echo '<td>'.$row['scan_date_detected'].'</td>';
+		echo '<td>'.$row['maintenance_by'].'</td>';
+		echo '<td>'.$row['maintenance_date'].'</td>';
+		echo '</tr>';
+    }
+}
+
+if ($method == 'get_applicator_shots_qah') {
+    $inspection_date_from = $_GET['inspection_date_from'];
+    $inspection_date_to = $_GET['inspection_date_to'];
+    $car_maker = $_GET['car_maker'];
+    $car_model = $_GET['car_model'];
+    $applicator_no = $_GET['applicator_no'];
+
+    $c = 0;
+
+    $sql = "SELECT 
+                l.car_maker,
+                l.car_model,
+                l.applicator_no,
+                qah.inspected_by,
+                qah.inspection_date
+            FROM 
+                t_applicator_shots_qah qah 
+            LEFT JOIN 
+                t_applicator_list l ON qah.applicator_no = l.applicator_no 
+            WHERE 
+                (qah.inspection_date >= ? AND qah.inspection_date <= ?) AND 
+                l.applicator_no IS NOT NULL";
+
+    $params = [
+        $inspection_date_from, 
+        $inspection_date_to 
+    ];
+
+    if (!empty($car_maker)) {
+        $sql .= " AND l.car_maker = ?";
+        $params[] = $car_maker;
+    }
+    if (!empty($car_model)) {
+        $sql .= " AND l.car_model = ?";
+        $params[] = $car_model;
+    }
+    if (!empty($applicator_no)) {
+        $sql .= " AND l.applicator_no LIKE ?";
+        $params[] = "%" . $applicator_no . "%";
+    }
+
+    $stmt = $conn->prepare($sql);
+	$stmt->execute($params);
+
+	while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
+		$c++;
+
+        echo '<tr>';
+		echo '<td>'.$c.'</td>';
+		echo '<td>'.$row['car_maker'].'</td>';
+		echo '<td>'.$row['car_model'].'</td>';
+		echo '<td>'.$row['applicator_no'].'</td>';
+		echo '<td>'.$row['inspected_by'].'</td>';
+		echo '<td>'.$row['inspection_date'].'</td>';
+		echo '</tr>';
+    }
+}
+
 $conn = null;

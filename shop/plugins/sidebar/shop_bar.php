@@ -118,6 +118,18 @@
             </p>
           </a>
         </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/shop/applicator_shots_mch.php") { ?>
+          <a href="applicator_shots_mch.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_shots_mch.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-history"></i>
+            <p>
+              Applicator Maintenance History
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>

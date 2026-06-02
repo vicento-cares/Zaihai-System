@@ -2,7 +2,7 @@
   <!-- Brand Logo -->
   <a href="applicator_shots_qa.php" class="brand-link">
     <img src="../dist/img/logo.ico" alt="Logo" class="brand-image elevation-3" style="opacity: .8">
-    <span class="brand-text font-weight-light">Zaihai | PD</span>
+    <span class="brand-text font-weight-light">Zaihai | QA</span>
   </a>
 
   <!-- Sidebar -->
@@ -31,6 +31,18 @@
             <i class="nav-icon fas fa-search"></i>
             <p>
               Applicator Appearance Inspection Logging
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/qa/applicator_shots_qah.php") { ?>
+          <a href="applicator_shots_qah.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator_shots_qah.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-history"></i>
+            <p>
+              Applicator Appearance Inspection History
             </p>
           </a>
         </li>
