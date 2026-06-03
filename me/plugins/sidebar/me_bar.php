@@ -82,6 +82,18 @@
             </p>
           </a>
         </li>
+        <li class="nav-item d-none">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/me/zaihai_backup.php") { ?>
+          <a href="zaihai_backup.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="zaihai_backup.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-database"></i>
+            <p>
+              Zaihai Backup
+            </p>
+          </a>
+        </li>
         <?php include 'logout.php'; ?>
       </ul>
     </nav>
