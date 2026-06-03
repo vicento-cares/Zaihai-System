@@ -13,6 +13,16 @@
         let bak_date_from = document.getElementById('bak_date_from').value;
         let bak_date_to = document.getElementById('bak_date_to').value;
 
+        Swal.fire({
+            icon: 'info',
+            title: 'Transferring Data to Backup Database Please Wait...',
+            text: 'Info',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false
+        });
+
         $.ajax({
             url: '../process/backup/zb_p.php',
             type: 'POST',
@@ -22,6 +32,7 @@
                 bak_date_from: bak_date_from,
                 bak_date_to: bak_date_to
             }, success: function (response) {
+                swal.close();
                 if (response == 'success') {
                     Swal.fire({
                         icon: 'success',

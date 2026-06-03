@@ -11,8 +11,8 @@ if ($method == 'backup_zaihai_data') {
     $bak_date_from = $_POST['bak_date_from'];
     $bak_date_to = $_POST['bak_date_to'];
 
-    $bak_date_time_from = $bak_date_from . ' 06:00:00';
-    $bak_date_time_to = $bak_date_to . ' 06:00:00';
+    $bak_date_time_from = $bak_date_from . ' 00:00:00';
+    $bak_date_time_to = $bak_date_to . ' 23:59:59';
 
     $backup_by = '';
 
@@ -65,7 +65,7 @@ if ($method == 'backup_zaihai_data') {
                     FROM 
                         zaihai_db.dbo.t_error_monitoring 
                     WHERE 
-                        (date_recorded >= ? AND date_recorded < ?)";
+                        (date_recorded >= ? AND date_recorded <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -73,7 +73,7 @@ if ($method == 'backup_zaihai_data') {
         $query = "DELETE FROM 
                         zaihai_db.dbo.t_error_monitoring 
                     WHERE 
-                        (date_recorded >= ? AND date_recorded < ?)";
+                        (date_recorded >= ? AND date_recorded <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -267,7 +267,7 @@ if ($method == 'backup_zaihai_data') {
                 FROM 
                     zaihai_db.dbo.t_applicator_c 
                 WHERE 
-                    (inspection_date_time >= ? AND inspection_date_time < ?)";
+                    (inspection_date_time >= ? AND inspection_date_time <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -275,7 +275,7 @@ if ($method == 'backup_zaihai_data') {
         $query = "DELETE FROM 
                         zaihai_db.dbo.t_applicator_c 
                     WHERE 
-                        (inspection_date_time >= ? AND inspection_date_time < ?)";
+                        (inspection_date_time >= ? AND inspection_date_time <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -311,7 +311,7 @@ if ($method == 'backup_zaihai_data') {
                     FROM 
                         zaihai_db.dbo.t_applicator_in_out_history 
                     WHERE 
-                        (confirmation_date >= ? AND confirmation_date < ?)";
+                        (confirmation_date >= ? AND confirmation_date <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -319,7 +319,7 @@ if ($method == 'backup_zaihai_data') {
         $query = "DELETE FROM 
                         zaihai_db.dbo.t_applicator_in_out_history 
                     WHERE 
-                        (confirmation_date >= ? AND confirmation_date < ?)";
+                        (confirmation_date >= ? AND confirmation_date <= ?)";
         
         $stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -337,7 +337,7 @@ if ($method == 'backup_zaihai_data') {
                     FROM 
                         zaihai_db.dbo.t_applicator_shots_temp 
                     WHERE 
-                        (date_created >= ? AND date_created < ?)";
+                        (date_created >= ? AND date_created <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -345,7 +345,7 @@ if ($method == 'backup_zaihai_data') {
         $query = "DELETE FROM 
                         zaihai_db.dbo.t_applicator_shots_temp 
                     WHERE 
-                        (date_created >= ? AND date_created < ?)";
+                        (date_created >= ? AND date_created <= ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_time_from, $bak_date_time_to]);
@@ -371,7 +371,7 @@ if ($method == 'backup_zaihai_data') {
                     FROM 
                         zaihai_db.dbo.t_applicator_shots_mch 
                     WHERE 
-                        (maintenance_date >= ? AND maintenance_date < ?)";
+                        maintenance_date BETWEEN ? AND ?";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_from, $bak_date_to]);
@@ -379,7 +379,7 @@ if ($method == 'backup_zaihai_data') {
         $query = "DELETE FROM 
                         zaihai_db.dbo.t_applicator_shots_mch 
                     WHERE 
-                        (maintenance_date >= ? AND maintenance_date < ?)";
+                        maintenance_date BETWEEN ? AND ?";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_from, $bak_date_to]);
@@ -399,7 +399,7 @@ if ($method == 'backup_zaihai_data') {
                     FROM 
                         zaihai_db.dbo.t_applicator_shots_qah 
                     WHERE 
-                        (inspection_date >= ? AND inspection_date < ?)";
+                        inspection_date BETWEEN ? AND ?";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_from, $bak_date_to]);
@@ -407,21 +407,21 @@ if ($method == 'backup_zaihai_data') {
         $query = "DELETE FROM 
                         zaihai_db.dbo.t_applicator_shots_qah 
                     WHERE 
-                        (inspection_date >= ? AND inspection_date < ?)";
+                        inspection_date BETWEEN ? AND ?";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_from, $bak_date_to]);
 
         // Log Transfer Zaihai Data to Backup Database
 
-        $query = "INSERT INTO zaihai_backup.dbo.t_applicator_shots_qah 
+        $query = "INSERT INTO zaihai_backup.dbo.t_backup_logs 
                         (
                             date_from
                             ,date_to
                             ,backup_by 
                         ) 
                     VALUES 
-                        (?, ?)";
+                        (?, ?, ?)";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$bak_date_from, $bak_date_to, $backup_by]);
