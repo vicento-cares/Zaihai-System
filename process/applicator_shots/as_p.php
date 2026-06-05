@@ -29,65 +29,64 @@ if ($method == 'log_applicator_maintenance') {
 		$query = "UPDATE s
 					SET 
 						s.shotcnt_u_limit_ee = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_ee 
+							WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_ee 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_U AS INT) < 50000 
 									THEN 100000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_U AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS FLOAT) / 100000.0) * 100000
+								ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 100000.0) * 100000
 							END
 							ELSE s.shotcnt_u_limit_ee 
 						END,
 						s.shotcnt_d_limit_ee = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_ee 
+							WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_ee 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_D AS INT) < 50000 
 									THEN 100000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_D AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS FLOAT) / 100000.0) * 100000
+								ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 100000.0) * 100000
 							END
 							ELSE s.shotcnt_d_limit_ee 
 						END,
 						s.shotcnt_i_u_limit_ee = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_ee 
+							WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_ee 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 
 									THEN 100000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS FLOAT) / 100000.0) * 100000
+								ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 100000.0) * 100000
 							END
 							ELSE s.shotcnt_i_u_limit_ee 
 						END,
 						s.shotcnt_i_d_limit_ee = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_ee 
+							WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_ee 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 
 									THEN 100000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS FLOAT) / 100000.0) * 100000
+								ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 100000.0) * 100000
 							END
 							ELSE s.shotcnt_i_d_limit_ee 
 						END,
 						s.shotcnt_c_limit_ee = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_ee 
+							WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_ee 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_C AS INT) < 50000 
 									THEN 100000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_C AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS FLOAT) / 100000.0) * 100000
+								ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 100000.0) * 100000
 							END
 							ELSE s.shotcnt_c_limit_ee 
 						END
-					FROM t_applicator_shots s
-					INNER JOIN t_applicator_shots_temp m
-						ON m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp)
-					CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j
-					WHERE s.[applicator_no] = ? AND JSON_VALUE(j.[value], '$.APPLICATOR_NO') = ?";
+					FROM t_applicator_shots s 
+					INNER JOIN v_m_apri_ccis_data m 
+						ON s.applicator_no = m.APPLICATOR_NO 
+					WHERE s.applicator_no = ? AND m.APPLICATOR_NO = ?";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$applicator_no, $applicator_no]);
@@ -134,65 +133,64 @@ if ($method == 'log_applicator_appearance') {
 		$query = "UPDATE s
 					SET 
 						s.shotcnt_u_limit_qa = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_qa 
+							WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_qa 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_U AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_U AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS FLOAT) / 50000.0) * 50000
+								ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_u_limit_qa 
 						END,
 						s.shotcnt_d_limit_qa = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_qa 
+							WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_qa 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_D AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_D AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS FLOAT) / 50000.0) * 50000
+								ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_d_limit_qa 
 						END,
 						s.shotcnt_i_u_limit_qa = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_qa 
+							WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_qa 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS FLOAT) / 50000.0) * 50000
+								ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_i_u_limit_qa 
 						END,
 						s.shotcnt_i_d_limit_qa = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_qa 
+							WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_qa 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS FLOAT) / 50000.0) * 50000
+								ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_i_d_limit_qa 
 						END,
 						s.shotcnt_c_limit_qa = CASE 
-							WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_qa 
+							WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_qa 
 							THEN CASE 
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) < 50000 
+								WHEN CAST(m.SHOTCNT_C AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) < 100000 
+								WHEN CAST(m.SHOTCNT_C AS INT) < 100000 
 									THEN 100000
-								ELSE CEILING(CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS FLOAT) / 50000.0) * 50000
+								ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_c_limit_qa 
 						END
-					FROM t_applicator_shots s
-					INNER JOIN t_applicator_shots_temp m
-						ON m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp)
-					CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j
-					WHERE s.[applicator_no] = ? AND JSON_VALUE(j.[value], '$.APPLICATOR_NO') = ?";
+					FROM t_applicator_shots s 
+					INNER JOIN v_m_apri_ccis_data m 
+						ON s.applicator_no = m.APPLICATOR_NO 
+					WHERE s.applicator_no = ? AND m.APPLICATOR_NO = ?";
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$applicator_no, $applicator_no]);

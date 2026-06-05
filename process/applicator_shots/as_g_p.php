@@ -48,80 +48,78 @@ if ($method == 'get_recent_applicator_shots') {
                                 END
                             ) 
                     END AS elapsed_time,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_U') AS SHOTCNT_U,
+                    m.SHOTCNT_U,
                     s.shotcnt_u_limit_ee,
                     s.shotcnt_u_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_ee 
+                        WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_ee 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_u_ee_status,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_qa 
+                        WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_u_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_D') AS SHOTCNT_D,
+                    m.SHOTCNT_D,
                     s.shotcnt_d_limit_ee,
                     s.shotcnt_d_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_ee 
+                        WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_ee 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_d_ee_status,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_qa 
+                        WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_d_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS SHOTCNT_I_U,
+                    m.SHOTCNT_I_U,
                     s.shotcnt_i_u_limit_ee,
                     s.shotcnt_i_u_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_ee 
+                        WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_ee 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_i_u_ee_status,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_qa 
+                        WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_i_u_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS SHOTCNT_I_D,
+                    m.SHOTCNT_I_D,
                     s.shotcnt_i_d_limit_ee,
                     s.shotcnt_i_d_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_ee 
+                        WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_ee 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_i_d_ee_status,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_qa 
+                        WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_i_d_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_C') AS SHOTCNT_C,
+                    m.SHOTCNT_C,
                     s.shotcnt_c_limit_ee,
                     s.shotcnt_c_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_ee 
+                        WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_ee 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_c_ee_status,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_qa 
+                        WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_c_qa_status,
-                    JSON_VALUE(j.[value], '$.C_SISKSNUSER') AS C_SISKSNUSER
-                FROM t_applicator_shots_temp m
-                CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j
+                    m.C_SISKSNUSER 
+                FROM v_m_apri_ccis_data m 
                 LEFT JOIN t_applicator_list l 
-                    ON JSON_VALUE(j.[value], '$.APPLICATOR_NO') = l.[applicator_no]
+                    ON m.APPLICATOR_NO = l.[applicator_no]
                 LEFT JOIN t_applicator_shots s 
-                    ON JSON_VALUE(j.[value], '$.APPLICATOR_NO') = s.[applicator_no]
+                    ON m.APPLICATOR_NO = s.[applicator_no]
                 WHERE 
-                    m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp) AND 
                     l.applicator_no IS NOT NULL
             )
 
@@ -315,52 +313,51 @@ if ($method == 'get_recent_applicator_shots_mc') {
 							END
 						) 
 				END AS elapsed_time,
-                JSON_VALUE(j.[value], '$.SHOTCNT_U') AS SHOTCNT_U,
+                m.SHOTCNT_U,
                 s.shotcnt_u_limit_ee,
                 CASE 
-                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_ee 
+                    WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_ee 
                     THEN 'Exceeded' 
                     ELSE 'Good' 
                 END AS shotcnt_u_ee_status,
-                JSON_VALUE(j.[value], '$.SHOTCNT_D') AS SHOTCNT_D,
+                m.SHOTCNT_D,
                 s.shotcnt_d_limit_ee,
                 CASE 
-                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_ee 
+                    WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_ee 
                     THEN 'Exceeded' 
                     ELSE 'Good' 
                 END AS shotcnt_d_ee_status,
-                JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS SHOTCNT_I_U,
+                m.SHOTCNT_I_U,
                 s.shotcnt_i_u_limit_ee,
                 CASE 
-                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_ee 
+                    WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_ee 
                     THEN 'Exceeded' 
                     ELSE 'Good' 
                 END AS shotcnt_i_u_ee_status,
-                JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS SHOTCNT_I_D,
+                m.SHOTCNT_I_D,
                 s.shotcnt_i_d_limit_ee,
                 CASE 
-                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_ee 
+                    WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_ee 
                     THEN 'Exceeded' 
                     ELSE 'Good' 
                 END AS shotcnt_i_d_ee_status,
-                JSON_VALUE(j.[value], '$.SHOTCNT_C') AS SHOTCNT_C,
+                m.SHOTCNT_C,
                 s.shotcnt_c_limit_ee,
                 CASE 
-                    WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_ee 
+                    WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_ee 
                     THEN 'Exceeded' 
                     ELSE 'Good' 
                 END AS shotcnt_c_ee_status,
-                JSON_VALUE(j.[value], '$.C_SISKSNUSER') AS C_SISKSNUSER 
+                m.C_SISKSNUSER 
             FROM t_applicator_shots_mc asmc 
-            LEFT JOIN t_applicator_shots_temp m 
-                CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j 
-                ON asmc.applicator_no = JSON_VALUE(j.[value], '$.APPLICATOR_NO') 
+            LEFT JOIN v_m_apri_ccis_data m 
+                ON asmc.applicator_no = m.APPLICATOR_NO 
             LEFT JOIN t_applicator_shots s 
                 ON asmc.applicator_no = s.applicator_no 
             LEFT JOIN t_applicator_list al 
                 ON asmc.applicator_no = al.applicator_no 
 			WHERE 
-                m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp)";
+                asmc.applicator_no IS NOT NULL";
 
     $params = [];
 
@@ -463,50 +460,48 @@ if ($method == 'get_recent_applicator_shots_qa') {
                                 END
                             ) 
                     END AS elapsed_time,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_U') AS SHOTCNT_U,
+                    m.SHOTCNT_U,
                     s.shotcnt_u_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_qa 
+                        WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_u_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_D') AS SHOTCNT_D,
+                    m.SHOTCNT_D,
                     s.shotcnt_d_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_qa 
+                        WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_d_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS SHOTCNT_I_U,
+                    m.SHOTCNT_I_U,
                     s.shotcnt_i_u_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_qa 
+                        WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_i_u_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS SHOTCNT_I_D,
+                    m.SHOTCNT_I_D,
                     s.shotcnt_i_d_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_qa 
+                        WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_i_d_qa_status,
-                    JSON_VALUE(j.[value], '$.SHOTCNT_C') AS SHOTCNT_C,
+                    m.SHOTCNT_C,
                     s.shotcnt_c_limit_qa,
                     CASE 
-                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_qa 
+                        WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_qa 
                         THEN 'Exceeded' 
                         ELSE 'Good' 
                     END AS shotcnt_c_qa_status,
-                    JSON_VALUE(j.[value], '$.C_SISKSNUSER') AS C_SISKSNUSER
-                FROM t_applicator_shots_temp m
-                CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j
+                    m.C_SISKSNUSER 
+                FROM v_m_apri_ccis_data m 
                 LEFT JOIN t_applicator_list l 
-                    ON JSON_VALUE(j.[value], '$.APPLICATOR_NO') = l.[applicator_no]
+                    ON m.APPLICATOR_NO = l.[applicator_no]
                 LEFT JOIN t_applicator_shots s 
-                    ON JSON_VALUE(j.[value], '$.APPLICATOR_NO') = s.[applicator_no]
+                    ON m.APPLICATOR_NO = s.[applicator_no]
                 WHERE 
-                    m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp) AND 
                     l.applicator_no IS NOT NULL
             )
 
