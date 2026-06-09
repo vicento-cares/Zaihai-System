@@ -218,37 +218,35 @@ if ($method == 'in_applicator') {
                         // Gathered CCIS Data Checking Applicator Shot Count
                         $sql = "SELECT 
                                     CASE 
-                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_U') AS INT) >= s.shotcnt_u_limit_ee 
+                                        WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_ee 
                                         THEN 'Exceeded' 
                                         ELSE 'Good' 
                                     END AS shotcnt_u_ee_status,
                                     CASE 
-                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_D') AS INT) >= s.shotcnt_d_limit_ee 
+                                        WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_ee 
                                         THEN 'Exceeded' 
                                         ELSE 'Good' 
                                     END AS shotcnt_d_ee_status,
                                     CASE 
-                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_U') AS INT) >= s.shotcnt_i_u_limit_ee 
+                                        WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_ee 
                                         THEN 'Exceeded' 
                                         ELSE 'Good' 
                                     END AS shotcnt_i_u_ee_status,
                                     CASE 
-                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_I_D') AS INT) >= s.shotcnt_i_d_limit_ee 
+                                        WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_ee 
                                         THEN 'Exceeded' 
                                         ELSE 'Good' 
                                     END AS shotcnt_i_d_ee_status,
                                     CASE 
-                                        WHEN CAST(JSON_VALUE(j.[value], '$.SHOTCNT_C') AS INT) >= s.shotcnt_c_limit_ee 
+                                        WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_ee 
                                         THEN 'Exceeded' 
                                         ELSE 'Good' 
                                     END AS shotcnt_c_ee_status,
-                                    JSON_VALUE(j.[value], '$.UNUSABLE') AS UNUSABLE 
-                                FROM t_applicator_shots_temp m 
-                                CROSS APPLY OPENJSON(m.[applicator_shot_json]) AS j 
-                                LEFT JOIN t_applicator_shots s 
-                                ON JSON_VALUE(j.[value], '$.APPLICATOR_NO') = s.[applicator_no] 
+                                    m.UNUSABLE 
+                                FROM v_m_apri_ccis_data m 
+                                INNER JOIN t_applicator_shots s 
+                                ON m.APPLICATOR_NO = s.applicator_no 
                                 WHERE 
-                                    m.[id] = (SELECT MAX([id]) FROM t_applicator_shots_temp) AND 
                                     s.applicator_no = ?";
 
                         $stmt = $conn->prepare($sql);
@@ -271,7 +269,7 @@ if ($method == 'in_applicator') {
                                 $shotcnt_i_u_ee_status == 'Exceeded' || 
                                 $shotcnt_i_d_ee_status == 'Exceeded' || 
                                 $shotcnt_c_ee_status == 'Exceeded' || 
-                                $applicator_unusable = 1
+                                $applicator_unusable == 1
                             ) {
                                 $error_status = 1;
                                 $message = 'Applicator Shot Count Exceeded';
