@@ -31,8 +31,6 @@ if ($method == 'log_applicator_maintenance') {
 						s.shotcnt_u_limit_ee = CASE 
 							WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_ee 
 							THEN CASE 
-								WHEN CAST(m.SHOTCNT_U AS INT) < 50000 
-									THEN 100000
 								WHEN CAST(m.SHOTCNT_U AS INT) < 100000 
 									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 100000.0) * 100000
@@ -42,8 +40,6 @@ if ($method == 'log_applicator_maintenance') {
 						s.shotcnt_d_limit_ee = CASE 
 							WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_ee 
 							THEN CASE 
-								WHEN CAST(m.SHOTCNT_D AS INT) < 50000 
-									THEN 100000
 								WHEN CAST(m.SHOTCNT_D AS INT) < 100000 
 									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 100000.0) * 100000
@@ -53,8 +49,6 @@ if ($method == 'log_applicator_maintenance') {
 						s.shotcnt_i_u_limit_ee = CASE 
 							WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_ee 
 							THEN CASE 
-								WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 
-									THEN 100000
 								WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 
 									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 100000.0) * 100000
@@ -64,8 +58,6 @@ if ($method == 'log_applicator_maintenance') {
 						s.shotcnt_i_d_limit_ee = CASE 
 							WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_ee 
 							THEN CASE 
-								WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 
-									THEN 100000
 								WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 
 									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 100000.0) * 100000
@@ -75,8 +67,6 @@ if ($method == 'log_applicator_maintenance') {
 						s.shotcnt_c_limit_ee = CASE 
 							WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_ee 
 							THEN CASE 
-								WHEN CAST(m.SHOTCNT_C AS INT) < 50000 
-									THEN 100000
 								WHEN CAST(m.SHOTCNT_C AS INT) < 100000 
 									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 100000.0) * 100000
@@ -137,8 +127,6 @@ if ($method == 'log_applicator_appearance') {
 							THEN CASE 
 								WHEN CAST(m.SHOTCNT_U AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(m.SHOTCNT_U AS INT) < 100000 
-									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_u_limit_qa 
@@ -148,8 +136,6 @@ if ($method == 'log_applicator_appearance') {
 							THEN CASE 
 								WHEN CAST(m.SHOTCNT_D AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(m.SHOTCNT_D AS INT) < 100000 
-									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_d_limit_qa 
@@ -159,8 +145,6 @@ if ($method == 'log_applicator_appearance') {
 							THEN CASE 
 								WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 
-									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_i_u_limit_qa 
@@ -170,8 +154,6 @@ if ($method == 'log_applicator_appearance') {
 							THEN CASE 
 								WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 
-									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_i_d_limit_qa 
@@ -181,8 +163,6 @@ if ($method == 'log_applicator_appearance') {
 							THEN CASE 
 								WHEN CAST(m.SHOTCNT_C AS INT) < 50000 
 									THEN 50000
-								WHEN CAST(m.SHOTCNT_C AS INT) < 100000 
-									THEN 100000
 								ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 50000.0) * 50000
 							END
 							ELSE s.shotcnt_c_limit_qa 
