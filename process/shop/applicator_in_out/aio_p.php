@@ -326,6 +326,7 @@ if ($method == 'in_applicator') {
     $message = '';
     $error_status = 0;
     $error_log_arr = [];
+    $shot_exceeded = 0;
 
     if (empty($location_before)) {
         $message = 'Please Select Borrowed By or Remarks';
@@ -371,6 +372,102 @@ if ($method == 'in_applicator') {
                     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
                     if ($row && $location_before == $row['trd_no']) {
+                        $id = $row['id']; // will be use on updating t_applicator_in_out
+
+                        // Gathered CCIS Data Checking Applicator Shot Count
+                        $sql = "SELECT 
+                                    CASE 
+                                        WHEN CAST(m.SHOTCNT_U AS INT) >= s.shotcnt_u_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_u_ee_status,
+                                    CASE 
+                                        WHEN CAST(m.SHOTCNT_D AS INT) >= s.shotcnt_d_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_d_ee_status,
+                                    CASE 
+                                        WHEN CAST(m.SHOTCNT_I_U AS INT) >= s.shotcnt_i_u_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_i_u_ee_status,
+                                    CASE 
+                                        WHEN CAST(m.SHOTCNT_I_D AS INT) >= s.shotcnt_i_d_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_i_d_ee_status,
+                                    CASE 
+                                        WHEN CAST(m.SHOTCNT_C AS INT) >= s.shotcnt_c_limit_ee 
+                                        THEN 'Exceeded' 
+                                        ELSE 'Good' 
+                                    END AS shotcnt_c_ee_status,
+                                    m.UNUSABLE 
+                                FROM v_m_apri_ccis_data m 
+                                INNER JOIN t_applicator_shots s 
+                                ON m.APPLICATOR_NO = s.applicator_no 
+                                WHERE 
+                                    s.applicator_no = ?";
+
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute([$applicator_no]);
+
+                        $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+                        if ($row) {
+                            $shotcnt_u_ee_status = $row['shotcnt_u_ee_status'];
+                            $shotcnt_d_ee_status = $row['shotcnt_d_ee_status'];
+                            $shotcnt_i_u_ee_status = $row['shotcnt_i_u_ee_status'];
+                            $shotcnt_i_d_ee_status = $row['shotcnt_i_d_ee_status'];
+                            $shotcnt_c_ee_status = $row['shotcnt_c_ee_status'];
+                            $applicator_unusable = intval($row['UNUSABLE']);
+
+                            // for every additional 100k shots, applicator out cannot proceed. technician must maintenance and fill out date maintenanced and pic
+                            if (
+                                $shotcnt_u_ee_status == 'Exceeded' || 
+                                $shotcnt_d_ee_status == 'Exceeded' || 
+                                $shotcnt_i_u_ee_status == 'Exceeded' || 
+                                $shotcnt_i_d_ee_status == 'Exceeded' || 
+                                $shotcnt_c_ee_status == 'Exceeded' || 
+                                $applicator_unusable == 1
+                            ) {
+                                // Temporary Condition Block for Trial
+                                if ($car_maker == 'Honda' && $car_model == 'TKRA') {
+                                    $shot_exceeded = 1;
+
+                                    $message = 'Applicator Shot Count Exceeded';
+
+                                    $sql = "IF NOT EXISTS (
+                                                SELECT 1 FROM t_applicator_shots_mc 
+                                                WHERE applicator_no = ? 
+                                            )
+                                            BEGIN
+                                                INSERT INTO t_applicator_shots_mc (applicator_no, detected_by) 
+                                                VALUES (?, ?);
+                                            END";
+                                    $stmt = $conn -> prepare($sql);
+                                    $stmt -> execute([$applicator_no, $applicator_no, $operator_in]);
+
+                                    $error_log_arr = [
+                                        'error_status' => 1,
+                                        'error_name' => $message,
+                                        'serial_no' => $serial_no,
+                                        'scanned_applicator_no' => $applicator_no,
+                                        'scanned_terminal_name' => $terminal_name,
+                                        'scanned_trd_no' => $location_before,
+                                        'scanned_by_no' => $operator_in,
+                                        'interface' => 'Shop Applicator In',
+                                        'zaihai_car_maker' => $car_maker,
+                                        'zaihai_car_model' => $car_model,
+                                        'ip' => $ip
+                                    ];
+                            
+                                    insert_error_log($error_log_arr, $conn);
+
+                                    $message .= '! ';
+                                }
+                            }
+                        }
+
                         $isTransactionActive = false;
                         
                         try {
@@ -378,8 +475,6 @@ if ($method == 'in_applicator') {
                                 $conn->beginTransaction();
                                 $isTransactionActive = true;
                             }
-                        
-                            $id = $row['id'];
                         
                             $sql = "UPDATE t_applicator_in_out 
                                     SET zaihai_stock_address = ?, operator_in = ?, date_time_in = ?
@@ -427,7 +522,7 @@ if ($method == 'in_applicator') {
                             // Commit the transaction
                             $conn->commit();
                             $isTransactionActive = false;
-                            $message = 'success';
+                            $message .= 'Pending Applicator In Succesfully!!!';
                         } catch (Exception $e) {
                             if ($isTransactionActive) {
                                 $conn->rollBack();
@@ -496,7 +591,7 @@ if ($method == 'in_applicator') {
         }
     }
 
-    if ($message != 'success') {
+    if ($message != 'Pending Applicator In Succesfully!!!' && $shot_exceeded == 0) {
         $error_log_arr = [
             'error_status' => $error_status,
             'error_name' => $message,
