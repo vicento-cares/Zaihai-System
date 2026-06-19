@@ -55,7 +55,11 @@ function get_applicator_list_status($applicator_no, $conn) {
     $params = array($applicator_no);
     $stmt->execute($params);
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
-    return $row['status'];
+    if ($row) {
+        return $row['status'];
+    } else {
+        return '';
+    }
 }
 
 // Remove UTF-8 BOM

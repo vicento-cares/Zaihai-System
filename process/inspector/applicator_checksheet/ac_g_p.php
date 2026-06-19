@@ -18,7 +18,7 @@ if ($method == 'get_recent_applicator_in_pending') {
     $car_model = '';
 
     if (isset($_GET['page']) && $_GET['page'] == 'shop') {
-        if (isset($_SESSION['car_maker']) || isset($_SESSION['car_model']) || isset($_SESSION['role'])) {
+        if (isset($_SESSION['car_maker']) && isset($_SESSION['car_model']) && isset($_SESSION['role'])) {
             $car_maker = $_SESSION['car_maker'];
             $car_model = $_SESSION['car_model'];
             $role = $_SESSION['role'];

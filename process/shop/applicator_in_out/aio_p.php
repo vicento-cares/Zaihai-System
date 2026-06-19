@@ -78,10 +78,12 @@ if ($method == 'out_applicator') {
     $car_model = '';
     $serial_no = '';
 
-    if (isset($_SESSION['car_maker']) || isset($_SESSION['car_model']) || isset($_SESSION['emp_no'])) {
+    if (isset($_SESSION['car_maker']) && isset($_SESSION['car_model']) && isset($_SESSION['emp_no'])) {
         $operator_out = $_SESSION['emp_no'];
         $car_maker = $_SESSION['car_maker'];
         $car_model = $_SESSION['car_model'];
+    } else {
+        $message = 'Session was expired. Please Re-Login your account.';
     }
 
     $message = '';
@@ -317,10 +319,12 @@ if ($method == 'in_applicator') {
     $car_model = '';
     $serial_no = '';
 
-    if (isset($_SESSION['car_maker']) || isset($_SESSION['car_model']) || isset($_SESSION['emp_no'])) {
+    if (isset($_SESSION['car_maker']) && isset($_SESSION['car_model']) && isset($_SESSION['emp_no'])) {
         $operator_in = $_SESSION['emp_no'];
         $car_maker = $_SESSION['car_maker'];
         $car_model = $_SESSION['car_model'];
+    } else {
+        $message = 'Session was expired. Please Re-Login your account.';
     }
 
     $message = '';

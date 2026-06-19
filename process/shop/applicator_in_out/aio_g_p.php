@@ -370,13 +370,13 @@ if ($method == 'get_recent_applicator_out') {
             $car_model = $_SESSION['car_model'];
         }
     } else {
-        $car_maker = addslashes($_GET['car_maker']);
-        $car_model = addslashes($_GET['car_model']);
+        $car_maker = $_GET['car_maker'];
+        $car_model = $_GET['car_model'];
     }
 
-    $applicator_no = addslashes($_GET['applicator_no']);
-    $terminal_name = addslashes($_GET['terminal_name']);
-    $location = addslashes($_GET['location']);
+    $applicator_no = $_GET['applicator_no'];
+    $terminal_name = $_GET['terminal_name'];
+    $location = $_GET['location'];
 
     $c = 0;
 
@@ -390,25 +390,32 @@ if ($method == 'get_recent_applicator_out') {
             FROM t_applicator_in_out aio
             LEFT JOIN m_applicator a ON aio.applicator_no = a.applicator_no
             WHERE aio.zaihai_stock_address IS NULL AND aio.date_time_in IS NULL";
+    $params = [];
+
     if (!empty($car_maker)) {
-        $sql .= " AND a.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND a.car_model='$car_model'";
+        $sql .= " AND a.car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND aio.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND aio.applicator_no LIKE ?";
+        $params[] = '%' . $applicator_no . '%';
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND aio.terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND aio.terminal_name LIKE ?";
+        $params[] = '%' . $terminal_name . '%';
     }
     if (!empty($location)) {
-        $sql .= " AND aio.trd_no LIKE '%$location%'";
+        $sql .= " AND aio.trd_no LIKE ?";
+        $params[] = '%' . $location . '%';
     }
     $sql .= " ORDER BY aio.date_time_out ASC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
         $c++;
@@ -531,13 +538,13 @@ if ($method == 'get_recent_applicator_in') {
             $car_model = $_SESSION['car_model'];
         }
     } else {
-        $car_maker = addslashes($_GET['car_maker']);
-        $car_model = addslashes($_GET['car_model']);
+        $car_maker = $_GET['car_maker'];
+        $car_model = $_GET['car_model'];
     }
     
-    $applicator_no = addslashes($_GET['applicator_no']);
-    $terminal_name = addslashes($_GET['terminal_name']);
-    $location = addslashes($_GET['location']);
+    $applicator_no = $_GET['applicator_no'];
+    $terminal_name = $_GET['terminal_name'];
+    $location = $_GET['location'];
 
     $c = 0;
 
@@ -562,27 +569,33 @@ if ($method == 'get_recent_applicator_in') {
             AND t1.date_time_in = t2.max_date_time_in
             LEFT JOIN m_applicator a ON t1.applicator_no = a.applicator_no
             WHERE t1.zaihai_stock_address IS NOT NULL AND t1.date_time_in IS NOT NULL";
+    $params = [];
 
     if (!empty($car_maker)) {
-        $sql .= " AND a.car_maker='$car_maker'";
+        $sql .= " AND a.car_maker = ?";
+        $params[] = $car_maker;
     }
     if (!empty($car_model)) {
-        $sql .= " AND a.car_model='$car_model'";
+        $sql .= " AND a.car_model = ?";
+        $params[] = $car_model;
     }
     if (!empty($applicator_no)) {
-        $sql .= " AND t1.applicator_no LIKE '%$applicator_no%'";
+        $sql .= " AND t1.applicator_no LIKE ?";
+        $params[] = '%' . $applicator_no . '%';
     }
     if (!empty($terminal_name)) {
-        $sql .= " AND t1.terminal_name LIKE '%$terminal_name%'";
+        $sql .= " AND t1.terminal_name LIKE ?";
+        $params[] = '%' . $terminal_name . '%';
     }
     if (!empty($location)) {
-        $sql .= " AND t1.trd_no LIKE '%$location%'";
+        $sql .= " AND t1.trd_no LIKE ?";
+        $params[] = '%' . $location . '%';
     }
 
     $sql .= " ORDER BY t1.date_time_in ASC";
 
     $stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute($params);
 
     while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
         $c++;
