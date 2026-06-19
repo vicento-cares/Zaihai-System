@@ -3,6 +3,9 @@ session_set_cookie_params(0, "/zaihai");
 session_name("zaihai");
 session_start();
 
+require '../../conn.php';
+include '../../lib/main.php';
+
 function out_applicator($conn, $out_applicator_arr) {
     $serial_no = str_replace('.', '', uniqid('MEI-295-AC-', true));
 
@@ -60,9 +63,6 @@ function out_applicator($conn, $out_applicator_arr) {
         exit();
     }
 }
-
-require '../../conn.php';
-include '../../lib/main.php';
 
 // REMOTE IP ADDRESS
 $ip = $_SERVER['REMOTE_ADDR'];
@@ -303,7 +303,13 @@ if ($method == 'out_applicator') {
             'ip' => $ip
         ];
 
-        insert_error_log($error_log_arr, $conn);
+        $error_code = insert_error_log($error_log_arr, $conn);
+
+        if (strpos($error_code, "ME") !== false) {
+            $message .= '! Call ME Initial for assistance';
+        } else if (strpos($error_code, "EE") !== false) {
+            $message .= '! Inform EE Initial for assistance';
+        }
     }
 
     echo $message;
@@ -610,7 +616,13 @@ if ($method == 'in_applicator') {
             'ip' => $ip
         ];
 
-        insert_error_log($error_log_arr, $conn);
+        $error_code = insert_error_log($error_log_arr, $conn);
+
+        if (strpos($error_code, "ME") !== false) {
+            $message .= '! Call ME Initial for assistance';
+        } else if (strpos($error_code, "EE") !== false) {
+            $message .= '! Inform EE Initial for assistance';
+        }
     }
 
     echo $message;

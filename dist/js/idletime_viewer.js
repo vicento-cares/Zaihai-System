@@ -37,14 +37,14 @@ const timerIncrement = () => {
         // Applicator In Interval
         clearInterval(realtime_get_recent_applicator_in);
         break;
-      case "/zaihai/viewer/applicator_err_mon.php":
-        // Applicator Out Interval
-        clearInterval(realtime_get_recent_applicator_err_mon);
-        break;
+      // case "/zaihai/viewer/applicator_err_mon.php":
+      //   // Applicator Out Interval
+      //   clearInterval(realtime_get_recent_applicator_err_mon);
+      //   break;
       default:
     }
 
-    if (url_path != "/zaihai/viewer/dashboard.php" && url_path != "/zaihai/viewer/applicator_history.php" && url_path != "/zaihai/viewer/applicator_pd_verification.php" && url_path != "/zaihai/viewer/applicator_list.php" && url_path != "/zaihai/viewer/applicator_shots.php") {
+    if (url_path != "/zaihai/viewer/dashboard.php" && url_path != "/zaihai/viewer/applicator_history.php" && url_path != "/zaihai/viewer/applicator_pd_verification.php" && url_path != "/zaihai/viewer/applicator_list.php" && url_path != "/zaihai/viewer/applicator_shots.php" && url_path != "/zaihai/viewer/applicator_err_mon.php") {
       window.location.href = '../index.php';
     }
   }

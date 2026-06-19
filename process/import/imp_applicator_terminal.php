@@ -2,7 +2,6 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -21,7 +20,7 @@ function check_csv ($file, $conn) {
     $dup_temp_arr = array();
 
     $message = "";
-    $check_csv_row = 0;
+    $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
@@ -108,121 +107,120 @@ $csvMimes = array(
     'text/plain'
 );
 
-if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMimes)) {
+if (empty($_FILES['file']['name']) || !in_array($_FILES['file']['type'], $csvMimes)) {
+    exit('INVALID FILE FORMAT!');
+}
 
-    if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+if (!is_uploaded_file($_FILES['file']['tmp_name'])) {
+    exit('CSV FILE NOT UPLOADED!');
+}
 
-        $chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
+require '../conn.php';
 
-        if ($chkCsvMsg == '') {
+$chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
 
-            //READ FILE
-            $csvFile = fopen($_FILES['file']['tmp_name'],'r');
+if ($chkCsvMsg != '') {
+    $conn = null;
+    exit($chkCsvMsg);
+}
 
-            // SKIP FIRST LINE (HEADER)
-            fgets($csvFile);
+//READ FILE
+$csvFile = fopen($_FILES['file']['tmp_name'],'r');
 
-            // PARSE
-            $error = 0;
+// SKIP FIRST LINE (HEADER)
+fgets($csvFile);
 
-            $isTransactionActive = false;
-            $chunkSize = 250; // Set your desired chunk size
+// PARSE
+$error = 0;
 
-            try {
-                if (!$isTransactionActive) {
-                    $conn->beginTransaction();
-                    $isTransactionActive = true;
-                }
+$isTransactionActive = false;
+$chunkSize = 250; // Set your desired chunk size
 
-                $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) VALUES ";
-                $values = [];
-                $placeholders = [];
-
-                while (($line = fgetcsv($csvFile)) !== false) {
-                    // Check if the row is blank or consists only of whitespace
-                    if (empty(implode('', $line))) {
-                        continue; // Skip blank lines
-                    }
-
-                    $applicator_no = $line[0];
-                    $terminal_name = $line[1];
-
-                    // Create a temporary array for the current row
-                    $currentValues = [
-                        $applicator_no,
-                        $terminal_name
-                    ];
-
-                    // Create placeholders for each row
-                    $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
-                    $placeholders[] = "($generated_placeholders)";
-
-                    // Add current values to the main values array
-                    $values = array_merge($values, $currentValues);
-
-                    // Check if we reached the chunk size
-                    if (count($placeholders) === $chunkSize) {
-                        // Combine the SQL statement with the placeholders
-                        $sql .= implode(', ', $placeholders);
-                        
-                        // Prepare the statement
-                        $stmt = $conn->prepare($sql);
-                        
-                        // Execute the statement with the values
-                        if (!$stmt->execute($values)) {
-                            $error++;
-                        }
-
-                        // Reset for the next chunk
-                        $placeholders = [];
-                        $values = [];
-                        $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) VALUES ";
-                    }
-                }
-
-                // Insert any remaining rows that didn't fill a complete chunk
-                if (!empty($placeholders)) {
-                    $sql .= implode(', ', $placeholders);
-                    $stmt = $conn->prepare($sql);
-                    if (!$stmt->execute($values)) {
-                        $error++;
-                    }
-                }
-
-                if ($error > 0) {
-                    if ($isTransactionActive) {
-                        $conn->rollBack();
-                        $isTransactionActive = false;
-                    }
-                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
-                    exit();
-                }
-
-                $conn->commit();
-                $isTransactionActive = false;
-            } catch (Exception $e) {
-                if ($isTransactionActive) {
-                    $conn->rollBack();
-                    $isTransactionActive = false;
-                }
-                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-                exit();
-            }
-            
-            fclose($csvFile);
-
-            if ($error > 0) {
-                echo 'error ' . $error;
-            }
-
-        } else {
-            echo $chkCsvMsg; 
-        }
-    } else {
-        echo 'CSV FILE NOT UPLOADED!';
+try {
+    if (!$isTransactionActive) {
+        $conn->beginTransaction();
+        $isTransactionActive = true;
     }
-} else {
-    echo 'INVALID FILE FORMAT!';
+
+    $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) VALUES ";
+    $values = [];
+    $placeholders = [];
+
+    while (($line = fgetcsv($csvFile)) !== false) {
+        // Check if the row is blank or consists only of whitespace
+        if (empty(implode('', $line))) {
+            continue; // Skip blank lines
+        }
+
+        $applicator_no = $line[0];
+        $terminal_name = $line[1];
+
+        // Create a temporary array for the current row
+        $currentValues = [
+            $applicator_no,
+            $terminal_name
+        ];
+
+        // Create placeholders for each row
+        $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
+        $placeholders[] = "($generated_placeholders)";
+
+        // Add current values to the main values array
+        $values = array_merge($values, $currentValues);
+
+        // Check if we reached the chunk size
+        if (count($placeholders) === $chunkSize) {
+            // Combine the SQL statement with the placeholders
+            $sql .= implode(', ', $placeholders);
+            
+            // Prepare the statement
+            $stmt = $conn->prepare($sql);
+            
+            // Execute the statement with the values
+            if (!$stmt->execute($values)) {
+                $error++;
+            }
+
+            // Reset for the next chunk
+            $placeholders = [];
+            $values = [];
+            $sql = "INSERT INTO m_applicator_terminal (applicator_no, terminal_name) VALUES ";
+        }
+    }
+
+    // Insert any remaining rows that didn't fill a complete chunk
+    if (!empty($placeholders)) {
+        $sql .= implode(', ', $placeholders);
+        $stmt = $conn->prepare($sql);
+        if (!$stmt->execute($values)) {
+            $error++;
+        }
+    }
+
+    if ($error > 0) {
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
+        echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+        exit();
+    }
+
+    $conn->commit();
+    $isTransactionActive = false;
+} catch (Exception $e) {
+    if ($isTransactionActive) {
+        $conn->rollBack();
+        $isTransactionActive = false;
+    }
+    echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+    exit();
+}
+
+fclose($csvFile);
+
+if ($error > 0) {
+    echo 'error ' . $error;
 }
 
 // KILL CONNECTION

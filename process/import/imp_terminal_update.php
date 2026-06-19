@@ -2,7 +2,6 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -25,7 +24,7 @@ function check_csv ($file, $conn) {
     $notExiststTerminalArr = array();
 
     $message = "";
-    $check_csv_row = 0;
+    $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
@@ -153,110 +152,109 @@ $csvMimes = array(
     'text/plain'
 );
 
-if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMimes)) {
+if (empty($_FILES['file']['name']) || !in_array($_FILES['file']['type'], $csvMimes)) {
+    exit('INVALID FILE FORMAT!');
+}
 
-    if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+if (!is_uploaded_file($_FILES['file']['tmp_name'])) {
+    exit('CSV FILE NOT UPLOADED!');
+}
 
-        $chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
+require '../conn.php';
 
-        if ($chkCsvMsg == '') {
+$chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
 
-            //READ FILE
-            $csvFile = fopen($_FILES['file']['tmp_name'],'r');
+if ($chkCsvMsg != '') {
+    $conn = null;
+    exit($chkCsvMsg);
+}
 
-            // SKIP FIRST LINE (HEADER)
-            fgets($csvFile);
+//READ FILE
+$csvFile = fopen($_FILES['file']['tmp_name'],'r');
 
-            // PARSE
-            $error = 0;
+// SKIP FIRST LINE (HEADER)
+fgets($csvFile);
 
-            $isTransactionActive = false;
+// PARSE
+$error = 0;
 
-            try {
-                if (!$isTransactionActive) {
-                    $conn->beginTransaction();
-                    $isTransactionActive = true;
-                }
+$isTransactionActive = false;
 
-                while (($line = fgetcsv($csvFile)) !== false) {
-                    // Check if the row is blank or consists only of whitespace
-                    if (empty(implode('', $line))) {
-                        continue; // Skip blank lines
-                    }
-
-                    $car_maker = $line[0];
-                    $car_model = $line[1];
-                    $terminal_name = $line[2];
-                    $line_address = $line[3];
-                    $car_maker_new = $line[4];
-                    $car_model_new = $line[5];
-                    $terminal_name_new = $line[6];
-                    $line_address_new = $line[7];
-
-                    if (empty($car_maker_new) && empty($car_model_new) 
-                        && empty($terminal_name_new) && empty($line_address_new)) {
-                        continue; // Skip blank lines
-                    }
-                    if (empty($car_maker_new)) {
-                        $car_maker_new = $car_maker;
-                    }
-                    if (empty($car_model_new)) {
-                        $car_model_new = $car_model;
-                    }
-                    if (empty($terminal_name_new)) {
-                        $terminal_name_new = $terminal_name;
-                    }
-                    if (empty($line_address_new)) {
-                        $line_address_new = $line_address;
-                    }
-
-                    $sql = "UPDATE m_terminal 
-                            SET car_maker = ?, car_model = ?, 
-                            terminal_name = ?, line_address = ?
-                            WHERE line_address = ?";
-
-                    $stmt = $conn->prepare($sql);
-                    $params = array($car_maker_new, $car_model_new, 
-                                    $terminal_name_new, $line_address_new, $line_address);
-                    if (!$stmt->execute($params)) {
-                        $error++;
-                    }
-                }
-
-                if ($error > 0) {
-                    if ($isTransactionActive) {
-                        $conn->rollBack();
-                        $isTransactionActive = false;
-                    }
-                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
-                    exit();
-                }
-
-                $conn->commit();
-                $isTransactionActive = false;
-            } catch (Exception $e) {
-                if ($isTransactionActive) {
-                    $conn->rollBack();
-                    $isTransactionActive = false;
-                }
-                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-                exit();
-            }
-            
-            fclose($csvFile);
-
-            if ($error > 0) {
-                echo 'error ' . $error;
-            }
-
-        } else {
-            echo $chkCsvMsg; 
-        }
-    } else {
-        echo 'CSV FILE NOT UPLOADED!';
+try {
+    if (!$isTransactionActive) {
+        $conn->beginTransaction();
+        $isTransactionActive = true;
     }
-} else {
-    echo 'INVALID FILE FORMAT!';
+
+    while (($line = fgetcsv($csvFile)) !== false) {
+        // Check if the row is blank or consists only of whitespace
+        if (empty(implode('', $line))) {
+            continue; // Skip blank lines
+        }
+
+        $car_maker = $line[0];
+        $car_model = $line[1];
+        $terminal_name = $line[2];
+        $line_address = $line[3];
+        $car_maker_new = $line[4];
+        $car_model_new = $line[5];
+        $terminal_name_new = $line[6];
+        $line_address_new = $line[7];
+
+        if (empty($car_maker_new) && empty($car_model_new) 
+            && empty($terminal_name_new) && empty($line_address_new)) {
+            continue; // Skip blank lines
+        }
+        if (empty($car_maker_new)) {
+            $car_maker_new = $car_maker;
+        }
+        if (empty($car_model_new)) {
+            $car_model_new = $car_model;
+        }
+        if (empty($terminal_name_new)) {
+            $terminal_name_new = $terminal_name;
+        }
+        if (empty($line_address_new)) {
+            $line_address_new = $line_address;
+        }
+
+        $sql = "UPDATE m_terminal 
+                SET car_maker = ?, car_model = ?, 
+                terminal_name = ?, line_address = ?
+                WHERE line_address = ?";
+
+        $stmt = $conn->prepare($sql);
+        $params = array($car_maker_new, $car_model_new, 
+                        $terminal_name_new, $line_address_new, $line_address);
+        if (!$stmt->execute($params)) {
+            $error++;
+        }
+    }
+
+    if ($error > 0) {
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
+        echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+        exit();
+    }
+
+    $conn->commit();
+    $isTransactionActive = false;
+} catch (Exception $e) {
+    if ($isTransactionActive) {
+        $conn->rollBack();
+        $isTransactionActive = false;
+    }
+    echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+    exit();
+}
+
+fclose($csvFile);
+
+if ($error > 0) {
+    echo 'error ' . $error;
 }
 
 // KILL CONNECTION

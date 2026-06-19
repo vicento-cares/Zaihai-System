@@ -89,6 +89,7 @@ function insert_error_log($error_log_arr, $conn) {
     }
 
     $find_error_name = "Failed.";
+    $error_code = "";
     $error_name = "";
     $it_error_details = "";
 
@@ -141,4 +142,6 @@ function insert_error_log($error_log_arr, $conn) {
             exit();
         }
     }
+
+    return $error_code;
 }

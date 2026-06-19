@@ -2,7 +2,6 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -26,7 +25,7 @@ function check_csv ($file, $conn) {
     $readyToUseOnlyArr = array();
 
     $message = "";
-    $check_csv_row = 0;
+    $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
@@ -172,121 +171,134 @@ $csvMimes = array(
     'text/plain'
 );
 
-if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMimes)) {
+$csvMimes = array(
+    'text/x-comma-separated-values', 
+    'text/comma-separated-values', 
+    'application/octet-stream', 
+    'application/vnd.ms-excel', 
+    'application/x-csv', 
+    'text/x-csv', 
+    'text/csv', 
+    'application/csv', 
+    'application/excel', 
+    'application/vnd.msexcel', 
+    'text/plain'
+);
 
-    if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+if (empty($_FILES['file']['name']) || !in_array($_FILES['file']['type'], $csvMimes)) {
+    exit('INVALID FILE FORMAT!');
+}
 
-        $chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
+if (!is_uploaded_file($_FILES['file']['tmp_name'])) {
+    exit('CSV FILE NOT UPLOADED!');
+}
 
-        if ($chkCsvMsg == '') {
+require '../conn.php';
 
-            //READ FILE
-            $csvFile = fopen($_FILES['file']['tmp_name'],'r');
+$chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
 
-            // SKIP FIRST LINE (HEADER)
-            fgets($csvFile);
+if ($chkCsvMsg != '') {
+    $conn = null;
+    exit($chkCsvMsg);
+}
 
-            // PARSE
-            $error = 0;
+//READ FILE
+$csvFile = fopen($_FILES['file']['tmp_name'],'r');
 
-            $isTransactionActive = false;
+// SKIP FIRST LINE (HEADER)
+fgets($csvFile);
 
-            try {
-                if (!$isTransactionActive) {
-                    $conn->beginTransaction();
-                    $isTransactionActive = true;
-                }
+// PARSE
+$error = 0;
 
-                while (($line = fgetcsv($csvFile)) !== false) {
-                    // Check if the row is blank or consists only of whitespace
-                    if (empty(implode('', $line))) {
-                        continue; // Skip blank lines
-                    }
+$isTransactionActive = false;
 
-                    $car_maker = $line[0];
-                    $car_model = $line[1];
-                    $applicator_no = $line[2];
-                    $zaihai_stock_address = $line[3];
-                    $car_maker_new = $line[4];
-                    $car_model_new = $line[5];
-                    $applicator_no_new = $line[6];
-                    $zaihai_stock_address_new = $line[7];
-
-                    if (empty($car_maker_new) && empty($car_model_new) 
-                        && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
-                        continue; // Skip blank lines
-                    } else if (empty($car_maker_new)) {
-                        $car_maker_new = $car_maker;
-                    } else if (empty($car_model_new)) {
-                        $car_model_new = $car_model;
-                    } else if (empty($applicator_no_new)) {
-                        $applicator_no_new = $applicator_no;
-                    } else if (empty($zaihai_stock_address_new)) {
-                        $zaihai_stock_address_new = $zaihai_stock_address;
-                    }
-
-                    $query = "UPDATE t_applicator_list 
-                                SET car_maker = ?, car_model = ?, 
-                                applicator_no = ?, location = ?
-                                WHERE car_maker = ? AND car_model = ? 
-                                AND applicator_no = ? AND location = ?";
-
-                    $stmt = $conn->prepare($query);
-                    $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new,
-                                    $car_maker, $car_model, $applicator_no, $zaihai_stock_address);
-                    if ($stmt->execute($params)) {
-                        $stmt = NULL;
-
-                        $query = "UPDATE m_applicator 
-                                SET car_maker = ?, car_model = ?, 
-                                applicator_no = ?, zaihai_stock_address = ? 
-                                WHERE zaihai_stock_address = ?";
-
-                        $stmt = $conn->prepare($query);
-                        $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new, 
-                                        $zaihai_stock_address);
-                        if (!$stmt->execute($params)) {
-                            $error++;
-                        }
-                    } else {
-                        $error++;
-                    }
-                }
-
-                if ($error > 0) {
-                    if ($isTransactionActive) {
-                        $conn->rollBack();
-                        $isTransactionActive = false;
-                    }
-                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
-                    exit();
-                }
-
-                $conn->commit();
-                $isTransactionActive = false;
-            } catch (Exception $e) {
-                if ($isTransactionActive) {
-                    $conn->rollBack();
-                    $isTransactionActive = false;
-                }
-                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-                exit();
-            }
-            
-            fclose($csvFile);
-
-            if ($error > 0) {
-                echo 'error ' . $error;
-            }
-
-        } else {
-            echo $chkCsvMsg; 
-        }
-    } else {
-        echo 'CSV FILE NOT UPLOADED!';
+try {
+    if (!$isTransactionActive) {
+        $conn->beginTransaction();
+        $isTransactionActive = true;
     }
-} else {
-    echo 'INVALID FILE FORMAT!';
+
+    while (($line = fgetcsv($csvFile)) !== false) {
+        // Check if the row is blank or consists only of whitespace
+        if (empty(implode('', $line))) {
+            continue; // Skip blank lines
+        }
+
+        $car_maker = $line[0];
+        $car_model = $line[1];
+        $applicator_no = $line[2];
+        $zaihai_stock_address = $line[3];
+        $car_maker_new = $line[4];
+        $car_model_new = $line[5];
+        $applicator_no_new = $line[6];
+        $zaihai_stock_address_new = $line[7];
+
+        if (empty($car_maker_new) && empty($car_model_new) 
+            && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
+            continue; // Skip blank lines
+        } else if (empty($car_maker_new)) {
+            $car_maker_new = $car_maker;
+        } else if (empty($car_model_new)) {
+            $car_model_new = $car_model;
+        } else if (empty($applicator_no_new)) {
+            $applicator_no_new = $applicator_no;
+        } else if (empty($zaihai_stock_address_new)) {
+            $zaihai_stock_address_new = $zaihai_stock_address;
+        }
+
+        $query = "UPDATE t_applicator_list 
+                    SET car_maker = ?, car_model = ?, 
+                    applicator_no = ?, location = ?
+                    WHERE car_maker = ? AND car_model = ? 
+                    AND applicator_no = ? AND location = ?";
+
+        $stmt = $conn->prepare($query);
+        $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new,
+                        $car_maker, $car_model, $applicator_no, $zaihai_stock_address);
+        if ($stmt->execute($params)) {
+            $stmt = NULL;
+
+            $query = "UPDATE m_applicator 
+                    SET car_maker = ?, car_model = ?, 
+                    applicator_no = ?, zaihai_stock_address = ? 
+                    WHERE zaihai_stock_address = ?";
+
+            $stmt = $conn->prepare($query);
+            $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new, 
+                            $zaihai_stock_address);
+            if (!$stmt->execute($params)) {
+                $error++;
+            }
+        } else {
+            $error++;
+        }
+    }
+
+    if ($error > 0) {
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
+        echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+        exit();
+    }
+
+    $conn->commit();
+    $isTransactionActive = false;
+} catch (Exception $e) {
+    if ($isTransactionActive) {
+        $conn->rollBack();
+        $isTransactionActive = false;
+    }
+    echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+    exit();
+}
+
+fclose($csvFile);
+
+if ($error > 0) {
+    echo 'error ' . $error;
 }
 
 // KILL CONNECTION

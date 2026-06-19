@@ -2,7 +2,6 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -26,7 +25,7 @@ function check_csv ($file, $conn) {
     $readyToUseOnlyArr = array();
 
     $message = "";
-    $check_csv_row = 0;
+    $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
@@ -155,181 +154,253 @@ $csvMimes = array(
     'text/plain'
 );
 
-if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMimes)) {
+if (empty($_FILES['file']['name']) || !in_array($_FILES['file']['type'], $csvMimes)) {
+    exit('INVALID FILE FORMAT!');
+}
 
-    if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+if (!is_uploaded_file($_FILES['file']['tmp_name'])) {
+    exit('CSV FILE NOT UPLOADED!');
+}
 
-        $chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
+require '../conn.php';
 
-        if ($chkCsvMsg == '') {
+$chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
 
-            //READ FILE
-            $csvFile = fopen($_FILES['file']['tmp_name'],'r');
+if ($chkCsvMsg != '') {
+    $conn = null;
+    exit($chkCsvMsg);
+}
 
-            // SKIP FIRST LINE (HEADER)
-            fgets($csvFile);
+//READ FILE
+$csvFile = fopen($_FILES['file']['tmp_name'],'r');
 
-            // PARSE
-            $error = 0;
+// SKIP FIRST LINE (HEADER)
+fgets($csvFile);
 
-            $isTransactionActive = false;
-            $chunkSize = 250; // Set your desired chunk size
+// PARSE
+$error = 0;
 
-            try {
-                if (!$isTransactionActive) {
-                    $conn->beginTransaction();
-                    $isTransactionActive = true;
-                }
+$isTransactionActive = false;
+$chunkSize = 250; // Set your desired chunk size
 
-                $sql_insert_applicator = "INSERT INTO m_applicator 
-                                            (car_maker, car_model, applicator_no, zaihai_stock_address) 
-                                            VALUES ";
-                $values = [];
-                $placeholders = [];
-
-                $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
-                                            (car_maker, car_model, applicator_no, location, status) 
-                                            VALUES ";
-                $values2 = [];
-                $placeholders2 = [];
-
-                while (($line = fgetcsv($csvFile)) !== false) {
-                    // Check if the row is blank or consists only of whitespace
-                    if (empty(implode('', $line))) {
-                        continue; // Skip blank lines
-                    }
-
-                    $car_maker = $line[0];
-                    $car_model = $line[1];
-                    $applicator_no = $line[2];
-                    $zaihai_stock_address = $line[3];
-
-                    // Create a temporary array for the current row
-                    $currentValues = [
-                        $car_maker,
-                        $car_model,
-                        $applicator_no,
-                        $zaihai_stock_address
-                    ];
-
-                    // Create a temporary array for the current row
-                    $currentValues2 = [
-                        $car_maker,
-                        $car_model,
-                        $applicator_no,
-                        $zaihai_stock_address,
-                        'Ready To Use'
-                    ];
-
-                    // Create placeholders for each row
-                    $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
-                    $placeholders[] = "($generated_placeholders)";
-
-                    // Create placeholders for each row
-                    $generated_placeholders2 = implode(',', array_fill(0, count($currentValues2), '?'));
-                    $placeholders2[] = "($generated_placeholders2)";
-
-                    // Add current values to the main values array
-                    $values = array_merge($values, $currentValues);
-
-                    // Add current values to the main values array
-                    $values2 = array_merge($values2, $currentValues2);
-
-                    // Check if we reached the chunk size
-                    if (count($placeholders) === $chunkSize) {
-                        // Combine the SQL statement with the placeholders
-                        $sql_insert_applicator .= implode(', ', $placeholders);
-                        
-                        // Prepare the statement
-                        $stmt = $conn->prepare($sql_insert_applicator);
-                        
-                        // Execute the statement with the values
-                        if (!$stmt->execute($values)) {
-                            $error++;
-                        }
-
-                        // Reset for the next chunk
-                        $placeholders = [];
-                        $values = [];
-                        $sql_insert_applicator = "INSERT INTO m_applicator 
-                                        (car_maker, car_model, applicator_no, zaihai_stock_address) 
-                                        VALUES ";
-                    }
-
-                    // Check if we reached the chunk size
-                    if (count($placeholders2) === $chunkSize) {
-                        // Combine the SQL statement with the placeholders
-                        $sql_insert_applicator_list .= implode(', ', $placeholders2);
-                        
-                        // Prepare the statement
-                        $stmt = $conn->prepare($sql_insert_applicator_list);
-                        
-                        // Execute the statement with the values
-                        if (!$stmt->execute($values2)) {
-                            $error++;
-                        }
-
-                        // Reset for the next chunk
-                        $placeholders2 = [];
-                        $values2 = [];
-                        $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
-                                        (car_maker, car_model, applicator_no, location, status) 
-                                        VALUES ";
-                    }
-                }
-
-                // Insert any remaining rows that didn't fill a complete chunk
-                if (!empty($placeholders)) {
-                    $sql_insert_applicator .= implode(', ', $placeholders);
-                    $stmt = $conn->prepare($sql_insert_applicator);
-                    if (!$stmt->execute($values)) {
-                        $error++;
-                    }
-                }
-
-                // Insert any remaining rows that didn't fill a complete chunk
-                if (!empty($placeholders2)) {
-                    $sql_insert_applicator_list .= implode(', ', $placeholders2);
-                    $stmt = $conn->prepare($sql_insert_applicator_list);
-                    if (!$stmt->execute($values2)) {
-                        $error++;
-                    }
-                }
-
-                if ($error > 0) {
-                    if ($isTransactionActive) {
-                        $conn->rollBack();
-                        $isTransactionActive = false;
-                    }
-                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
-                    exit();
-                }
-
-                $conn->commit();
-                $isTransactionActive = false;
-            } catch (Exception $e) {
-                if ($isTransactionActive) {
-                    $conn->rollBack();
-                    $isTransactionActive = false;
-                }
-                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-                exit();
-            }
-            
-            fclose($csvFile);
-
-            if ($error > 0) {
-                echo 'error ' . $error;
-            }
-
-        } else {
-            echo $chkCsvMsg; 
-        }
-    } else {
-        echo 'CSV FILE NOT UPLOADED!';
+try {
+    if (!$isTransactionActive) {
+        $conn->beginTransaction();
+        $isTransactionActive = true;
     }
-} else {
-    echo 'INVALID FILE FORMAT!';
+
+    $sql_insert_applicator = "INSERT INTO m_applicator 
+                                (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                                VALUES ";
+    $values = [];
+    $placeholders = [];
+
+    $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
+                                (car_maker, car_model, applicator_no, location, status) 
+                                VALUES ";
+    $values2 = [];
+    $placeholders2 = [];
+
+    while (($line = fgetcsv($csvFile)) !== false) {
+        // Check if the row is blank or consists only of whitespace
+        if (empty(implode('', $line))) {
+            continue; // Skip blank lines
+        }
+
+        $car_maker = $line[0];
+        $car_model = $line[1];
+        $applicator_no = $line[2];
+        $zaihai_stock_address = $line[3];
+
+        // Create a temporary array for the current row
+        $currentValues = [
+            $car_maker,
+            $car_model,
+            $applicator_no,
+            $zaihai_stock_address
+        ];
+
+        // Create a temporary array for the current row
+        $currentValues2 = [
+            $car_maker,
+            $car_model,
+            $applicator_no,
+            $zaihai_stock_address,
+            'Ready To Use'
+        ];
+
+        // Create placeholders for each row
+        $generated_placeholders = implode(',', array_fill(0, count($currentValues), '?'));
+        $placeholders[] = "($generated_placeholders)";
+
+        // Create placeholders for each row
+        $generated_placeholders2 = implode(',', array_fill(0, count($currentValues2), '?'));
+        $placeholders2[] = "($generated_placeholders2)";
+
+        // Add current values to the main values array
+        $values = array_merge($values, $currentValues);
+
+        // Add current values to the main values array
+        $values2 = array_merge($values2, $currentValues2);
+
+        // Check if we reached the chunk size
+        if (count($placeholders) === $chunkSize) {
+            // Combine the SQL statement with the placeholders
+            $sql_insert_applicator .= implode(', ', $placeholders);
+            
+            // Prepare the statement
+            $stmt = $conn->prepare($sql_insert_applicator);
+            
+            // Execute the statement with the values
+            if (!$stmt->execute($values)) {
+                $error++;
+            }
+
+            // Reset for the next chunk
+            $placeholders = [];
+            $values = [];
+            $sql_insert_applicator = "INSERT INTO m_applicator 
+                            (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                            VALUES ";
+        }
+
+        // Check if we reached the chunk size
+        if (count($placeholders2) === $chunkSize) {
+            // Combine the SQL statement with the placeholders
+            $sql_insert_applicator_list .= implode(', ', $placeholders2);
+            
+            // Prepare the statement
+            $stmt = $conn->prepare($sql_insert_applicator_list);
+            
+            // Execute the statement with the values
+            if (!$stmt->execute($values2)) {
+                $error++;
+            }
+
+            // Reset for the next chunk
+            $placeholders2 = [];
+            $values2 = [];
+            $sql_insert_applicator_list = "INSERT INTO t_applicator_list 
+                            (car_maker, car_model, applicator_no, location, status) 
+                            VALUES ";
+        }
+    }
+
+    // Insert any remaining rows that didn't fill a complete chunk
+    if (!empty($placeholders)) {
+        $sql_insert_applicator .= implode(', ', $placeholders);
+        $stmt = $conn->prepare($sql_insert_applicator);
+        if (!$stmt->execute($values)) {
+            $error++;
+        }
+    }
+
+    // Insert any remaining rows that didn't fill a complete chunk
+    if (!empty($placeholders2)) {
+        $sql_insert_applicator_list .= implode(', ', $placeholders2);
+        $stmt = $conn->prepare($sql_insert_applicator_list);
+        if (!$stmt->execute($values2)) {
+            $error++;
+        }
+    }
+
+    // Applicator Shots Registration
+    $sql_insert_applicator_shots = "INSERT INTO t_applicator_shots 
+                (applicator_no, shotcnt_u_limit_ee, shotcnt_u_limit_qa, shotcnt_d_limit_ee, shotcnt_d_limit_qa,
+                shotcnt_i_u_limit_ee, shotcnt_i_u_limit_qa, shotcnt_i_d_limit_ee, shotcnt_i_d_limit_qa,
+                shotcnt_c_limit_ee, shotcnt_c_limit_qa)
+            SELECT 
+                al.applicator_no,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_U AS INT) < 50000 THEN 100000
+                    WHEN CAST(m.SHOTCNT_U AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 100000.0) * 100000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_U AS INT) < 50000 THEN 50000
+                    WHEN CAST(m.SHOTCNT_U AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 50000.0) * 50000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_D AS INT) < 50000 THEN 100000
+                    WHEN CAST(m.SHOTCNT_D AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 100000.0) * 100000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_D AS INT) < 50000 THEN 50000
+                    WHEN CAST(m.SHOTCNT_D AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 50000.0) * 50000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 THEN 100000
+                    WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 100000.0) * 100000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 THEN 50000
+                    WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 50000.0) * 50000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 THEN 100000
+                    WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 100000.0) * 100000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 THEN 50000
+                    WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 50000.0) * 50000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_C AS INT) < 50000 THEN 100000
+                    WHEN CAST(m.SHOTCNT_C AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 100000.0) * 100000
+                END,
+                CASE 
+                    WHEN CAST(m.SHOTCNT_C AS INT) < 50000 THEN 50000
+                    WHEN CAST(m.SHOTCNT_C AS INT) < 100000 THEN 100000
+                    ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 50000.0) * 50000
+                END
+            FROM 
+                t_applicator_list al
+            INNER JOIN v_m_apri_ccis_data m 
+                ON al.applicator_no = m.APPLICATOR_NO
+            WHERE 
+                NOT EXISTS (
+                    SELECT 1 
+                    FROM t_applicator_shots aps 
+                    WHERE al.applicator_no = aps.applicator_no 
+                );
+            ";
+    $stmt = $conn->prepare($sql_insert_applicator_shots);
+    if (!$stmt->execute()) {
+        $error++;
+    }
+
+    if ($error > 0) {
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
+        echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+        exit();
+    }
+
+    $conn->commit();
+    $isTransactionActive = false;
+} catch (Exception $e) {
+    if ($isTransactionActive) {
+        $conn->rollBack();
+        $isTransactionActive = false;
+    }
+    echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+    exit();
+}
+
+fclose($csvFile);
+
+if ($error > 0) {
+    echo 'error ' . $error;
 }
 
 // KILL CONNECTION

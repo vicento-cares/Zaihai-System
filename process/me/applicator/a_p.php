@@ -37,7 +37,78 @@ if ($method == 'add_applicator') {
 
 			$stmt = $conn->prepare($query);
 			$stmt->execute();
-					
+
+			// Applicator Shots Registration
+			$query = "INSERT INTO t_applicator_shots 
+							(applicator_no, shotcnt_u_limit_ee, shotcnt_u_limit_qa, shotcnt_d_limit_ee, shotcnt_d_limit_qa,
+							shotcnt_i_u_limit_ee, shotcnt_i_u_limit_qa, shotcnt_i_d_limit_ee, shotcnt_i_d_limit_qa,
+							shotcnt_c_limit_ee, shotcnt_c_limit_qa)
+						SELECT 
+							al.applicator_no,
+							CASE 
+								WHEN CAST(m.SHOTCNT_U AS INT) < 50000 THEN 100000
+								WHEN CAST(m.SHOTCNT_U AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 100000.0) * 100000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_U AS INT) < 50000 THEN 50000
+								WHEN CAST(m.SHOTCNT_U AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_U AS FLOAT) / 50000.0) * 50000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_D AS INT) < 50000 THEN 100000
+								WHEN CAST(m.SHOTCNT_D AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 100000.0) * 100000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_D AS INT) < 50000 THEN 50000
+								WHEN CAST(m.SHOTCNT_D AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_D AS FLOAT) / 50000.0) * 50000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 THEN 100000
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 100000.0) * 100000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 50000 THEN 50000
+								WHEN CAST(m.SHOTCNT_I_U AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_I_U AS FLOAT) / 50000.0) * 50000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 THEN 100000
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 100000.0) * 100000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 50000 THEN 50000
+								WHEN CAST(m.SHOTCNT_I_D AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_I_D AS FLOAT) / 50000.0) * 50000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_C AS INT) < 50000 THEN 100000
+								WHEN CAST(m.SHOTCNT_C AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 100000.0) * 100000
+							END,
+							CASE 
+								WHEN CAST(m.SHOTCNT_C AS INT) < 50000 THEN 50000
+								WHEN CAST(m.SHOTCNT_C AS INT) < 100000 THEN 100000
+								ELSE CEILING(CAST(m.SHOTCNT_C AS FLOAT) / 50000.0) * 50000
+							END
+						FROM 
+							t_applicator_list al
+						INNER JOIN v_m_apri_ccis_data m 
+							ON al.applicator_no = m.APPLICATOR_NO
+						WHERE 
+							NOT EXISTS (
+								SELECT 1 
+								FROM t_applicator_shots aps 
+								WHERE al.applicator_no = aps.applicator_no 
+							);
+						";
+			$stmt = $conn->prepare($query);
+			$stmt->execute();
+		
 			$conn->commit();
 			$isTransactionActive = false;
 			echo 'success';
@@ -170,6 +241,10 @@ if ($method == 'delete_applicator') {
 					$conn->beginTransaction();
 					$isTransactionActive = true;
 				}
+
+				$query = "DELETE FROM t_applicator_shots WHERE applicator_no = '$applicator_no'";
+				$stmt = $conn->prepare($query);
+				$stmt->execute();
 
 				$query = "DELETE FROM t_applicator_list WHERE id = '$id_al'";
 				$stmt = $conn->prepare($query);

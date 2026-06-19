@@ -63,9 +63,9 @@
                             <?php } ?>
 
                             <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/viewer/applicator_err_mon.php") { ?>
-                            <li class="d-none"><a href="applicator_err_mon.php" class="dropdown-item active">Applicator Error Monitoring</a></li>
+                            <li><a href="applicator_err_mon.php" class="dropdown-item active">Applicator Error Monitoring</a></li>
                             <?php } else { ?>
-                            <li class="d-none"><a href="applicator_err_mon.php" class="dropdown-item">Applicator Error Monitoring</a></li>
+                            <li><a href="applicator_err_mon.php" class="dropdown-item">Applicator Error Monitoring</a></li>
                             <?php } ?>
                         </ul>
                     </li>

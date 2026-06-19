@@ -2,7 +2,6 @@
 // error_reporting(0);
 set_time_limit(0);
 
-require '../conn.php';
 require '../lib/main.php';
 
 function check_csv ($file, $conn) {
@@ -21,7 +20,7 @@ function check_csv ($file, $conn) {
     $dup_temp_arr = array();
 
     $message = "";
-    $check_csv_row = 0;
+    $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
@@ -118,94 +117,93 @@ $csvMimes = array(
     'text/plain'
 );
 
-if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'],$csvMimes)) {
+if (empty($_FILES['file']['name']) || !in_array($_FILES['file']['type'], $csvMimes)) {
+    exit('INVALID FILE FORMAT!');
+}
 
-    if (is_uploaded_file($_FILES['file']['tmp_name'])) {
+if (!is_uploaded_file($_FILES['file']['tmp_name'])) {
+    exit('CSV FILE NOT UPLOADED!');
+}
 
-        $chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
+require '../conn.php';
 
-        if ($chkCsvMsg == '') {
+$chkCsvMsg = check_csv($_FILES['file']['tmp_name'], $conn);
 
-            //READ FILE
-            $csvFile = fopen($_FILES['file']['tmp_name'],'r');
+if ($chkCsvMsg != '') {
+    $conn = null;
+    exit($chkCsvMsg);
+}
 
-            // SKIP FIRST LINE (HEADER)
-            fgets($csvFile);
+//READ FILE
+$csvFile = fopen($_FILES['file']['tmp_name'],'r');
 
-            // PARSE
-            $error = 0;
+// SKIP FIRST LINE (HEADER)
+fgets($csvFile);
 
-            $isTransactionActive = false;
+// PARSE
+$error = 0;
 
-            try {
-                if (!$isTransactionActive) {
-                    $conn->beginTransaction();
-                    $isTransactionActive = true;
-                }
+$isTransactionActive = false;
 
-                while (($line = fgetcsv($csvFile)) !== false) {
-                    // Check if the row is blank or consists only of whitespace
-                    if (empty(implode('', $line))) {
-                        continue; // Skip blank lines
-                    }
-
-                    $applicator_no = $line[0];
-                    $terminal_name = $line[1];
-                    $applicator_no_new = $line[2];
-                    $terminal_name_new = $line[3];
-
-                    if (empty($applicator_no_new) && empty($terminal_name_new)) {
-                        continue; // Skip blank lines
-                    } else if (empty($applicator_no_new)) {
-                        $applicator_no_new = $applicator_no;
-                    } else if (empty($terminal_name_new)) {
-                        $terminal_name_new = $terminal_name;
-                    }
-
-                    $query = "UPDATE m_applicator_terminal 
-                                SET applicator_no = ?, terminal_name = ?
-                                WHERE applicator_no = ? AND terminal_name = ?";
-                    $stmt = $conn->prepare($query);
-                    $params = array($applicator_no_new, $terminal_name_new, $applicator_no, $terminal_name);
-                    if (!$stmt->execute()) {
-                        $error++;
-                    }
-                }
-
-                if ($error > 0) {
-                    if ($isTransactionActive) {
-                        $conn->rollBack();
-                        $isTransactionActive = false;
-                    }
-                    echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
-                    exit();
-                }
-
-                $conn->commit();
-                $isTransactionActive = false;
-            } catch (Exception $e) {
-                if ($isTransactionActive) {
-                    $conn->rollBack();
-                    $isTransactionActive = false;
-                }
-                echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-                exit();
-            }
-            
-            fclose($csvFile);
-
-            if ($error > 0) {
-                echo 'error ' . $error;
-            }
-
-        } else {
-            echo $chkCsvMsg; 
-        }
-    } else {
-        echo 'CSV FILE NOT UPLOADED!';
+try {
+    if (!$isTransactionActive) {
+        $conn->beginTransaction();
+        $isTransactionActive = true;
     }
-} else {
-    echo 'INVALID FILE FORMAT!';
+
+    while (($line = fgetcsv($csvFile)) !== false) {
+        // Check if the row is blank or consists only of whitespace
+        if (empty(implode('', $line))) {
+            continue; // Skip blank lines
+        }
+
+        $applicator_no = $line[0];
+        $terminal_name = $line[1];
+        $applicator_no_new = $line[2];
+        $terminal_name_new = $line[3];
+
+        if (empty($applicator_no_new) && empty($terminal_name_new)) {
+            continue; // Skip blank lines
+        } else if (empty($applicator_no_new)) {
+            $applicator_no_new = $applicator_no;
+        } else if (empty($terminal_name_new)) {
+            $terminal_name_new = $terminal_name;
+        }
+
+        $query = "UPDATE m_applicator_terminal 
+                    SET applicator_no = ?, terminal_name = ?
+                    WHERE applicator_no = ? AND terminal_name = ?";
+        $stmt = $conn->prepare($query);
+        $params = array($applicator_no_new, $terminal_name_new, $applicator_no, $terminal_name);
+        if (!$stmt->execute()) {
+            $error++;
+        }
+    }
+
+    if ($error > 0) {
+        if ($isTransactionActive) {
+            $conn->rollBack();
+            $isTransactionActive = false;
+        }
+        echo 'Failed. Please Try Again or Call IT Personnel Immediately!';
+        exit();
+    }
+
+    $conn->commit();
+    $isTransactionActive = false;
+} catch (Exception $e) {
+    if ($isTransactionActive) {
+        $conn->rollBack();
+        $isTransactionActive = false;
+    }
+    echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+    exit();
+}
+
+fclose($csvFile);
+
+if ($error > 0) {
+    echo 'error ' . $error;
 }
 
 // KILL CONNECTION
