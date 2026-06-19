@@ -446,9 +446,9 @@
 				terminal_name: terminal_name
 			},
 			success: (response) => {
-				if (response == 'success') {
+				if (response.indexOf('Pending Applicator In Succesfully!!!') !== -1) {
 					get_recent_applicator_in();
-					display_applicator_in_out_result('in_applicator_result', '', 'Pending Applicator In Succesfully!!!');
+					display_applicator_in_out_result('in_applicator_result', '', response);
 				} else {
 					display_applicator_in_out_result('in_applicator_result', 'error', response);
 				}
