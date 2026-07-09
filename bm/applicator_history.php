@@ -116,8 +116,16 @@
                       <th>Line Address</th>
                       <th>Operator In</th>
                       <th>Date Time In</th>
+                      <th>Days</th>
+                      <th>Hours</th>
+                      <th>Minutes</th>
+                      <th>Time In Elapsed Time</th>
                       <th>Inspected By</th>
                       <th>Confirmation Date</th>
+                      <th>Days</th>
+                      <th>Hours</th>
+                      <th>Minutes</th>
+                      <th>Confirmation Elapsed Time</th>
                       <th>Adjustment Content</th>
                       <th>Adjustment Content Remarks</th>
                     </tr>

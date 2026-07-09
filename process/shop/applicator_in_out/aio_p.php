@@ -521,6 +521,33 @@ if ($method == 'in_applicator') {
                                 $conn = null;
                                 exit();
                             }
+
+                            $sql = "UPDATE 
+                                        t_applicator_in_out 
+                                    SET 
+                                        days_elapsed_in = CASE 
+                                                                WHEN DATEDIFF(MINUTE, date_time_out, date_time_in) / 1440 > 0 THEN 
+                                                                    DATEDIFF(MINUTE, date_time_out, date_time_in) / 1440
+                                                                ELSE 0 
+                                                            END,
+                                        hours_elapsed_in = CASE 
+                                                                WHEN (DATEDIFF(MINUTE, date_time_out, date_time_in) % 1440) / 60 > 0 THEN 
+                                                                    (DATEDIFF(MINUTE, date_time_out, date_time_in) % 1440) / 60
+                                                                ELSE 0
+                                                            END,
+                                        minutes_elapsed_in = CASE 
+                                                                WHEN DATEDIFF(MINUTE, date_time_out, date_time_in) % 60 > 0 THEN 
+                                                                    DATEDIFF(MINUTE, date_time_out, date_time_in) % 60
+                                                                ELSE 0
+                                                            END,
+                                        saved_elapsed_time_in = dbo.FormatElapsedTime(date_time_out, date_time_in) 
+                                    WHERE 
+                                        id = ? AND 
+                                        date_time_out IS NOT NULL AND 
+                                        date_time_in IS NOT NULL";
+                            $stmt = $conn -> prepare($sql);
+                            $params = array($id);
+                            $stmt -> execute($params);
                         
                             $sql = "UPDATE t_applicator_list 
                                     SET location = ?, status = 'Pending', date_updated = ?

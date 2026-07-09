@@ -37,7 +37,10 @@ if ($method == 'get_applicator_history') {
 
     $sql = "SELECT aioh.serial_no, aioh.applicator_no, aioh.terminal_name, 
                 aioh.trd_no, aioh.operator_out, aioh.date_time_out, 
-                aioh.zaihai_stock_address, aioh.operator_in, aioh.date_time_in, aioh.inspected_by AS inspected_by_no, aioh.confirmation_date, 
+                aioh.zaihai_stock_address, aioh.operator_in, aioh.date_time_in, 
+                aioh.days_elapsed_in, aioh.hours_elapsed_in, aioh.minutes_elapsed_in, 
+                aioh.inspected_by AS inspected_by_no, aioh.confirmation_date, aioh.saved_elapsed_time_in, 
+                aioh.days_elapsed_confirm, aioh.hours_elapsed_confirm, aioh.minutes_elapsed_confirm, aioh.saved_elapsed_time_confirm, 
                 a.car_maker, a.car_model, 
                 ac.equipment_no, ac.line_address, ac.inspection_date_time, ac.inspection_shift, ac.adjustment_content, ac.adjustment_content_remarks, ac.cross_section_result, 
                 ac.inspected_by, ac.checked_by, ac.confirmed_by, ac.judgement, 
@@ -120,8 +123,16 @@ if ($method == 'get_applicator_history') {
         echo '<td>'.$row['line_address'].'</td>';
         echo '<td>'.$row['operator_in'].'</td>';
         echo '<td>'.$row['date_time_in'].'</td>';
+        echo '<td>'.$row['days_elapsed_in'].'</td>';
+        echo '<td>'.$row['hours_elapsed_in'].'</td>';
+        echo '<td>'.$row['minutes_elapsed_in'].'</td>';
+        echo '<td>'.$row['saved_elapsed_time_in'].'</td>';
         echo '<td>'.$row['inspected_by_no'].'</td>';
         echo '<td>'.$row['confirmation_date'].'</td>';
+        echo '<td>'.$row['days_elapsed_confirm'].'</td>';
+        echo '<td>'.$row['hours_elapsed_confirm'].'</td>';
+        echo '<td>'.$row['minutes_elapsed_confirm'].'</td>';
+        echo '<td>'.$row['saved_elapsed_time_confirm'].'</td>';
         echo '<td>'.$row['adjustment_content'].'</td>';
         echo '<td>'.$row['adjustment_content_remarks'].'</td>';
         echo '</tr>';

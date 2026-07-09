@@ -130,9 +130,15 @@ if ($method == 'make_checksheet') {
             $stmt -> execute($params);
 
             if ($created_from_itf == 0) {
-                $sql = "INSERT INTO t_applicator_in_out_history 
-                        (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date)
-                        SELECT serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, operator_in, date_time_in, inspected_by, confirmation_date
+                $sql = "INSERT INTO 
+                            t_applicator_in_out_history 
+                                (serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, 
+                                operator_in, date_time_in, days_elapsed_in, hours_elapsed_in, minutes_elapsed_in, saved_elapsed_time_in, inspected_by, 
+                                confirmation_date)
+                        SELECT 
+                            serial_no, applicator_no, terminal_name, trd_no, operator_out, date_time_out, zaihai_stock_address, 
+                            operator_in, date_time_in, days_elapsed_in, hours_elapsed_in, minutes_elapsed_in, saved_elapsed_time_in, inspected_by, 
+                            confirmation_date
                         FROM t_applicator_in_out
                         WHERE serial_no = ?";
                 $stmt = $conn -> prepare($sql);
@@ -144,6 +150,34 @@ if ($method == 'make_checksheet') {
                         WHERE serial_no = ?";
                 $stmt = $conn -> prepare($sql);
                 $params = array($location, $inspected_by_no, $server_date_time, $serial_no);
+                $stmt -> execute($params);
+
+                $sql = "UPDATE 
+                            t_applicator_in_out_history 
+                        SET 
+                            days_elapsed_confirm = CASE 
+                                                        WHEN DATEDIFF(MINUTE, date_time_in, confirmation_date) / 1440 > 0 THEN 
+                                                            DATEDIFF(MINUTE, date_time_in, confirmation_date) / 1440
+                                                        ELSE 0 
+                                                    END,
+                            hours_elapsed_confirm = CASE 
+                                                        WHEN (DATEDIFF(MINUTE, date_time_in, confirmation_date) % 1440) / 60 > 0 THEN 
+                                                            (DATEDIFF(MINUTE, date_time_in, confirmation_date) % 1440) / 60
+                                                        ELSE 0
+                                                    END,
+                            minutes_elapsed_confirm = CASE 
+                                                        WHEN DATEDIFF(MINUTE, date_time_in, confirmation_date) % 60 > 0 THEN 
+                                                            DATEDIFF(MINUTE, date_time_in, confirmation_date) % 60
+                                                        ELSE 0
+                                                    END,
+                            saved_elapsed_time_confirm = dbo.FormatElapsedTime(date_time_in, confirmation_date) 
+                        WHERE 
+                            serial_no = ? AND 
+                            date_time_out IS NOT NULL AND 
+                            date_time_in IS NOT NULL AND 
+                            confirmation_date IS NOT NULL";
+                $stmt = $conn -> prepare($sql);
+                $params = array($serial_no);
                 $stmt -> execute($params);
 
                 $sql = "DELETE FROM t_applicator_in_out WHERE serial_no = ?";
