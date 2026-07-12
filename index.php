@@ -86,7 +86,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="/zaihai/wi/Zaihai System WI (Shop).xlsx" target="_blank" class="nav-link active"><i class="fas fa-file"></i> Work Instruction</a>
+                        <a href="/zaihai/wi/Zaihai System WI (Shop) Rev 1.xlsx" target="_blank" class="nav-link active"><i class="fas fa-file"></i> Work Instruction</a>
                     </li>
                     <li class="nav-item">
                         <a href="/zaihai/login/" target="_blank" class="nav-link active"><i class="fas fa-sign-in-alt"></i> Login</a>
