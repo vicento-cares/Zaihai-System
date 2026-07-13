@@ -19,18 +19,19 @@ function check_csv ($file, $conn) {
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
-    $row_valid_arr = array(0, 0);
+    $row_valid_arr = array(0, 0, 0);
 
     $notExistsApplicatorArr = array();
     $readyToUseOnlyArr = array();
+    $invalidPriorityArr = array();
 
     $message = "";
     $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Car Maker,Car Model,Applicator No.,Zaihai Stock Address,Car Maker New,Car Model New,Applicator No. New,Zaihai Stock Address New";
-    $valid_first_line2 = '"Car Maker","Car Model","Applicator No.","Zaihai Stock Address","Car Maker New","Car Model New","Applicator No. New","Zaihai Stock Address New"';
+    $valid_first_line = "Car Maker,Car Model,Applicator No.,Zaihai Stock Address,Car Maker New,Car Model New,Applicator No. New,Zaihai Stock Address New,Priority Status";
+    $valid_first_line2 = '"Car Maker","Car Model","Applicator No.","Zaihai Stock Address","Car Maker New","Car Model New","Applicator No. New","Zaihai Stock Address New","Priority Status"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -44,6 +45,7 @@ function check_csv ($file, $conn) {
             $car_model = $line[1];
             $applicator_no = $line[2];
             $zaihai_stock_address = $line[3];
+            $priority_status = $line[8];
 
             if ($car_maker == '' || $car_model == '' || 
                 $applicator_no == '' || $zaihai_stock_address == '') {
@@ -87,6 +89,13 @@ function check_csv ($file, $conn) {
                 $row_valid_arr[1] = 1;
                 array_push($readyToUseOnlyArr, $check_csv_row);
             }
+
+            // 2
+            if (!empty($priority_status) && strtolower($priority_status) != 'priority') {
+                $hasError = 1;
+                $row_valid_arr[2] = 1;
+                array_push($invalidPriorityArr, $check_csv_row);
+            }
             
             // Joining all row values for checking duplicated rows
             $whole_line = join(',', $line);
@@ -125,6 +134,9 @@ function check_csv ($file, $conn) {
         }
         if ($row_valid_arr[1] == 1) {
             $message = $message . 'Ready to use status only on Applicator List to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
+        }
+        if ($row_valid_arr[2] == 1) {
+            $message = $message . 'Invalid Priority Status on row/s ' . implode(", ", $invalidPriorityArr) . '. ';
         }
 
         if ($isExistsOnDb == 1) {
@@ -190,7 +202,7 @@ try {
     }
 
     $sql_insert_applicator = "INSERT INTO m_applicator 
-                                (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                                (car_maker, car_model, applicator_no, zaihai_stock_address, is_priority) 
                                 VALUES ";
     $values = [];
     $placeholders = [];
@@ -211,13 +223,21 @@ try {
         $car_model = $line[1];
         $applicator_no = $line[2];
         $zaihai_stock_address = $line[3];
+        $priority_status = $line[8];
+
+        $is_priority = 0;
+
+        if (!empty($priority_status) && strtolower($priority_status) == 'priority') {
+            $is_priority = 1;
+        }
 
         // Create a temporary array for the current row
         $currentValues = [
             $car_maker,
             $car_model,
             $applicator_no,
-            $zaihai_stock_address
+            $zaihai_stock_address,
+            $is_priority
         ];
 
         // Create a temporary array for the current row
@@ -260,7 +280,7 @@ try {
             $placeholders = [];
             $values = [];
             $sql_insert_applicator = "INSERT INTO m_applicator 
-                            (car_maker, car_model, applicator_no, zaihai_stock_address) 
+                            (car_maker, car_model, applicator_no, zaihai_stock_address, is_priority) 
                             VALUES ";
         }
 

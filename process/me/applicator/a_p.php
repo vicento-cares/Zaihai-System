@@ -4,14 +4,15 @@ require '../../conn.php';
 $method = $_POST['method'];
 
 if ($method == 'add_applicator') {
-	$car_maker = addslashes(trim($_POST['car_maker']));
-    $car_model = addslashes(trim($_POST['car_model']));
-	$applicator_no = addslashes(trim($_POST['applicator_no']));
-	$zaihai_stock_address = addslashes(trim($_POST['zaihai_stock_address']));
+	$car_maker = trim($_POST['car_maker']);
+    $car_model = trim($_POST['car_model']);
+	$applicator_no = trim($_POST['applicator_no']);
+	$zaihai_stock_address = trim($_POST['zaihai_stock_address']);
+	$is_priority = intval($_POST['is_priority']);
 	
-	$check = "SELECT id FROM m_applicator WHERE zaihai_stock_address = '$zaihai_stock_address'";
+	$check = "SELECT id FROM m_applicator WHERE zaihai_stock_address = ?";
 	$stmt = $conn->prepare($check);
-	$stmt->execute();
+	$stmt->execute([$zaihai_stock_address]);
 
 	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -26,17 +27,25 @@ if ($method == 'add_applicator') {
 				$isTransactionActive = true;
 			}
 
-			$query = "INSERT INTO m_applicator (car_maker, car_model, applicator_no, zaihai_stock_address) 
-				VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address')";
+			$query = "INSERT INTO m_applicator 
+						(car_maker, car_model, applicator_no, zaihai_stock_address, is_priority) 
+					VALUES 
+						(?,?,?,?,?)";
 
 			$stmt = $conn->prepare($query);
-			$stmt->execute();
+			$stmt->execute([
+				$car_maker, $car_model, $applicator_no, $zaihai_stock_address, $is_priority
+			]);
 				
-			$query = "INSERT INTO t_applicator_list (car_maker, car_model, applicator_no, location, status) 
-					VALUES ('$car_maker','$car_model','$applicator_no','$zaihai_stock_address','Ready To Use')";
+			$query = "INSERT INTO t_applicator_list 
+							(car_maker, car_model, applicator_no, location, status) 
+						VALUES 
+							(?,?,?,?,?)";
 
 			$stmt = $conn->prepare($query);
-			$stmt->execute();
+			$stmt->execute([
+				$car_maker, $car_model, $applicator_no, $zaihai_stock_address, 'Ready To Use'
+			]);
 
 			// Applicator Shots Registration
 			$query = "INSERT INTO t_applicator_shots 
@@ -125,14 +134,15 @@ if ($method == 'add_applicator') {
 
 if ($method == 'update_applicator') {
 	$id = $_POST['id'];
-	$car_maker = addslashes(trim($_POST['car_maker']));
-    $car_model = addslashes(trim($_POST['car_model']));
-	$applicator_no = addslashes(trim($_POST['applicator_no']));
-	$zaihai_stock_address = addslashes(trim($_POST['zaihai_stock_address']));
+	$car_maker = trim($_POST['car_maker']);
+    $car_model = trim($_POST['car_model']);
+	$applicator_no = trim($_POST['applicator_no']);
+	$zaihai_stock_address = trim($_POST['zaihai_stock_address']);
+	$is_priority = intval($_POST['is_priority']);
 	
-	$check = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = '$id'";
+	$check = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = ?";
 	$stmt = $conn->prepare($check);
-	$stmt->execute();
+	$stmt->execute([$id]);
 
 	$row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -140,68 +150,112 @@ if ($method == 'update_applicator') {
 		$applicator_no_old = $row['applicator_no'];
 		$zaihai_stock_address_old = $row['zaihai_stock_address'];
 
-		$check = "SELECT id, status FROM t_applicator_list WHERE applicator_no = '$applicator_no_old'";
+		$check = "SELECT id FROM t_applicator_list WHERE applicator_no = ?";
         $stmt = $conn->prepare($check);
-        $stmt->execute();
+        $stmt->execute([$applicator_no_old]);
 
         $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+		// if ($row) {
+		// 	if ($row['status'] != 'Ready To Use') {
+        //         echo 'Ready To Use Only';
+        //     } else {
+
+		// 	}
+		// } else {
+        //     echo 'Ready To Use Only';
+        // }
 
         if ($row) {
 			$id_al = $row['id'];
 
-            if ($row['status'] != 'Ready To Use') {
-                echo 'Ready To Use Only';
-            } else {
-				$isTransactionActive = false;
-		
-				try {
-					if (!$isTransactionActive) {
-						$conn->beginTransaction();
-						$isTransactionActive = true;
-					}
-
-					$query = "UPDATE t_applicator_list 
-                        	SET car_maker = '$car_maker', 
-								car_model = '$car_model', 
-								applicator_no = '$applicator_no'";
-
-					if ($zaihai_stock_address_old != $zaihai_stock_address) {
-						$query .= ", location = '$zaihai_stock_address'";
-					}
-
-					$query .= "WHERE id = '$id_al'";
-					
-					$stmt = $conn->prepare($query);
-					$stmt->execute();
-
-					$query = "UPDATE m_applicator 
-								SET car_maker = '$car_maker', 
-									car_model = '$car_model', 
-									applicator_no = '$applicator_no'";
-					
-					if ($zaihai_stock_address_old != $zaihai_stock_address) {
-						$query .= ", zaihai_stock_address = '$zaihai_stock_address'";
-					}
-
-					$query .= "WHERE id = '$id'";
-
-					$stmt = $conn->prepare($query);
-					$stmt->execute();
-							
-					$conn->commit();
-					$isTransactionActive = false;
-					echo 'success';
-				} catch (Exception $e) {
-					if ($isTransactionActive) {
-						$conn->rollBack();
-						$isTransactionActive = false;
-					}
-					echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
-					exit();
+			$isTransactionActive = false;
+	
+			try {
+				if (!$isTransactionActive) {
+					$conn->beginTransaction();
+					$isTransactionActive = true;
 				}
-            }
+
+				// Only priority update applied
+				$query = "UPDATE m_applicator 
+							SET 
+								is_priority = ?
+							WHERE 
+								id = ? AND is_priority != ?";
+				$stmt = $conn->prepare($query);
+				$stmt->execute([$is_priority, $id, $is_priority]);
+
+				// Update applicator details if status is ready to use
+				$query = "UPDATE 
+							t_applicator_list 
+						SET 
+							car_maker = ?, 
+							car_model = ?, 
+							applicator_no = ?";
+				
+				$params = [$car_maker, $car_model, $applicator_no];
+
+				if ($zaihai_stock_address_old != $zaihai_stock_address) {
+					$query .= ", location = ?";
+					$params[] = $zaihai_stock_address;
+				}
+
+				$query .= " WHERE id = ? AND 
+							EXISTS (
+								SELECT 1
+								FROM t_applicator_list a
+								WHERE a.applicator_no = t_applicator_list.applicator_no
+								AND a.status = 'Ready To Use'
+							)";
+							
+				$params[] = $id_al;
+				
+				$stmt = $conn->prepare($query);
+				$stmt->execute($params);
+
+				$rowsAffected = $stmt->rowCount();
+
+				if ($rowsAffected > 0) {
+					$query = "UPDATE m_applicator 
+							SET car_maker = ?, 
+								car_model = ?, 
+								applicator_no = ?";
+
+					$params = [$car_maker, $car_model, $applicator_no];
+					
+					if ($zaihai_stock_address_old != $zaihai_stock_address) {
+						$query .= ", zaihai_stock_address = ?";
+						$params[] = $zaihai_stock_address;
+					}
+
+					$query .= " WHERE id = ? AND 
+								EXISTS (
+									SELECT 1
+									FROM t_applicator_list a
+									WHERE a.applicator_no = m_applicator.applicator_no
+									AND a.status = 'Ready To Use'
+								)";
+
+					$params[] = $id;
+
+					$stmt = $conn->prepare($query);
+					$stmt->execute($params);
+				}
+						
+				$conn->commit();
+				$isTransactionActive = false;
+				echo 'success';
+			} catch (Exception $e) {
+				if ($isTransactionActive) {
+					$conn->rollBack();
+					$isTransactionActive = false;
+				}
+				echo 'Failed. Please Try Again or Call IT Personnel Immediately!: ' . $e->getMessage();
+				exit();
+			}
         } else {
-            echo 'Ready To Use Only';
+            echo 'Record Not Found On Applicator List! Call IT Personnel Immediately!!!';
         }
 	} else {
 		echo 'Record Not Found';
@@ -211,9 +265,9 @@ if ($method == 'update_applicator') {
 if ($method == 'delete_applicator') {
 	$id = $_POST['id'];
 
-	$sql = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = '$id'";
+	$sql = "SELECT applicator_no, zaihai_stock_address FROM m_applicator WHERE id = ?";
 	$stmt = $conn->prepare($sql);
-	$stmt->execute();
+	$stmt->execute([$id]);
 
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -221,9 +275,9 @@ if ($method == 'delete_applicator') {
 	$zaihai_stock_address = addslashes($row['zaihai_stock_address']);
 
 	$check = "SELECT id, status FROM t_applicator_list 
-				WHERE applicator_no = '$applicator_no'";
+				WHERE applicator_no = ?";
 	$stmt = $conn->prepare($check);
-	$stmt->execute();
+	$stmt->execute([$applicator_no]);
 
     $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
@@ -242,17 +296,17 @@ if ($method == 'delete_applicator') {
 					$isTransactionActive = true;
 				}
 
-				$query = "DELETE FROM t_applicator_shots WHERE applicator_no = '$applicator_no'";
+				$query = "DELETE FROM t_applicator_shots WHERE applicator_no = ?";
 				$stmt = $conn->prepare($query);
-				$stmt->execute();
+				$stmt->execute([$applicator_no]);
 
-				$query = "DELETE FROM t_applicator_list WHERE id = '$id_al'";
+				$query = "DELETE FROM t_applicator_list WHERE id = ?";
 				$stmt = $conn->prepare($query);
-				$stmt->execute();
+				$stmt->execute([$id_al]);
 
-				$query = "DELETE FROM m_applicator WHERE id = '$id'";
+				$query = "DELETE FROM m_applicator WHERE id = ?";
 				$stmt = $conn->prepare($query);
-				$stmt->execute();
+				$stmt->execute([$id]);
 
 				$conn->commit();
 				$isTransactionActive = false;
@@ -267,7 +321,7 @@ if ($method == 'delete_applicator') {
 			}
 		}
 	} else {
-		echo 'Ready To Use Only';
+		echo 'Record Not Found On Applicator List! Call IT Personnel Immediately!!!';
 	}
 }
 

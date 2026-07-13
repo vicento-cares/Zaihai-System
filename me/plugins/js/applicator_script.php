@@ -226,6 +226,8 @@
         document.getElementById('a_car_model_master_update').value = '';
         document.getElementById('a_applicator_no_master_update').value = '';
         document.getElementById('a_zaihai_stock_address_master_update').value = '';
+
+        document.getElementById('a_chkbx_is_priority').checked = false;
     }
 
 	$("#new_applicator").on('hidden.bs.modal', e => {
@@ -243,6 +245,12 @@
         var applicator_no = document.getElementById('a_applicator_no_master').value;
         var zaihai_stock_address = document.getElementById('a_zaihai_stock_address_master').value;
 
+        var is_priority = 0;
+
+        if (document.getElementById('a_chkbx_is_priority').checked) {
+            is_priority = 1;
+        }
+
         $.ajax({
             url: '../process/me/applicator/a_p.php',
             type: 'POST',
@@ -252,7 +260,8 @@
                 car_maker: car_maker,
                 car_model: car_model,
                 applicator_no: applicator_no,
-                zaihai_stock_address: zaihai_stock_address
+                zaihai_stock_address: zaihai_stock_address,
+                is_priority: is_priority
             }, success: function (response) {
                 if (response == 'success') {
                     Swal.fire({
@@ -292,12 +301,19 @@
         var car_model = string[2];
         var applicator_no = string[3];
         var zaihai_stock_address = string[4];
+        var is_priority = parseInt(string[5]);
 
         document.getElementById('id_applicator_master_update').value = id;
         document.getElementById('a_car_maker_master_update').value = car_maker;
         document.getElementById('a_car_model_master_update').value = car_model;
         document.getElementById('a_applicator_no_master_update').value = applicator_no;
         document.getElementById('a_zaihai_stock_address_master_update').value = zaihai_stock_address;
+
+        if (is_priority > 0) {
+            document.getElementById('a_chkbx_is_priority_update').checked = true;
+        } else {
+            document.getElementById('a_chkbx_is_priority_update').checked = false;
+        }
 	}
 
 	// Get the form element
@@ -327,6 +343,12 @@
         var applicator_no = document.getElementById('a_applicator_no_master_update').value;
         var zaihai_stock_address = document.getElementById('a_zaihai_stock_address_master_update').value;
 
+        var is_priority = 0;
+
+        if (document.getElementById('a_chkbx_is_priority_update').checked) {
+            is_priority = 1;
+        }
+
         $.ajax({
             url: '../process/me/applicator/a_p.php',
             type: 'POST',
@@ -337,7 +359,8 @@
                 car_maker: car_maker,
                 car_model: car_model,
                 applicator_no: applicator_no,
-                zaihai_stock_address: zaihai_stock_address
+                zaihai_stock_address: zaihai_stock_address,
+                is_priority: is_priority
             }, success: function (response) {
                 if (response == 'success') {
                     Swal.fire({

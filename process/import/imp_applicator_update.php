@@ -19,18 +19,19 @@ function check_csv ($file, $conn) {
     $isDuplicateOnCsvArr = array();
     $dup_temp_arr = array();
 
-    $row_valid_arr = array(0, 0);
+    $row_valid_arr = array(0, 0, 0);
 
     $notExistsApplicatorArr = array();
     $readyToUseOnlyArr = array();
+    $invalidPriorityArr = array();
 
     $message = "";
     $check_csv_row = 1;
 
     // CHECK CSV BASED ON HEADER
     $first_line = preg_replace('/[\t\n\r]+/', '', $first_line);
-    $valid_first_line = "Car Maker,Car Model,Applicator No.,Zaihai Stock Address,Car Maker New,Car Model New,Applicator No. New,Zaihai Stock Address New";
-    $valid_first_line2 = '"Car Maker","Car Model","Applicator No.","Zaihai Stock Address","Car Maker New","Car Model New","Applicator No. New","Zaihai Stock Address New"';
+    $valid_first_line = "Car Maker,Car Model,Applicator No.,Zaihai Stock Address,Car Maker New,Car Model New,Applicator No. New,Zaihai Stock Address New,Priority Status";
+    $valid_first_line2 = '"Car Maker","Car Model","Applicator No.","Zaihai Stock Address","Car Maker New","Car Model New","Applicator No. New","Zaihai Stock Address New","Priority Status"';
     if ($first_line == $valid_first_line || $first_line == $valid_first_line2) {
         while (($line = fgetcsv($csvFile)) !== false) {
             // Check if the row is blank or consists only of whitespace
@@ -48,9 +49,17 @@ function check_csv ($file, $conn) {
             $car_model_new = $line[5];
             $applicator_no_new = $line[6];
             $zaihai_stock_address_new = $line[7];
+            $priority_status = $line[8];
 
             if (empty($car_maker_new) && empty($car_model_new) 
                 && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
+                // 2
+                if (!empty($priority_status) && strtolower($priority_status) != 'priority') {
+                    $hasError = 1;
+                    $row_valid_arr[2] = 1;
+                    array_push($invalidPriorityArr, $check_csv_row);
+                }
+                
                 continue; // Skip blank lines
             } else if (empty($car_maker_new)) {
                 $car_maker_new = $car_maker;
@@ -87,22 +96,29 @@ function check_csv ($file, $conn) {
             }
 
             // 1
-            $sql = "SELECT status FROM t_applicator_list 
-                    WHERE applicator_no = ?";
-            $stmt = $conn -> prepare($sql);
-            $params = array($applicator_no);
-            $stmt -> execute($params);
+            // $sql = "SELECT status FROM t_applicator_list 
+            //         WHERE applicator_no = ?";
+            // $stmt = $conn -> prepare($sql);
+            // $params = array($applicator_no);
+            // $stmt -> execute($params);
 
-            $row = $stmt -> fetch(PDO::FETCH_ASSOC);
+            // $row = $stmt -> fetch(PDO::FETCH_ASSOC);
 
-            if ($row && $row['status'] != 'Ready To Use') {
+            // if ($row && $row['status'] != 'Ready To Use') {
+            //     $hasError = 1;
+            //     $row_valid_arr[1] = 1;
+            //     array_push($readyToUseOnlyArr, $check_csv_row);
+            // } else if (!$row) {
+            //     $hasError = 1;
+            //     $row_valid_arr[1] = 1;
+            //     array_push($readyToUseOnlyArr, $check_csv_row);
+            // }
+
+            // 2
+            if (!empty($priority_status) && strtolower($priority_status) != 'priority') {
                 $hasError = 1;
-                $row_valid_arr[1] = 1;
-                array_push($readyToUseOnlyArr, $check_csv_row);
-            } else if (!$row) {
-                $hasError = 1;
-                $row_valid_arr[1] = 1;
-                array_push($readyToUseOnlyArr, $check_csv_row);
+                $row_valid_arr[2] = 1;
+                array_push($invalidPriorityArr, $check_csv_row);
             }
             
             // Joining all row values for checking duplicated rows
@@ -142,6 +158,9 @@ function check_csv ($file, $conn) {
         }
         if ($row_valid_arr[1] == 1) {
             $message = $message . 'Ready to use status only on Applicator List to continue on row/s ' . implode(", ", $readyToUseOnlyArr) . '. ';
+        }
+        if ($row_valid_arr[2] == 1) {
+            $message = $message . 'Invalid Priority Status on row/s ' . implode(", ", $invalidPriorityArr) . '. ';
         }
 
         // if ($isExistsOnDb == 1) {
@@ -233,9 +252,28 @@ try {
         $car_model_new = $line[5];
         $applicator_no_new = $line[6];
         $zaihai_stock_address_new = $line[7];
+        $priority_status = $line[8];
+
+        $is_priority = 0;
+
+        if (!empty($priority_status) && strtolower($priority_status) == 'priority') {
+            $is_priority = 1;
+        }
 
         if (empty($car_maker_new) && empty($car_model_new) 
             && empty($applicator_no_new) && empty($zaihai_stock_address_new)) {
+            // Only priority update applied
+            $query = "UPDATE m_applicator 
+                        SET 
+                            is_priority = ?
+                        WHERE 
+                            applicator_no = ? AND is_priority != ?";
+
+            $stmt = $conn->prepare($query);
+            $params = array($is_priority, $applicator_no, $is_priority);
+    
+            $stmt->execute($params);
+
             continue; // Skip blank lines
         } else if (empty($car_maker_new)) {
             $car_maker_new = $car_maker;
@@ -247,28 +285,68 @@ try {
             $zaihai_stock_address_new = $zaihai_stock_address;
         }
 
+        // Only priority update applied
+        $query = "UPDATE m_applicator 
+                    SET 
+                        is_priority = ?
+                    WHERE 
+                        applicator_no = ? AND is_priority != ?";
+
+        $stmt = $conn->prepare($query);
+        $params = array($is_priority, $applicator_no, $is_priority);
+ 
+        $stmt->execute($params);
+
+        // Update applicator details if status is ready to use
         $query = "UPDATE t_applicator_list 
-                    SET car_maker = ?, car_model = ?, 
-                    applicator_no = ?, location = ?
-                    WHERE car_maker = ? AND car_model = ? 
-                    AND applicator_no = ? AND location = ?";
+                    SET 
+                        car_maker = ?, 
+                        car_model = ?, 
+                        applicator_no = ?, 
+                        location = ? 
+                    WHERE 
+                        car_maker = ? AND 
+                        car_model = ? AND 
+                        applicator_no = ? AND 
+                        location = ? AND 
+                        EXISTS (
+                            SELECT 1
+                            FROM t_applicator_list a
+                            WHERE a.applicator_no = t_applicator_list.applicator_no
+                            AND a.status = 'Ready To Use'
+                        )";
 
         $stmt = $conn->prepare($query);
         $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new,
                         $car_maker, $car_model, $applicator_no, $zaihai_stock_address);
         if ($stmt->execute($params)) {
-            $stmt = NULL;
 
-            $query = "UPDATE m_applicator 
-                    SET car_maker = ?, car_model = ?, 
-                    applicator_no = ?, zaihai_stock_address = ? 
-                    WHERE zaihai_stock_address = ?";
+            $rowsAffected = $stmt->rowCount();
 
-            $stmt = $conn->prepare($query);
-            $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new, 
-                            $zaihai_stock_address);
-            if (!$stmt->execute($params)) {
-                $error++;
+            if ($rowsAffected > 0) {
+                $stmt = NULL;
+
+                $query = "UPDATE m_applicator 
+                            SET 
+                                car_maker = ?, 
+                                car_model = ?, 
+                                applicator_no = ?, 
+                                zaihai_stock_address = ? 
+                            WHERE 
+                                zaihai_stock_address = ? AND 
+                                EXISTS (
+                                    SELECT 1
+                                    FROM t_applicator_list a
+                                    WHERE a.applicator_no = m_applicator.applicator_no
+                                    AND a.status = 'Ready To Use'
+                                )";
+
+                $stmt = $conn->prepare($query);
+                $params = array($car_maker_new, $car_model_new, $applicator_no_new, $zaihai_stock_address_new, 
+                                $zaihai_stock_address);
+                if (!$stmt->execute($params)) {
+                    $error++;
+                }
             }
         } else {
             $error++;

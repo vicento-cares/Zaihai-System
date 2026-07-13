@@ -36,6 +36,12 @@
               <input type="text" id="a_zaihai_stock_address_master" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-sm-12">
+              <input type="checkbox" name="a_chkbx_is_priority" id="a_chkbx_is_priority" value="1">
+              <label for="a_chkbx_is_priority">Priority</label>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" id="btnAddApplicator" name="btn_add_applicator" class="btn btn-success">Add</button>

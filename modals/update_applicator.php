@@ -37,6 +37,12 @@
               <input type="text" id="a_zaihai_stock_address_master_update" class="form-control" maxlength="100" autocomplete="off" required>
             </div>
           </div>
+          <div class="row mb-2">
+            <div class="col-sm-12">
+              <input type="checkbox" name="a_chkbx_is_priority_update" id="a_chkbx_is_priority_update" value="1">
+              <label for="a_chkbx_is_priority_update">Priority</label>
+            </div>
+          </div>
           <br>
           <hr>
           <div class="row">

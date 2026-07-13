@@ -118,7 +118,7 @@ if ($method == 'get_applicators') {
 
     $c = 0;
 
-    $sql = "SELECT id, car_maker, car_model, applicator_no, zaihai_stock_address, date_updated FROM m_applicator";
+    $sql = "SELECT id, car_maker, car_model, applicator_no, zaihai_stock_address, is_priority, CASE WHEN CAST(is_priority AS INT) > 0 THEN 'Priority' ELSE 'Non-Priority' END AS priority_status, date_updated FROM m_applicator";
 
     if (!empty($applicator_no)) {
         $sql .= " WHERE applicator_no LIKE '$applicator_no%'";
@@ -144,12 +144,13 @@ if ($method == 'get_applicators') {
             $c++;
 
             echo '<tr style="cursor:pointer;" class="modal-trigger" data-toggle="modal" data-target="#update_applicator"
-                    onclick="get_applicator_details(&quot;'.$row['id'].'~!~'.$row['car_maker'].'~!~'.$row['car_model'].'~!~'.$row['applicator_no'].'~!~'.$row['zaihai_stock_address'].'&quot;)">';
+                    onclick="get_applicator_details(&quot;'.$row['id'].'~!~'.$row['car_maker'].'~!~'.$row['car_model'].'~!~'.$row['applicator_no'].'~!~'.$row['zaihai_stock_address'].'~!~'.$row['is_priority'].'&quot;)">';
             echo '<td>'.$c.'</td>';
             echo '<td>'.$row['car_maker'].'</td>';
             echo '<td>'.$row['car_model'].'</td>';
             echo '<td>'.$row['applicator_no'].'</td>';
             echo '<td>'.$row['zaihai_stock_address'].'</td>';
+			echo '<td>'.$row['priority_status'].'</td>';
             echo '<td>'.$row['date_updated'].'</td>';
             echo '</tr>';
         }

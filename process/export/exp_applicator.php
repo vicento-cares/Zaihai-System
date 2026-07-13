@@ -39,10 +39,10 @@ $f = fopen('php://memory', 'w');
 fputs($f, "\xEF\xBB\xBF");
 
 // Set column headers 
-$fields = array('Car Maker', 'Car Model', 'Applicator No.', 'Zaihai Stock Address', 'Car Maker New', 'Car Model New', 'Applicator No. New', 'Zaihai Stock Address New'); 
+$fields = array('Car Maker', 'Car Model', 'Applicator No.', 'Zaihai Stock Address', 'Car Maker New', 'Car Model New', 'Applicator No. New', 'Zaihai Stock Address New', 'Priority Status'); 
 fputcsv($f, $fields, $delimiter); 
 
-$sql = "SELECT id, car_maker, car_model, applicator_no, zaihai_stock_address, date_updated 
+$sql = "SELECT id, car_maker, car_model, applicator_no, zaihai_stock_address, is_priority, date_updated 
         FROM m_applicator 
         WHERE applicator_no != ''";
 $params = [];
@@ -75,7 +75,13 @@ $stmt->execute($params);
 // Output each row of the data, format line as csv and write to file pointer 
 while($row = $stmt -> fetch(PDO::FETCH_ASSOC)) { 
 
-    $lineData = array($row['car_maker'], $row['car_model'], $row['applicator_no'], $row['zaihai_stock_address'], '', '', '', ''); 
+    $priority_status = '';
+
+    if (intval($row['is_priority']) > 0) {
+        $priority_status = 'Priority';
+    }
+
+    $lineData = array($row['car_maker'], $row['car_model'], $row['applicator_no'], $row['zaihai_stock_address'], '', '', '', '', $priority_status); 
     fputcsv($f, $lineData, $delimiter); 
     
 }

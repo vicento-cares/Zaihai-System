@@ -108,6 +108,7 @@
                       <th>Car Model</th>
                       <th>Applicator No.</th>
                       <th>Zaihai Stock Address</th>
+                      <th>Priority Status</th>
                       <th>Date Updated</th>
                     </tr>
                   </thead>
