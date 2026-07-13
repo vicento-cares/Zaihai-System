@@ -293,8 +293,16 @@ if ($method == 'backup_zaihai_data') {
                             ,zaihai_stock_address
                             ,operator_in
                             ,date_time_in
+                            ,days_elapsed_in
+                            ,hours_elapsed_in
+                            ,minutes_elapsed_in
+                            ,saved_elapsed_time_in
                             ,inspected_by
                             ,confirmation_date
+                            ,days_elapsed_confirm
+                            ,hours_elapsed_confirm
+                            ,minutes_elapsed_confirm
+                            ,saved_elapsed_time_confirm
                         ) 
                     SELECT 
                         serial_no
@@ -306,8 +314,16 @@ if ($method == 'backup_zaihai_data') {
                         ,zaihai_stock_address
                         ,operator_in
                         ,date_time_in
+                        ,days_elapsed_in
+                        ,hours_elapsed_in
+                        ,minutes_elapsed_in
+                        ,saved_elapsed_time_in
                         ,inspected_by
-                        ,confirmation_date 
+                        ,confirmation_date
+                        ,days_elapsed_confirm
+                        ,hours_elapsed_confirm
+                        ,minutes_elapsed_confirm
+                        ,saved_elapsed_time_confirm 
                     FROM 
                         zaihai_db.dbo.t_applicator_in_out_history 
                     WHERE 
