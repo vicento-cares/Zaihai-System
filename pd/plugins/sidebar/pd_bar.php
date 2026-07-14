@@ -22,6 +22,23 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
              with font-awesome or any other icon font library -->
+        <?php if (isset($_SESSION['line_no']) && (empty($_SESSION['line_no']) || strtolower($_SESSION['line_no']) == 'undefined')) { ?>
+
+        <li class="nav-item">
+          <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/pd/applicator.php") { ?>
+          <a href="applicator.php" class="nav-link active">
+          <?php } else { ?>
+          <a href="applicator.php" class="nav-link">
+          <?php } ?>
+            <i class="nav-icon fas fa-check"></i>
+            <p>
+              Applicator
+            </p>
+          </a>
+        </li>
+
+        <?php } else { ?>
+
         <li class="nav-item">
           <?php if ($_SERVER['REQUEST_URI'] == "/zaihai/pd/verify_checksheet.php") { ?>
           <a href="verify_checksheet.php" class="nav-link active">
@@ -34,6 +51,9 @@
             </p>
           </a>
         </li>
+
+        <?php } ?>
+      
         <?php include 'logout.php'; ?>
       </ul>
     </nav>

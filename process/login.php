@@ -5,6 +5,21 @@ session_start();
 
 require 'conn.php';
 
+function get_positions($conn)
+{
+    $data = array();
+
+    $sql = "SELECT position FROM m_positions WHERE [rank] > 2 ORDER BY position ASC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        array_push($data, $row['position']);
+    }
+
+    return $data;
+}
+
 function get_access_location_by_ip($ip, $conn) {
     $can_access = false;
     $car_maker = '';
@@ -45,7 +60,7 @@ if (isset($_POST['login_btn'])) {
     } else if ($role == 'PD') {
         include 'conn_emp_mgt.php';
 
-        $check = "SELECT emp_no, full_name, line_no FROM m_employees 
+        $check = "SELECT emp_no, full_name, dept, section, line_no, position FROM m_employees 
                     WHERE emp_no = ? COLLATE SQL_Latin1_General_CP1_CS_AS";
         $params[] = $emp_no;
 
@@ -55,16 +70,26 @@ if (isset($_POST['login_btn'])) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	    if (count($results) > 0) {
+            $dept = '';
+            $section = '';
             $line_no = '';
+            $position = '';
 
             foreach ($results as $row) {
                 $emp_no = $row['emp_no'];
                 $full_name = $row['full_name'];
+                $dept = $row['dept'];
+                $section = $row['section'];
                 $line_no = $row['line_no'];
+                $position = $row['position'];
             }
 
             $is_fp = strpos($line_no, "First Process");
             $is_sp = strpos($line_no, "Secondary Process");
+
+            $is_pd = strpos($dept, "PD");
+
+            $position_arr = get_positions($conn_emp_mgt);
 
             if ($is_fp !== false || $is_sp !== false) {
                 $_SESSION['emp_no'] = $emp_no;
@@ -73,6 +98,31 @@ if (isset($_POST['login_btn'])) {
 
                 $conn_emp_mgt = null;
                 header('location:/zaihai/pd/verify_checksheet.php');
+                exit();
+            } else if (in_array($position, $position_arr) && $is_pd !== false) {
+                // If Staff and Above for Applicator Masterlist Access
+                $_SESSION['emp_no'] = $emp_no;
+                $_SESSION['full_name'] = $full_name;
+                $_SESSION['role'] = $role;
+                $_SESSION['line_no'] = $line_no;
+
+                $conn_emp_mgt = null;
+
+                $sql = "SELECT car_maker, car_model FROM m_car_maker WHERE section = ?";
+
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$section]);
+
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($row) {
+                    $_SESSION['car_maker'] = $row['car_maker'];
+                    $_SESSION['car_model'] = $row['car_model'];
+                }
+
+                $conn = null;
+
+                header('location:/zaihai/pd/applicator.php');
                 exit();
             } else {
                 echo '<script>alert("Sign In Failed. Only First and Secondary Process On Any Section Allowed")</script>';
