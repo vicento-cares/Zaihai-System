@@ -226,17 +226,14 @@ if ($method == 'get_recent_applicator_shots') {
             $row['shotcnt_d_ee_status'] == 'Exceeded' || 
             $row['shotcnt_i_u_ee_status'] == 'Exceeded' || 
             $row['shotcnt_i_d_ee_status'] == 'Exceeded' || 
-            $row['shotcnt_c_ee_status'] == 'Exceeded'
-        ) {
-			$row_class = 'bg-danger';
-		} else if (
+            $row['shotcnt_c_ee_status'] == 'Exceeded' || 
             $row['shotcnt_u_qa_status'] == 'Exceeded' || 
             $row['shotcnt_d_qa_status'] == 'Exceeded' || 
             $row['shotcnt_i_u_qa_status'] == 'Exceeded' || 
             $row['shotcnt_i_d_qa_status'] == 'Exceeded' || 
             $row['shotcnt_c_qa_status'] == 'Exceeded'
         ) {
-            $row_class = 'bg-warning';
+            $row_class = 'bg-gray';
         }
 		echo '<tr class="'.$row_class.'">';
 
@@ -250,28 +247,28 @@ if ($method == 'get_recent_applicator_shots') {
 		echo '<td>'.$row['SHOTCNT_U'].'</td>';
         echo '<td>'.$row['shotcnt_u_limit_ee'].'</td>';
         echo '<td>'.$row['shotcnt_u_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_u_ee_status'].'</td>';
-        echo '<td>'.$row['shotcnt_u_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_u_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_u_ee_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_u_qa_status'] == 'Exceeded') ? 'bg-warning' : '').'">'.$row['shotcnt_u_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_D'].'</td>';
         echo '<td>'.$row['shotcnt_d_limit_ee'].'</td>';
         echo '<td>'.$row['shotcnt_d_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_d_ee_status'].'</td>';
-        echo '<td>'.$row['shotcnt_d_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_d_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_d_ee_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_d_qa_status'] == 'Exceeded') ? 'bg-warning' : '').'">'.$row['shotcnt_d_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_I_U'].'</td>';
         echo '<td>'.$row['shotcnt_i_u_limit_ee'].'</td>';
         echo '<td>'.$row['shotcnt_i_u_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_i_u_ee_status'].'</td>';
-        echo '<td>'.$row['shotcnt_i_u_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_u_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_i_u_ee_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_u_qa_status'] == 'Exceeded') ? 'bg-warning' : '').'">'.$row['shotcnt_i_u_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_I_D'].'</td>';
         echo '<td>'.$row['shotcnt_i_d_limit_ee'].'</td>';
         echo '<td>'.$row['shotcnt_i_d_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_i_d_ee_status'].'</td>';
-        echo '<td>'.$row['shotcnt_i_d_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_d_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_i_d_ee_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_i_d_qa_status'] == 'Exceeded') ? 'bg-warning' : '').'">'.$row['shotcnt_i_d_qa_status'].'</td>';
         echo '<td>'.$row['SHOTCNT_C'].'</td>';
         echo '<td>'.$row['shotcnt_c_limit_ee'].'</td>';
         echo '<td>'.$row['shotcnt_c_limit_qa'].'</td>';
-        echo '<td>'.$row['shotcnt_c_ee_status'].'</td>';
-        echo '<td>'.$row['shotcnt_c_qa_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_c_ee_status'] == 'Exceeded') ? 'bg-danger' : '').'">'.$row['shotcnt_c_ee_status'].'</td>';
+        echo '<td class="'.(($row['shotcnt_c_qa_status'] == 'Exceeded') ? 'bg-warning' : '').'">'.$row['shotcnt_c_qa_status'].'</td>';
 		echo '</tr>';
     }
 }

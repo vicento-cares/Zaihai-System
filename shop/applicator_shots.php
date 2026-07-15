@@ -80,6 +80,17 @@
                 </div>
               </div>
               <div class="row mb-2">
+                  <div class="form-group mb-0 px-2">
+                  <label><b>Applicator Shots Table Legend</b></label>
+                  </div>
+              </div>
+              <div class="row mb-4">
+                  <div class="col-sm-6 col-lg-3 p-1 border"><center>All Good</center></div>
+                  <div class="col-sm-6 col-lg-3 p-1 border bg-gray"><center>Shot Limit Exceeded</center></div>
+                  <div class="col-sm-6 col-lg-3 p-1 border bg-danger"><center>100k Shots Exceeded (EE)</center></div>
+                  <div class="col-sm-6 col-lg-3 p-1 border bg-warning"><center>50k Shots Exceeded (QA)</center></div>
+              </div>
+              <div class="row mb-2">
                 <div class="col-sm-2">
                   <span id="count_view"></span>
                 </div>
