@@ -66,7 +66,7 @@ if ($method == 'get_applicators') {
 
             echo '<tr>';
             echo '<td><p class="mb-0"><label class="mb-0"><input type="checkbox" class="singleCheck" id="a_chkbx_'.$c.'" 
-							value="'.$is_prod_priority.'" data-id="'.$row['id'].'" onclick="update_applicator('.$c.', this)" "' . $checked . '"/><span></span></label></p></td>';
+							value="'.$is_prod_priority.'" data-id="'.$row['id'].'" onclick="update_applicator('.$c.', this)" ' . $checked . '/><span></span></label></p></td>';
 			echo '<td>'.$c.'</td>';
             echo '<td>'.$row['car_maker'].'</td>';
             echo '<td>'.$row['car_model'].'</td>';
