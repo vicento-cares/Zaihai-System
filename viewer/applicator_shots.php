@@ -28,6 +28,154 @@ include 'plugins/navbar/viewer_navbar.php';
                         <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline">
                                 <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Applicator Count based on Shot Count Status as of <?=date("F j, Y")?></h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="row mb-2">
+                                        <h5>Current Overall Applicator Count Based On Applicator Shot Count Limit</h5>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12">
+                                            <table class="table table-bordered table-black-white">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Shot Count Limit Status</th>
+                                                        <th>Normal</th>
+                                                        <th>Priority</th>
+                                                        <th>Prod Priority</th>
+                                                        <th>Total Applicators</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Not Exceeded 50k Shots</td>
+                                                        <td id="total_appshot_good_normal_qa">0</td>
+                                                        <td id="total_appshot_good_prio_qa">0</td>
+                                                        <td id="total_appshot_good_prod_prio_qa">0</td>
+                                                        <td id="total_appshot_good_qa">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Not Exceeded 100k Shots</td>
+                                                        <td id="total_appshot_good_normal_ee">0</td>
+                                                        <td id="total_appshot_good_prio_ee">0</td>
+                                                        <td id="total_appshot_good_prod_prio_ee">0</td>
+                                                        <td id="total_appshot_good_ee">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Exceeded 50k Shots</td>
+                                                        <td id="total_appshot_exceeded_normal_qa">0</td>
+                                                        <td id="total_appshot_exceeded_prio_qa">0</td>
+                                                        <td id="total_appshot_exceeded_prod_prio_qa">0</td>
+                                                        <td id="total_appshot_exceeded_qa">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Exceeded 100k Shots</td>
+                                                        <td id="total_appshot_exceeded_normal_ee">0</td>
+                                                        <td id="total_appshot_exceeded_prio_ee">0</td>
+                                                        <td id="total_appshot_exceeded_prod_prio_ee">0</td>
+                                                        <td id="total_appshot_exceeded_ee">0</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12">
+                                            <table class="table table-bordered table-black-white">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Applicator Parts</th>
+                                                        <th>Not Exceeded 50k Shots</th>
+                                                        <th>Exceeded 50k Shots</th>
+                                                        <th>Not Exceeded 100k Shots</th>
+                                                        <th>Exceeded 100k Shots</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Wire Crimper</td>
+                                                        <td id="total_shotcnt_u_qa_good">0</td>
+                                                        <td id="total_shotcnt_u_qa_exceeded">0</td>
+                                                        <td id="total_shotcnt_u_ee_good">0</td>
+                                                        <td id="total_shotcnt_u_ee_exceeded">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Wire Anvil</td>
+                                                        <td id="total_shotcnt_d_qa_good">0</td>
+                                                        <td id="total_shotcnt_d_qa_exceeded">0</td>
+                                                        <td id="total_shotcnt_d_ee_good">0</td>
+                                                        <td id="total_shotcnt_d_ee_exceeded">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Insulation Crimper</td>
+                                                        <td id="total_shotcnt_i_u_qa_good">0</td>
+                                                        <td id="total_shotcnt_i_u_qa_exceeded">0</td>
+                                                        <td id="total_shotcnt_i_u_ee_good">0</td>
+                                                        <td id="total_shotcnt_i_u_ee_exceeded">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Insulation Anvil</td>
+                                                        <td id="total_shotcnt_i_d_qa_good">0</td>
+                                                        <td id="total_shotcnt_i_d_qa_exceeded">0</td>
+                                                        <td id="total_shotcnt_i_d_ee_good">0</td>
+                                                        <td id="total_shotcnt_i_d_ee_exceeded">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Slide Cutter</td>
+                                                        <td id="total_shotcnt_c_qa_good">0</td>
+                                                        <td id="total_shotcnt_c_qa_exceeded">0</td>
+                                                        <td id="total_shotcnt_c_ee_good">0</td>
+                                                        <td id="total_shotcnt_c_ee_exceeded">0</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_good_vs_exceeded_qa_chart"></div>
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_good_vs_exceeded_ee_chart"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_exceeded_prio_qa_chart"></div>
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_exceeded_prio_ee_chart"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_exceeded_appstat_qa_chart"></div>
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_exceeded_appstat_ee_chart"></div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <h5>Applicator Count Based On Actual Applicator Shot Counts Accumulated</h5>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_u_ranges_chart"></div>
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_d_ranges_chart"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_i_u_ranges_chart"></div>
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_i_d_ranges_chart"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-sm-12" id="shotcnt_c_ranges_chart"></div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline">
+                                <div class="card-header">
                                 <h3 class="card-title"><i class="fas fa-list"></i> Applicator Shots Table</h3>
                                 <div class="card-tools">
                                     <button type="button" class="btn btn-tool" data-card-widget="collapse">

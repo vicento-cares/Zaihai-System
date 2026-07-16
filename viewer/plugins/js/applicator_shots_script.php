@@ -1,9 +1,34 @@
 <script type="text/javascript">
+	let shotcnt_good_vs_exceeded_qa_chart;
+	let shotcnt_good_vs_exceeded_ee_chart;
+	let shotcnt_exceeded_prio_ee_chart;
+	let shotcnt_exceeded_prio_qa_chart;
+	let shotcnt_exceeded_appstat_ee_chart;
+	let shotcnt_exceeded_appstat_qa_chart;
+	let shotcnt_u_ranges_chart;
+	let shotcnt_d_ranges_chart;
+	let shotcnt_i_u_ranges_chart;
+	let shotcnt_i_d_ranges_chart;
+	let shotcnt_c_ranges_chart;
+
     // Global Variables for Realtime
 	var realtime_get_recent_applicator_shots;
 
 	// DOMContentLoaded function
 	document.addEventListener("DOMContentLoaded", () => {
+		get_current_overall_shotcnt();
+		get_shotcnt_good_vs_exceeded_qa_chart();
+		get_shotcnt_good_vs_exceeded_ee_chart();
+		get_shotcnt_exceeded_prio_ee_chart();
+		get_shotcnt_exceeded_prio_qa_chart();
+		get_shotcnt_exceeded_appstat_ee_chart();
+		get_shotcnt_exceeded_appstat_qa_chart();
+		get_shotcnt_u_ranges_chart();
+		get_shotcnt_d_ranges_chart();
+		get_shotcnt_i_u_ranges_chart();
+		get_shotcnt_i_d_ranges_chart();
+		get_shotcnt_c_ranges_chart();
+		
 		get_car_maker_dropdown_search();
 		get_car_model_dropdown_search();
 		get_applicator_no_datalist_search();
@@ -11,6 +36,802 @@
 		get_recent_applicator_shots();
 		realtime_get_recent_applicator_shots = setInterval(get_recent_applicator_shots, 10000);
 	});
+
+	const get_current_overall_shotcnt = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_overall_shotcnt'
+			},  
+			success: response => {
+				// Good
+				document.getElementById("total_appshot_good_ee").innerHTML = `<b>${response.total_appshot_good_ee}</b>`;
+				document.getElementById("total_appshot_good_prio_ee").innerHTML = `<b>${response.total_appshot_good_prio_ee}</b>`;
+				document.getElementById("total_appshot_good_prod_prio_ee").innerHTML = `<b>${response.total_appshot_good_prod_prio_ee}</b>`;
+				document.getElementById("total_appshot_good_normal_ee").innerHTML = `<b>${response.total_appshot_good_normal_ee}</b>`;
+
+				document.getElementById("total_appshot_good_qa").innerHTML = `<b>${response.total_appshot_good_qa}</b>`;
+				document.getElementById("total_appshot_good_prio_qa").innerHTML = `<b>${response.total_appshot_good_prio_qa}</b>`;
+				document.getElementById("total_appshot_good_prod_prio_qa").innerHTML = `<b>${response.total_appshot_good_prod_prio_qa}</b>`;
+				document.getElementById("total_appshot_good_normal_qa").innerHTML = `<b>${response.total_appshot_good_normal_qa}</b>`;
+
+				document.getElementById("total_shotcnt_u_ee_good").innerHTML = `<b>${response.total_shotcnt_u_ee_good}</b>`;
+				document.getElementById("total_shotcnt_d_ee_good").innerHTML = `<b>${response.total_shotcnt_d_ee_good}</b>`;
+				document.getElementById("total_shotcnt_i_u_ee_good").innerHTML = `<b>${response.total_shotcnt_i_u_ee_good}</b>`;
+				document.getElementById("total_shotcnt_i_d_ee_good").innerHTML = `<b>${response.total_shotcnt_i_d_ee_good}</b>`;
+				document.getElementById("total_shotcnt_c_ee_good").innerHTML = `<b>${response.total_shotcnt_c_ee_good}</b>`;
+
+				document.getElementById("total_shotcnt_u_qa_good").innerHTML = `<b>${response.total_shotcnt_u_qa_good}</b>`;
+				document.getElementById("total_shotcnt_d_qa_good").innerHTML = `<b>${response.total_shotcnt_d_qa_good}</b>`;
+				document.getElementById("total_shotcnt_i_u_qa_good").innerHTML = `<b>${response.total_shotcnt_i_u_qa_good}</b>`;
+				document.getElementById("total_shotcnt_i_d_qa_good").innerHTML = `<b>${response.total_shotcnt_i_d_qa_good}</b>`;
+				document.getElementById("total_shotcnt_c_qa_good").innerHTML = `<b>${response.total_shotcnt_c_qa_good}</b>`;
+
+				// Exceeded
+				document.getElementById("total_appshot_exceeded_ee").innerHTML = `<b>${response.total_appshot_exceeded_ee}</b>`;
+				document.getElementById("total_appshot_exceeded_prio_ee").innerHTML = `<b>${response.total_appshot_exceeded_prio_ee}</b>`;
+				document.getElementById("total_appshot_exceeded_prod_prio_ee").innerHTML = `<b>${response.total_appshot_exceeded_prod_prio_ee}</b>`;
+				document.getElementById("total_appshot_exceeded_normal_ee").innerHTML = `<b>${response.total_appshot_exceeded_normal_ee}</b>`;
+
+				document.getElementById("total_appshot_exceeded_qa").innerHTML = `<b>${response.total_appshot_exceeded_qa}</b>`;
+				document.getElementById("total_appshot_exceeded_prio_qa").innerHTML = `<b>${response.total_appshot_exceeded_prio_qa}</b>`;
+				document.getElementById("total_appshot_exceeded_prod_prio_qa").innerHTML = `<b>${response.total_appshot_exceeded_prod_prio_qa}</b>`;
+				document.getElementById("total_appshot_exceeded_normal_qa").innerHTML = `<b>${response.total_appshot_exceeded_normal_qa}</b>`;
+
+				document.getElementById("total_shotcnt_u_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_u_ee_exceeded}</b>`;
+				document.getElementById("total_shotcnt_d_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_d_ee_exceeded}</b>`;
+				document.getElementById("total_shotcnt_i_u_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_i_u_ee_exceeded}</b>`;
+				document.getElementById("total_shotcnt_i_d_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_i_d_ee_exceeded}</b>`;
+				document.getElementById("total_shotcnt_c_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_c_ee_exceeded}</b>`;
+
+				document.getElementById("total_shotcnt_u_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_u_qa_exceeded}</b>`;
+				document.getElementById("total_shotcnt_d_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_d_qa_exceeded}</b>`;
+				document.getElementById("total_shotcnt_i_u_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_i_u_qa_exceeded}</b>`;
+				document.getElementById("total_shotcnt_i_d_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_i_d_qa_exceeded}</b>`;
+				document.getElementById("total_shotcnt_c_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_c_qa_exceeded}</b>`;
+			}
+		});
+	}
+
+	const get_shotcnt_good_vs_exceeded_qa_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_good_vs_exceeded_qa_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#28a745', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_good_vs_exceeded_qa_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					},
+					dataLabels: {
+						enabled: true
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count In 50k Shot Count Condition`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_good_vs_exceeded_qa_chart) {
+					shotcnt_good_vs_exceeded_qa_chart.destroy();
+				}
+
+				shotcnt_good_vs_exceeded_qa_chart = new ApexCharts(ctx, options);
+				shotcnt_good_vs_exceeded_qa_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_good_vs_exceeded_ee_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_good_vs_exceeded_ee_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#28a745', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_good_vs_exceeded_ee_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					},
+					dataLabels: {
+						enabled: true
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count In 100k Shot Count Condition`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_good_vs_exceeded_ee_chart) {
+					shotcnt_good_vs_exceeded_ee_chart.destroy();
+				}
+
+				shotcnt_good_vs_exceeded_ee_chart = new ApexCharts(ctx, options);
+				shotcnt_good_vs_exceeded_ee_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_exceeded_prio_ee_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_exceeded_prio_ee_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#dc3545', '#ffc107', '#28a745'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_exceeded_prio_ee_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					},
+					dataLabels: {
+						enabled: true
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count Exceeded 100k Shot Count Based On Priority`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_exceeded_prio_ee_chart) {
+					shotcnt_exceeded_prio_ee_chart.destroy();
+				}
+
+				shotcnt_exceeded_prio_ee_chart = new ApexCharts(ctx, options);
+				shotcnt_exceeded_prio_ee_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_exceeded_prio_qa_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_exceeded_prio_qa_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#dc3545', '#ffc107', '#28a745'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_exceeded_prio_qa_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					},
+					dataLabels: {
+						enabled: true
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count Exceeded 50k Shot Count Based On Priority`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_exceeded_prio_qa_chart) {
+					shotcnt_exceeded_prio_qa_chart.destroy();
+				}
+
+				shotcnt_exceeded_prio_qa_chart = new ApexCharts(ctx, options);
+				shotcnt_exceeded_prio_qa_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_exceeded_appstat_ee_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_exceeded_appstat_ee_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_exceeded_appstat_ee_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					},
+					dataLabels: {
+						enabled: true
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count Exceeded 100k Shot Count Based On Applicator List Status`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_exceeded_appstat_ee_chart) {
+					shotcnt_exceeded_appstat_ee_chart.destroy();
+				}
+
+				shotcnt_exceeded_appstat_ee_chart = new ApexCharts(ctx, options);
+				shotcnt_exceeded_appstat_ee_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_exceeded_appstat_qa_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_exceeded_appstat_qa_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_exceeded_appstat_qa_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						height: 350
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					},
+					dataLabels: {
+						enabled: true
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count Exceeded 50k Shot Count Based On Applicator List Status`,
+						align: 'left'
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_exceeded_appstat_qa_chart) {
+					shotcnt_exceeded_appstat_qa_chart.destroy();
+				}
+
+				shotcnt_exceeded_appstat_qa_chart = new ApexCharts(ctx, options);
+				shotcnt_exceeded_appstat_qa_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_u_ranges_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_u_ranges_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#27ae60', '#28a745', '#ffc107', '#f39c12', '#e74c3c', '#e74c3c', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_u_ranges_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						toolbar: {
+							show: true
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count With Wire Crimper Shot Count Accumulated`,
+						align: 'left'
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_u_ranges_chart) {
+					shotcnt_u_ranges_chart.destroy();
+				}
+
+				shotcnt_u_ranges_chart = new ApexCharts(ctx, options);
+				shotcnt_u_ranges_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_d_ranges_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_d_ranges_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#27ae60', '#28a745', '#ffc107', '#f39c12', '#e74c3c', '#e74c3c', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_d_ranges_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						toolbar: {
+							show: true
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count With Wire Anvil Shot Count Accumulated`,
+						align: 'left'
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_d_ranges_chart) {
+					shotcnt_d_ranges_chart.destroy();
+				}
+
+				shotcnt_d_ranges_chart = new ApexCharts(ctx, options);
+				shotcnt_d_ranges_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_i_u_ranges_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_i_u_ranges_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#27ae60', '#28a745', '#ffc107', '#f39c12', '#e74c3c', '#e74c3c', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_i_u_ranges_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						toolbar: {
+							show: true
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count With Insulation Crimper Shot Count Accumulated`,
+						align: 'left'
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_i_u_ranges_chart) {
+					shotcnt_i_u_ranges_chart.destroy();
+				}
+
+				shotcnt_i_u_ranges_chart = new ApexCharts(ctx, options);
+				shotcnt_i_u_ranges_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_i_d_ranges_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_i_d_ranges_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#27ae60', '#28a745', '#ffc107', '#f39c12', '#e74c3c', '#e74c3c', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_i_d_ranges_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						toolbar: {
+							show: true
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count With Insulation Anvil Shot Count Accumulated`,
+						align: 'left'
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_i_d_ranges_chart) {
+					shotcnt_i_d_ranges_chart.destroy();
+				}
+
+				shotcnt_i_d_ranges_chart = new ApexCharts(ctx, options);
+				shotcnt_i_d_ranges_chart.render();
+			}
+		});
+	}
+
+	const get_shotcnt_c_ranges_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_shotcnt_c_ranges_chart'
+			},  
+			success: response => {
+				console.log(response.categories);
+				console.log(response.data);
+
+				// Define Bootstrap 4 colors
+				const bootstrapColors = ['#27ae60', '#28a745', '#ffc107', '#f39c12', '#e74c3c', '#e74c3c', '#dc3545'];
+
+				// Convert the data object to an array
+				const seriesData = response.data.map(item => {
+					return {
+						name: item.name,
+						data: Object.values(item.data)
+					};
+				});
+
+				let ctx = document.querySelector("#shotcnt_c_ranges_chart");
+
+				var options = {
+					chart: {
+						type: 'bar',
+						stacked: true,
+						toolbar: {
+							show: true
+						}
+					},
+					series: seriesData,
+					colors: bootstrapColors,
+					xaxis: {
+						categories: response.categories
+					},
+					yaxis: {
+						title: {
+							text: 'Applicator Count'
+						}
+					},
+					title: {
+						text: `Current Applicator Count With Slide Cutter Shot Count Accumulated`,
+						align: 'left'
+					},
+					plotOptions: {
+						bar: {
+							horizontal: false,
+							columnWidth: '55%'
+						},
+					}
+				};
+
+				// Destroy previous chart instance before creating a new one
+				if (shotcnt_c_ranges_chart) {
+					shotcnt_c_ranges_chart.destroy();
+				}
+
+				shotcnt_c_ranges_chart = new ApexCharts(ctx, options);
+				shotcnt_c_ranges_chart.render();
+			}
+		});
+	}
 
 	const get_car_maker_dropdown_search = () => {
 		$.ajax({
