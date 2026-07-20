@@ -26,6 +26,82 @@ if ($method == 'log_applicator_maintenance') {
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$maintenance_by, $maintenance_date, $applicator_no, $id]);
 
+		// Update History Logs
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_U AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '100K Shots' AND 
+						sh.shotcnt_type = 'Wire Crimper' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_D AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '100K Shots' AND 
+						sh.shotcnt_type = 'Wire Anvil' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_I_U AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '100K Shots' AND 
+						sh.shotcnt_type = 'Insulation Crimper' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_I_D AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '100K Shots' AND 
+						sh.shotcnt_type = 'Insulation Anvil' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_C AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '100K Shots' AND 
+						sh.shotcnt_type = 'Slide Cutter' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
 		$query = "UPDATE s
 					SET 
 						s.shotcnt_u_limit_ee = CASE 
@@ -119,6 +195,82 @@ if ($method == 'log_applicator_appearance') {
 
 		$stmt = $conn->prepare($query);
 		$stmt->execute([$applicator_no, $inspected_by, $inspection_date]);
+
+		// Update History Logs
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_U AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '50K Shots' AND 
+						sh.shotcnt_type = 'Wire Crimper' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_D AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '50K Shots' AND 
+						sh.shotcnt_type = 'Wire Anvil' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_I_U AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '50K Shots' AND 
+						sh.shotcnt_type = 'Insulation Crimper' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_I_D AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '50K Shots' AND 
+						sh.shotcnt_type = 'Insulation Anvil' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
+
+		$query = "UPDATE sh 
+						SET sh.is_limit_reset = CASE WHEN CAST(m.SHOTCNT_C AS INT) >= sh.shotcnt_limit THEN 1 ELSE sh.is_limit_reset END 
+					FROM t_applicator_shots_h sh 
+					INNER JOIN v_t_applicator_shots m 
+						ON sh.applicator_no = m.applicator_no 
+					WHERE 
+						sh.applicator_no = ? AND 
+						m.applicator_no = ? AND 
+						sh.shotcnt_category = '50K Shots' AND 
+						sh.shotcnt_type = 'Slide Cutter' AND 
+						sh.is_limit_reset = 0";
+
+		$stmt = $conn->prepare($query);
+		$stmt->execute([$applicator_no, $applicator_no]);
 
 		$query = "UPDATE s
 					SET 
