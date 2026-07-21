@@ -1,4 +1,14 @@
 <?php
+session_set_cookie_params(0, "/zaihai");
+session_name("zaihai");
+session_start();
+
+$full_view = false;
+
+// Check Session if shop then full data view else required on viewer page only
+if (isset($_SESSION['role']) && $_SESSION['role'] == 'Shop') {
+    $full_view = true;
+}
 
 require '../conn.php';
 
@@ -19,216 +29,374 @@ $color_map = array(
 if ($method == 'get_current_overall_shotcnt') {
     $data = [];
 
-    $sql = "SELECT 
-                COUNT(
-                    CASE 
-                        WHEN 
-                            [shotcnt_u_ee_status] = 'Good' AND 
-                            [shotcnt_d_ee_status] = 'Good' AND 
-                            [shotcnt_i_u_ee_status] = 'Good' AND 
-                            [shotcnt_i_d_ee_status] = 'Good' AND 
-                            [shotcnt_c_ee_status] = 'Good' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Good' AND 
-                            [shotcnt_d_ee_status] = 'Good' AND 
-                            [shotcnt_i_u_ee_status] = 'Good' AND 
-                            [shotcnt_i_d_ee_status] = 'Good' AND 
-                            [shotcnt_c_ee_status] = 'Good') AND 
-                            is_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_prio_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Good' AND 
-                            [shotcnt_d_ee_status] = 'Good' AND 
-                            [shotcnt_i_u_ee_status] = 'Good' AND 
-                            [shotcnt_i_d_ee_status] = 'Good' AND 
-                            [shotcnt_c_ee_status] = 'Good') AND 
-                            is_prod_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_prod_prio_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Good' AND 
-                            [shotcnt_d_ee_status] = 'Good' AND 
-                            [shotcnt_i_u_ee_status] = 'Good' AND 
-                            [shotcnt_i_d_ee_status] = 'Good' AND 
-                            [shotcnt_c_ee_status] = 'Good') AND 
-                            is_priority = 0 AND is_prod_priority = 0 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_normal_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            [shotcnt_u_qa_status] = 'Good' AND 
-                            [shotcnt_d_qa_status] = 'Good' AND 
-                            [shotcnt_i_u_qa_status] = 'Good' AND 
-                            [shotcnt_i_d_qa_status] = 'Good' AND 
-                            [shotcnt_c_qa_status] = 'Good' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Good' AND 
-                            [shotcnt_d_qa_status] = 'Good' AND 
-                            [shotcnt_i_u_qa_status] = 'Good' AND 
-                            [shotcnt_i_d_qa_status] = 'Good' AND 
-                            [shotcnt_c_qa_status] = 'Good') AND 
-                            is_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_prio_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Good' AND 
-                            [shotcnt_d_qa_status] = 'Good' AND 
-                            [shotcnt_i_u_qa_status] = 'Good' AND 
-                            [shotcnt_i_d_qa_status] = 'Good' AND 
-                            [shotcnt_c_qa_status] = 'Good') AND 
-                            is_prod_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_prod_prio_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Good' AND 
-                            [shotcnt_d_qa_status] = 'Good' AND 
-                            [shotcnt_i_u_qa_status] = 'Good' AND 
-                            [shotcnt_i_d_qa_status] = 'Good' AND 
-                            [shotcnt_c_qa_status] = 'Good') AND 
-                            is_priority = 0 AND is_prod_priority = 0
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_normal_qa,
-                COUNT(CASE WHEN [shotcnt_u_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_u_ee_good,
-                COUNT(CASE WHEN [shotcnt_d_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_d_ee_good,
-                COUNT(CASE WHEN [shotcnt_i_u_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_u_ee_good,
-                COUNT(CASE WHEN [shotcnt_i_d_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_d_ee_good,
-                COUNT(CASE WHEN [shotcnt_c_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_c_ee_good,
-                COUNT(CASE WHEN [shotcnt_u_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_u_qa_good,
-                COUNT(CASE WHEN [shotcnt_d_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_d_qa_good,
-                COUNT(CASE WHEN [shotcnt_i_u_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_u_qa_good,
-                COUNT(CASE WHEN [shotcnt_i_d_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_d_qa_good,
-                COUNT(CASE WHEN [shotcnt_c_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_c_qa_good, 
-                COUNT(
-                    CASE 
-                        WHEN 
-                            [shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded') AND 
-                            is_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_prio_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded') AND 
-                            is_prod_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_prod_prio_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded') AND 
-                            is_priority = 0 AND is_prod_priority = 0 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_normal_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            [shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded') AND 
-                            is_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_prio_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded') AND 
-                            is_prod_priority = 1 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_prod_prio_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded') AND 
-                            is_priority = 0 AND is_prod_priority = 0
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_normal_qa,
-                COUNT(CASE WHEN [shotcnt_u_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_u_ee_exceeded,
-                COUNT(CASE WHEN [shotcnt_d_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_d_ee_exceeded,
-                COUNT(CASE WHEN [shotcnt_i_u_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_u_ee_exceeded,
-                COUNT(CASE WHEN [shotcnt_i_d_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_d_ee_exceeded,
-                COUNT(CASE WHEN [shotcnt_c_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_c_ee_exceeded,
-                COUNT(CASE WHEN [shotcnt_u_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_u_qa_exceeded,
-                COUNT(CASE WHEN [shotcnt_d_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_d_qa_exceeded,
-                COUNT(CASE WHEN [shotcnt_i_u_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_u_qa_exceeded,
-                COUNT(CASE WHEN [shotcnt_i_d_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_d_qa_exceeded,
-                COUNT(CASE WHEN [shotcnt_c_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_c_qa_exceeded 
-            FROM v_t_applicator_shots";
+    $sql = "";
+
+    if ($full_view) {
+        // full view
+        $sql = "SELECT 
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' AND 
+                                [shotcnt_i_u_ee_status] = 'Good' AND 
+                                [shotcnt_i_d_ee_status] = 'Good' AND 
+                                [shotcnt_c_ee_status] = 'Good' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' AND 
+                                [shotcnt_i_u_ee_status] = 'Good' AND 
+                                [shotcnt_i_d_ee_status] = 'Good' AND 
+                                [shotcnt_c_ee_status] = 'Good') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' AND 
+                                [shotcnt_i_u_ee_status] = 'Good' AND 
+                                [shotcnt_i_d_ee_status] = 'Good' AND 
+                                [shotcnt_c_ee_status] = 'Good') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prod_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' AND 
+                                [shotcnt_i_u_ee_status] = 'Good' AND 
+                                [shotcnt_i_d_ee_status] = 'Good' AND 
+                                [shotcnt_c_ee_status] = 'Good') AND 
+                                is_priority = 0 AND is_prod_priority = 0 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_normal_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good' AND 
+                                [shotcnt_i_u_qa_status] = 'Good' AND 
+                                [shotcnt_i_d_qa_status] = 'Good' AND 
+                                [shotcnt_c_qa_status] = 'Good' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good' AND 
+                                [shotcnt_i_u_qa_status] = 'Good' AND 
+                                [shotcnt_i_d_qa_status] = 'Good' AND 
+                                [shotcnt_c_qa_status] = 'Good') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good' AND 
+                                [shotcnt_i_u_qa_status] = 'Good' AND 
+                                [shotcnt_i_d_qa_status] = 'Good' AND 
+                                [shotcnt_c_qa_status] = 'Good') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prod_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good' AND 
+                                [shotcnt_i_u_qa_status] = 'Good' AND 
+                                [shotcnt_i_d_qa_status] = 'Good' AND 
+                                [shotcnt_c_qa_status] = 'Good') AND 
+                                is_priority = 0 AND is_prod_priority = 0
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_normal_qa,
+                    COUNT(CASE WHEN [shotcnt_u_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_u_ee_good,
+                    COUNT(CASE WHEN [shotcnt_d_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_d_ee_good,
+                    COUNT(CASE WHEN [shotcnt_i_u_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_u_ee_good,
+                    COUNT(CASE WHEN [shotcnt_i_d_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_d_ee_good,
+                    COUNT(CASE WHEN [shotcnt_c_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_c_ee_good,
+                    COUNT(CASE WHEN [shotcnt_u_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_u_qa_good,
+                    COUNT(CASE WHEN [shotcnt_d_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_d_qa_good,
+                    COUNT(CASE WHEN [shotcnt_i_u_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_u_qa_good,
+                    COUNT(CASE WHEN [shotcnt_i_d_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_i_d_qa_good,
+                    COUNT(CASE WHEN [shotcnt_c_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_c_qa_good, 
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prod_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded') AND 
+                                is_priority = 0 AND is_prod_priority = 0 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_normal_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prod_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded') AND 
+                                is_priority = 0 AND is_prod_priority = 0
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_normal_qa,
+                    COUNT(CASE WHEN [shotcnt_u_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_u_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_d_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_d_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_i_u_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_u_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_i_d_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_d_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_c_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_c_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_u_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_u_qa_exceeded,
+                    COUNT(CASE WHEN [shotcnt_d_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_d_qa_exceeded,
+                    COUNT(CASE WHEN [shotcnt_i_u_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_u_qa_exceeded,
+                    COUNT(CASE WHEN [shotcnt_i_d_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_i_d_qa_exceeded,
+                    COUNT(CASE WHEN [shotcnt_c_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_c_qa_exceeded 
+                FROM v_t_applicator_shots";
+    } else {
+        // non full view
+        $sql = "SELECT 
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prod_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good') AND 
+                                is_priority = 0 AND is_prod_priority = 0 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_normal_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_prod_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Good' AND 
+                                [shotcnt_d_qa_status] = 'Good') AND 
+                                is_priority = 0 AND is_prod_priority = 0
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_normal_qa,
+                    COUNT(CASE WHEN [shotcnt_u_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_u_ee_good,
+                    COUNT(CASE WHEN [shotcnt_d_ee_status] = 'Good' THEN applicator_no END) AS total_shotcnt_d_ee_good,
+                    COUNT(CASE WHEN [shotcnt_u_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_u_qa_good,
+                    COUNT(CASE WHEN [shotcnt_d_qa_status] = 'Good' THEN applicator_no END) AS total_shotcnt_d_qa_good,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prod_prio_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded') AND 
+                                is_priority = 0 AND is_prod_priority = 0 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_normal_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded'  
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded') AND 
+                                is_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded') AND 
+                                is_prod_priority = 1 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_prod_prio_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded') AND 
+                                is_priority = 0 AND is_prod_priority = 0
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_normal_qa,
+                    COUNT(CASE WHEN [shotcnt_u_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_u_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_d_ee_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_d_ee_exceeded,
+                    COUNT(CASE WHEN [shotcnt_u_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_u_qa_exceeded,
+                    COUNT(CASE WHEN [shotcnt_d_qa_status] = 'Exceeded' THEN applicator_no END) AS total_shotcnt_d_qa_exceeded 
+                FROM v_t_applicator_shots";
+    }
+
     $stmt = $conn -> prepare($sql);
     $stmt -> execute();
 
@@ -244,14 +412,14 @@ if ($method == 'get_current_overall_shotcnt') {
             'total_appshot_good_normal_qa' => intval($row['total_appshot_good_normal_qa']),
             'total_shotcnt_u_ee_good' => intval($row['total_shotcnt_u_ee_good']),
             'total_shotcnt_d_ee_good' => intval($row['total_shotcnt_d_ee_good']),
-            'total_shotcnt_i_u_ee_good' => intval($row['total_shotcnt_i_u_ee_good']),
-            'total_shotcnt_i_d_ee_good' => intval($row['total_shotcnt_i_d_ee_good']),
-            'total_shotcnt_c_ee_good' => intval($row['total_shotcnt_c_ee_good']),
+            'total_shotcnt_i_u_ee_good' => (isset($row['total_shotcnt_i_u_ee_good'])) ? intval($row['total_shotcnt_i_u_ee_good']) : 0,
+            'total_shotcnt_i_d_ee_good' => (isset($row['total_shotcnt_i_d_ee_good'])) ? intval($row['total_shotcnt_i_d_ee_good']) : 0,
+            'total_shotcnt_c_ee_good' => (isset($row['total_shotcnt_c_ee_good'])) ? intval($row['total_shotcnt_c_ee_good']) : 0,
             'total_shotcnt_u_qa_good' => intval($row['total_shotcnt_u_qa_good']),
             'total_shotcnt_d_qa_good' => intval($row['total_shotcnt_d_qa_good']),
-            'total_shotcnt_i_u_qa_good' => intval($row['total_shotcnt_i_u_qa_good']),
-            'total_shotcnt_i_d_qa_good' => intval($row['total_shotcnt_i_d_qa_good']),
-            'total_shotcnt_c_qa_good' => intval($row['total_shotcnt_c_qa_good']),
+            'total_shotcnt_i_u_qa_good' => (isset($row['total_shotcnt_i_u_qa_good'])) ? intval($row['total_shotcnt_i_u_qa_good']) : 0,
+            'total_shotcnt_i_d_qa_good' => (isset($row['total_shotcnt_i_d_qa_good'])) ? intval($row['total_shotcnt_i_d_qa_good']) : 0,
+            'total_shotcnt_c_qa_good' => (isset($row['total_shotcnt_c_qa_good'])) ? intval($row['total_shotcnt_c_qa_good']) : 0,
             'total_appshot_exceeded_ee' => intval($row['total_appshot_exceeded_ee']),
             'total_appshot_exceeded_prio_ee' => intval($row['total_appshot_exceeded_prio_ee']),
             'total_appshot_exceeded_prod_prio_ee' => intval($row['total_appshot_exceeded_prod_prio_ee']),
@@ -262,14 +430,14 @@ if ($method == 'get_current_overall_shotcnt') {
             'total_appshot_exceeded_normal_qa' => intval($row['total_appshot_exceeded_normal_qa']),
             'total_shotcnt_u_ee_exceeded' => intval($row['total_shotcnt_u_ee_exceeded']),
             'total_shotcnt_d_ee_exceeded' => intval($row['total_shotcnt_d_ee_exceeded']),
-            'total_shotcnt_i_u_ee_exceeded' => intval($row['total_shotcnt_i_u_ee_exceeded']),
-            'total_shotcnt_i_d_ee_exceeded' => intval($row['total_shotcnt_i_d_ee_exceeded']),
-            'total_shotcnt_c_ee_exceeded' => intval($row['total_shotcnt_c_ee_exceeded']),
+            'total_shotcnt_i_u_ee_exceeded' => (isset($row['total_shotcnt_i_u_ee_exceeded'])) ? intval($row['total_shotcnt_i_u_ee_exceeded']) : 0,
+            'total_shotcnt_i_d_ee_exceeded' => (isset($row['total_shotcnt_i_d_ee_exceeded'])) ? intval($row['total_shotcnt_i_d_ee_exceeded']) : 0,
+            'total_shotcnt_c_ee_exceeded' => (isset($row['total_shotcnt_c_ee_exceeded'])) ? intval($row['total_shotcnt_c_ee_exceeded']) : 0,
             'total_shotcnt_u_qa_exceeded' => intval($row['total_shotcnt_u_qa_exceeded']),
             'total_shotcnt_d_qa_exceeded' => intval($row['total_shotcnt_d_qa_exceeded']),
-            'total_shotcnt_i_u_qa_exceeded' => intval($row['total_shotcnt_i_u_qa_exceeded']),
-            'total_shotcnt_i_d_qa_exceeded' => intval($row['total_shotcnt_i_d_qa_exceeded']),
-            'total_shotcnt_c_qa_exceeded' => intval($row['total_shotcnt_c_qa_exceeded'])
+            'total_shotcnt_i_u_qa_exceeded' => (isset($row['total_shotcnt_i_u_qa_exceeded'])) ? intval($row['total_shotcnt_i_u_qa_exceeded']) : 0,
+            'total_shotcnt_i_d_qa_exceeded' => (isset($row['total_shotcnt_i_d_qa_exceeded'])) ? intval($row['total_shotcnt_i_d_qa_exceeded']) : 0,
+            'total_shotcnt_c_qa_exceeded' => (isset($row['total_shotcnt_c_qa_exceeded'])) ? intval($row['total_shotcnt_c_qa_exceeded']) : 0 
         ];
     }
 
@@ -280,36 +448,65 @@ if ($method == 'get_shotcnt_good_vs_exceeded_ee_chart') {
     $data = [];
     $categories = [];
 
-    $sql = "SELECT 
-                car_maker,
-                car_model,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            [shotcnt_u_ee_status] = 'Good' AND 
-                            [shotcnt_d_ee_status] = 'Good' AND 
-                            [shotcnt_i_u_ee_status] = 'Good' AND 
-                            [shotcnt_i_d_ee_status] = 'Good' AND 
-                            [shotcnt_c_ee_status] = 'Good' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_good_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            [shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_ee 
-            FROM 
-                v_t_applicator_shots
-            GROUP BY 
-                car_maker, 
-                car_model";
+    $sql = "";
+
+    if ($full_view) {
+        $sql = "SELECT 
+                    car_maker,
+                    car_model,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' AND 
+                                [shotcnt_i_u_ee_status] = 'Good' AND 
+                                [shotcnt_i_d_ee_status] = 'Good' AND 
+                                [shotcnt_c_ee_status] = 'Good' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_ee 
+                FROM 
+                    v_t_applicator_shots
+                GROUP BY 
+                    car_maker, 
+                    car_model";
+    } else {
+        $sql = "SELECT 
+                    car_maker,
+                    car_model,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Good' AND 
+                                [shotcnt_d_ee_status] = 'Good' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_good_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                [shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_ee 
+                FROM 
+                    v_t_applicator_shots
+                GROUP BY 
+                    car_maker, 
+                    car_model";
+    }
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -333,20 +530,33 @@ if ($method == 'get_shotcnt_good_vs_exceeded_ee_chart') {
         $data['Exceeded'][] = (int)$row['total_appshot_exceeded_ee'];
     }
 
-    // Create the final data structure
-    $finalData = [
-        'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'Good',
-                'data' => $data['Good']
-            ],
-            [
-                'name' => 'Exceeded',
-                'data' => $data['Exceeded']
+    if ($full_view) {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Good',
+                    'data' => $data['Good']
+                ],
+                [
+                    'name' => 'Exceeded',
+                    'data' => $data['Exceeded']
+                ]
             ]
-        ]
-    ];
+        ];
+    } else {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Exceeded',
+                    'data' => $data['Exceeded']
+                ]
+            ]
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);
@@ -356,7 +566,10 @@ if ($method == 'get_shotcnt_good_vs_exceeded_qa_chart') {
     $data = [];
     $categories = [];
 
-    $sql = "SELECT 
+    $sql = "";
+
+    if ($full_view) {
+        $sql = "SELECT 
                 car_maker,
                 car_model,
                 COUNT(
@@ -386,6 +599,32 @@ if ($method == 'get_shotcnt_good_vs_exceeded_qa_chart') {
             GROUP BY 
                 car_maker, 
                 car_model";
+    } else {
+        $sql = "SELECT 
+                car_maker,
+                car_model,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            [shotcnt_u_qa_status] = 'Good' AND 
+                            [shotcnt_d_qa_status] = 'Good' 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_good_qa,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            [shotcnt_u_qa_status] = 'Exceeded' OR 
+                            [shotcnt_d_qa_status] = 'Exceeded' 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_qa 
+            FROM 
+                v_t_applicator_shots
+            GROUP BY 
+                car_maker, 
+                car_model";
+    }
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -409,20 +648,33 @@ if ($method == 'get_shotcnt_good_vs_exceeded_qa_chart') {
         $data['Exceeded'][] = (int)$row['total_appshot_exceeded_qa'];
     }
 
-    // Create the final data structure
-    $finalData = [
-        'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'Good',
-                'data' => $data['Good']
-            ],
-            [
-                'name' => 'Exceeded',
-                'data' => $data['Exceeded']
+    if ($full_view) {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Good',
+                    'data' => $data['Good']
+                ],
+                [
+                    'name' => 'Exceeded',
+                    'data' => $data['Exceeded']
+                ]
             ]
-        ]
-    ];
+        ];
+    } else {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Exceeded',
+                    'data' => $data['Exceeded']
+                ]
+            ]
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);
@@ -432,7 +684,10 @@ if ($method == 'get_shotcnt_exceeded_prio_ee_chart') {
     $data = [];
     $categories = [];
 
-    $sql = "SELECT 
+    $sql = "";
+
+    if ($full_view) {
+        $sql = "SELECT 
                 car_maker,
                 car_model,
                 COUNT(
@@ -476,6 +731,43 @@ if ($method == 'get_shotcnt_exceeded_prio_ee_chart') {
             GROUP BY 
                 car_maker, 
                 car_model";
+    } else {
+        $sql = "SELECT 
+                car_maker,
+                car_model,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                            [shotcnt_d_ee_status] = 'Exceeded') AND 
+                            is_priority = 1 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_prio_ee,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                            [shotcnt_d_ee_status] = 'Exceeded') AND 
+                            is_prod_priority = 1 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_prod_prio_ee,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                            [shotcnt_d_ee_status] = 'Exceeded') AND 
+                            is_priority = 0 AND is_prod_priority = 0 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_normal_ee 
+            FROM 
+                v_t_applicator_shots
+            GROUP BY 
+                car_maker, 
+                car_model";
+    }
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -500,24 +792,41 @@ if ($method == 'get_shotcnt_exceeded_prio_ee_chart') {
         $data['Normal'][] = (int)$row['total_appshot_exceeded_normal_ee'];
     }
 
-    // Create the final data structure
-    $finalData = [
-        'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'Priority',
-                'data' => $data['Priority']
-            ],
-            [
-                'name' => 'Prod Priority',
-                'data' => $data['ProdPriority']
-            ],
-            [
-                'name' => 'Normal',
-                'data' => $data['Normal']
+    if ($full_view) {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Priority',
+                    'data' => $data['Priority']
+                ],
+                [
+                    'name' => 'Prod Priority',
+                    'data' => $data['ProdPriority']
+                ],
+                [
+                    'name' => 'Normal',
+                    'data' => $data['Normal']
+                ]
             ]
-        ]
-    ];
+        ];
+    } else {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Priority',
+                    'data' => $data['Priority']
+                ],
+                [
+                    'name' => 'Prod Priority',
+                    'data' => $data['ProdPriority']
+                ]
+            ]
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);
@@ -527,7 +836,10 @@ if ($method == 'get_shotcnt_exceeded_prio_qa_chart') {
     $data = [];
     $categories = [];
 
-    $sql = "SELECT 
+    $sql = "";
+
+    if ($full_view) {
+        $sql = "SELECT 
                 car_maker,
                 car_model,
                 COUNT(
@@ -571,6 +883,43 @@ if ($method == 'get_shotcnt_exceeded_prio_qa_chart') {
             GROUP BY 
                 car_maker, 
                 car_model";
+    } else {
+        $sql = "SELECT 
+                car_maker,
+                car_model,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                            [shotcnt_d_qa_status] = 'Exceeded') AND 
+                            is_priority = 1 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_prio_qa,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                            [shotcnt_d_qa_status] = 'Exceeded') AND 
+                            is_prod_priority = 1 
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_prod_prio_qa,
+                COUNT(
+                    CASE 
+                        WHEN 
+                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                            [shotcnt_d_qa_status] = 'Exceeded') AND 
+                            is_priority = 0 AND is_prod_priority = 0
+                        THEN applicator_no 
+                    END
+                ) AS total_appshot_exceeded_normal_qa 
+            FROM 
+                v_t_applicator_shots
+            GROUP BY 
+                car_maker, 
+                car_model";
+    }
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -595,24 +944,41 @@ if ($method == 'get_shotcnt_exceeded_prio_qa_chart') {
         $data['Normal'][] = (int)$row['total_appshot_exceeded_normal_qa'];
     }
 
-    // Create the final data structure
-    $finalData = [
-        'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'Priority',
-                'data' => $data['Priority']
-            ],
-            [
-                'name' => 'Prod Priority',
-                'data' => $data['ProdPriority']
-            ],
-            [
-                'name' => 'Normal',
-                'data' => $data['Normal']
+    if ($full_view) {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Priority',
+                    'data' => $data['Priority']
+                ],
+                [
+                    'name' => 'Prod Priority',
+                    'data' => $data['ProdPriority']
+                ],
+                [
+                    'name' => 'Normal',
+                    'data' => $data['Normal']
+                ]
             ]
-        ]
-    ];
+        ];
+    } else {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Priority',
+                    'data' => $data['Priority']
+                ],
+                [
+                    'name' => 'Prod Priority',
+                    'data' => $data['ProdPriority']
+                ]
+            ]
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);
@@ -932,50 +1298,90 @@ if ($method == 'get_shotcnt_exceeded_appstat_ee_chart') {
     $data = [];
     $categories = [];
 
-    $sql = "SELECT 
-                car_maker,
-                car_model,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded') AND 
-                            status = 'Ready To Use' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_rtu_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded') AND 
-                            status = 'Out' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_out_ee,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_ee_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_ee_status] = 'Exceeded' OR 
-                            [shotcnt_c_ee_status] = 'Exceeded') AND 
-                            status = 'Pending' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_pending_ee
-            FROM 
-                v_t_applicator_shots
-            GROUP BY 
-                car_maker, 
-                car_model";
+    $sql = "";
+
+    if ($full_view) {
+        $sql = "SELECT 
+                    car_maker,
+                    car_model,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded') AND 
+                                status = 'Ready To Use' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_rtu_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded') AND 
+                                status = 'Out' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_out_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_ee_status] = 'Exceeded' OR 
+                                [shotcnt_c_ee_status] = 'Exceeded') AND 
+                                status = 'Pending' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_pending_ee
+                FROM 
+                    v_t_applicator_shots
+                GROUP BY 
+                    car_maker, 
+                    car_model";
+    } else {
+        $sql = "SELECT 
+                    car_maker,
+                    car_model,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded') AND 
+                                status = 'Ready To Use' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_rtu_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded') AND 
+                                status = 'Out' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_out_ee,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_ee_status] = 'Exceeded' OR 
+                                [shotcnt_d_ee_status] = 'Exceeded') AND 
+                                status = 'Pending' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_pending_ee
+                FROM 
+                    v_t_applicator_shots
+                GROUP BY 
+                    car_maker, 
+                    car_model";
+    }
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -1000,24 +1406,40 @@ if ($method == 'get_shotcnt_exceeded_appstat_ee_chart') {
         $data['Pending'][] = (int)$row['total_appshot_exceeded_pending_ee'];
     }
 
-    // Create the final data structure
-    $finalData = [
-        'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'Ready To Use',
-                'data' => $data['ReadyToUse']
-            ],
-            [
-                'name' => 'Out',
-                'data' => $data['Out']
-            ],
-            [
-                'name' => 'Pending',
-                'data' => $data['Pending']
+    if ($full_view) {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Ready To Use',
+                    'data' => $data['ReadyToUse']
+                ],
+                [
+                    'name' => 'Out',
+                    'data' => $data['Out']
+                ],
+                [
+                    'name' => 'Pending',
+                    'data' => $data['Pending']
+                ]
             ]
-        ]
-    ];
+        ];
+    } else {
+            $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Out',
+                    'data' => $data['Out']
+                ],
+                [
+                    'name' => 'Pending',
+                    'data' => $data['Pending']
+                ]
+            ]
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);
@@ -1027,50 +1449,90 @@ if ($method == 'get_shotcnt_exceeded_appstat_qa_chart') {
     $data = [];
     $categories = [];
 
-    $sql = "SELECT 
-                car_maker,
-                car_model,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded') AND 
-                            status = 'Ready To Use' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_rtu_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded') AND 
-                            status = 'Out' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_out_qa,
-                COUNT(
-                    CASE 
-                        WHEN 
-                            ([shotcnt_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_u_qa_status] = 'Exceeded' OR 
-                            [shotcnt_i_d_qa_status] = 'Exceeded' OR 
-                            [shotcnt_c_qa_status] = 'Exceeded') AND 
-                            status = 'Pending' 
-                        THEN applicator_no 
-                    END
-                ) AS total_appshot_exceeded_pending_qa
-            FROM 
-                v_t_applicator_shots
-            GROUP BY 
-                car_maker, 
-                car_model";
+    $sql = "";
+
+    if ($full_view) {
+        $sql = "SELECT 
+                    car_maker,
+                    car_model,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded') AND 
+                                status = 'Ready To Use' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_rtu_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded') AND 
+                                status = 'Out' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_out_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_i_d_qa_status] = 'Exceeded' OR 
+                                [shotcnt_c_qa_status] = 'Exceeded') AND 
+                                status = 'Pending' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_pending_qa
+                FROM 
+                    v_t_applicator_shots
+                GROUP BY 
+                    car_maker, 
+                    car_model";
+    } else {
+        $sql = "SELECT 
+                    car_maker,
+                    car_model,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded') AND 
+                                status = 'Ready To Use' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_rtu_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded') AND 
+                                status = 'Out' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_out_qa,
+                    COUNT(
+                        CASE 
+                            WHEN 
+                                ([shotcnt_u_qa_status] = 'Exceeded' OR 
+                                [shotcnt_d_qa_status] = 'Exceeded') AND 
+                                status = 'Pending' 
+                            THEN applicator_no 
+                        END
+                    ) AS total_appshot_exceeded_pending_qa
+                FROM 
+                    v_t_applicator_shots
+                GROUP BY 
+                    car_maker, 
+                    car_model";
+    }
 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -1095,24 +1557,41 @@ if ($method == 'get_shotcnt_exceeded_appstat_qa_chart') {
         $data['Pending'][] = (int)$row['total_appshot_exceeded_pending_qa'];
     }
 
-    // Create the final data structure
-    $finalData = [
-        'categories' => $categories,
-        'data' => [
-            [
-                'name' => 'Ready To Use',
-                'data' => $data['ReadyToUse']
-            ],
-            [
-                'name' => 'Out',
-                'data' => $data['Out']
-            ],
-            [
-                'name' => 'Pending',
-                'data' => $data['Pending']
+    if ($full_view) {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Ready To Use',
+                    'data' => $data['ReadyToUse']
+                ],
+                [
+                    'name' => 'Out',
+                    'data' => $data['Out']
+                ],
+                [
+                    'name' => 'Pending',
+                    'data' => $data['Pending']
+                ]
             ]
-        ]
-    ];
+        ];
+    } else {
+        // Create the final data structure
+        $finalData = [
+            'categories' => $categories,
+            'data' => [
+                [
+                    'name' => 'Out',
+                    'data' => $data['Out']
+                ],
+                [
+                    'name' => 'Pending',
+                    'data' => $data['Pending']
+                ]
+            ]
+        ];
+    }
 
     // Encode the categories and data as JSON
     echo json_encode($finalData);

@@ -25,9 +25,9 @@
 		get_shotcnt_exceeded_appstat_qa_chart();
 		get_shotcnt_u_ranges_chart();
 		get_shotcnt_d_ranges_chart();
-		get_shotcnt_i_u_ranges_chart();
-		get_shotcnt_i_d_ranges_chart();
-		get_shotcnt_c_ranges_chart();
+		// get_shotcnt_i_u_ranges_chart();
+		// get_shotcnt_i_d_ranges_chart();
+		// get_shotcnt_c_ranges_chart();
 		
 		get_car_maker_dropdown_search();
 		get_car_model_dropdown_search();
@@ -48,50 +48,50 @@
 			},  
 			success: response => {
 				// Good
-				document.getElementById("total_appshot_good_ee").innerHTML = `<b>${response.total_appshot_good_ee}</b>`;
+				// document.getElementById("total_appshot_good_ee").innerHTML = `<b>${response.total_appshot_good_ee}</b>`;
 				document.getElementById("total_appshot_good_prio_ee").innerHTML = `<b>${response.total_appshot_good_prio_ee}</b>`;
 				document.getElementById("total_appshot_good_prod_prio_ee").innerHTML = `<b>${response.total_appshot_good_prod_prio_ee}</b>`;
-				document.getElementById("total_appshot_good_normal_ee").innerHTML = `<b>${response.total_appshot_good_normal_ee}</b>`;
+				// document.getElementById("total_appshot_good_normal_ee").innerHTML = `<b>${response.total_appshot_good_normal_ee}</b>`;
 
-				document.getElementById("total_appshot_good_qa").innerHTML = `<b>${response.total_appshot_good_qa}</b>`;
+				// document.getElementById("total_appshot_good_qa").innerHTML = `<b>${response.total_appshot_good_qa}</b>`;
 				document.getElementById("total_appshot_good_prio_qa").innerHTML = `<b>${response.total_appshot_good_prio_qa}</b>`;
 				document.getElementById("total_appshot_good_prod_prio_qa").innerHTML = `<b>${response.total_appshot_good_prod_prio_qa}</b>`;
-				document.getElementById("total_appshot_good_normal_qa").innerHTML = `<b>${response.total_appshot_good_normal_qa}</b>`;
+				// document.getElementById("total_appshot_good_normal_qa").innerHTML = `<b>${response.total_appshot_good_normal_qa}</b>`;
 
 				document.getElementById("total_shotcnt_u_ee_good").innerHTML = `<b>${response.total_shotcnt_u_ee_good}</b>`;
 				document.getElementById("total_shotcnt_d_ee_good").innerHTML = `<b>${response.total_shotcnt_d_ee_good}</b>`;
-				document.getElementById("total_shotcnt_i_u_ee_good").innerHTML = `<b>${response.total_shotcnt_i_u_ee_good}</b>`;
-				document.getElementById("total_shotcnt_i_d_ee_good").innerHTML = `<b>${response.total_shotcnt_i_d_ee_good}</b>`;
-				document.getElementById("total_shotcnt_c_ee_good").innerHTML = `<b>${response.total_shotcnt_c_ee_good}</b>`;
+				// document.getElementById("total_shotcnt_i_u_ee_good").innerHTML = `<b>${response.total_shotcnt_i_u_ee_good}</b>`;
+				// document.getElementById("total_shotcnt_i_d_ee_good").innerHTML = `<b>${response.total_shotcnt_i_d_ee_good}</b>`;
+				// document.getElementById("total_shotcnt_c_ee_good").innerHTML = `<b>${response.total_shotcnt_c_ee_good}</b>`;
 
 				document.getElementById("total_shotcnt_u_qa_good").innerHTML = `<b>${response.total_shotcnt_u_qa_good}</b>`;
 				document.getElementById("total_shotcnt_d_qa_good").innerHTML = `<b>${response.total_shotcnt_d_qa_good}</b>`;
-				document.getElementById("total_shotcnt_i_u_qa_good").innerHTML = `<b>${response.total_shotcnt_i_u_qa_good}</b>`;
-				document.getElementById("total_shotcnt_i_d_qa_good").innerHTML = `<b>${response.total_shotcnt_i_d_qa_good}</b>`;
-				document.getElementById("total_shotcnt_c_qa_good").innerHTML = `<b>${response.total_shotcnt_c_qa_good}</b>`;
+				// document.getElementById("total_shotcnt_i_u_qa_good").innerHTML = `<b>${response.total_shotcnt_i_u_qa_good}</b>`;
+				// document.getElementById("total_shotcnt_i_d_qa_good").innerHTML = `<b>${response.total_shotcnt_i_d_qa_good}</b>`;
+				// document.getElementById("total_shotcnt_c_qa_good").innerHTML = `<b>${response.total_shotcnt_c_qa_good}</b>`;
 
 				// Exceeded
-				document.getElementById("total_appshot_exceeded_ee").innerHTML = `<b>${response.total_appshot_exceeded_ee}</b>`;
+				// document.getElementById("total_appshot_exceeded_ee").innerHTML = `<b>${response.total_appshot_exceeded_ee}</b>`;
 				document.getElementById("total_appshot_exceeded_prio_ee").innerHTML = `<b>${response.total_appshot_exceeded_prio_ee}</b>`;
 				document.getElementById("total_appshot_exceeded_prod_prio_ee").innerHTML = `<b>${response.total_appshot_exceeded_prod_prio_ee}</b>`;
-				document.getElementById("total_appshot_exceeded_normal_ee").innerHTML = `<b>${response.total_appshot_exceeded_normal_ee}</b>`;
+				// document.getElementById("total_appshot_exceeded_normal_ee").innerHTML = `<b>${response.total_appshot_exceeded_normal_ee}</b>`;
 
-				document.getElementById("total_appshot_exceeded_qa").innerHTML = `<b>${response.total_appshot_exceeded_qa}</b>`;
+				// document.getElementById("total_appshot_exceeded_qa").innerHTML = `<b>${response.total_appshot_exceeded_qa}</b>`;
 				document.getElementById("total_appshot_exceeded_prio_qa").innerHTML = `<b>${response.total_appshot_exceeded_prio_qa}</b>`;
 				document.getElementById("total_appshot_exceeded_prod_prio_qa").innerHTML = `<b>${response.total_appshot_exceeded_prod_prio_qa}</b>`;
-				document.getElementById("total_appshot_exceeded_normal_qa").innerHTML = `<b>${response.total_appshot_exceeded_normal_qa}</b>`;
+				// document.getElementById("total_appshot_exceeded_normal_qa").innerHTML = `<b>${response.total_appshot_exceeded_normal_qa}</b>`;
 
 				document.getElementById("total_shotcnt_u_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_u_ee_exceeded}</b>`;
 				document.getElementById("total_shotcnt_d_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_d_ee_exceeded}</b>`;
-				document.getElementById("total_shotcnt_i_u_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_i_u_ee_exceeded}</b>`;
-				document.getElementById("total_shotcnt_i_d_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_i_d_ee_exceeded}</b>`;
-				document.getElementById("total_shotcnt_c_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_c_ee_exceeded}</b>`;
+				// document.getElementById("total_shotcnt_i_u_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_i_u_ee_exceeded}</b>`;
+				// document.getElementById("total_shotcnt_i_d_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_i_d_ee_exceeded}</b>`;
+				// document.getElementById("total_shotcnt_c_ee_exceeded").innerHTML = `<b>${response.total_shotcnt_c_ee_exceeded}</b>`;
 
 				document.getElementById("total_shotcnt_u_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_u_qa_exceeded}</b>`;
 				document.getElementById("total_shotcnt_d_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_d_qa_exceeded}</b>`;
-				document.getElementById("total_shotcnt_i_u_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_i_u_qa_exceeded}</b>`;
-				document.getElementById("total_shotcnt_i_d_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_i_d_qa_exceeded}</b>`;
-				document.getElementById("total_shotcnt_c_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_c_qa_exceeded}</b>`;
+				// document.getElementById("total_shotcnt_i_u_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_i_u_qa_exceeded}</b>`;
+				// document.getElementById("total_shotcnt_i_d_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_i_d_qa_exceeded}</b>`;
+				// document.getElementById("total_shotcnt_c_qa_exceeded").innerHTML = `<b>${response.total_shotcnt_c_qa_exceeded}</b>`;
 			}
 		});
 	}
@@ -110,7 +110,8 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#dc3545'];
+				// const bootstrapColors = ['#28a745', '#dc3545'];
+				const bootstrapColors = ['#dc3545'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -147,7 +148,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count In 50k Shot Count Condition`,
+						text: `Applicator Count In 50k Shot Count Exceeded Condition (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -177,7 +178,8 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#dc3545'];
+				// const bootstrapColors = ['#28a745', '#dc3545'];
+				const bootstrapColors = ['#dc3545'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -214,7 +216,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count In 100k Shot Count Condition`,
+						text: `Applicator Count In 100k Shot Count Exceeded Condition (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -281,7 +283,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count Exceeded 100k Shot Count Based On Priority`,
+						text: `Applicator Count In 100k Shot Count Exceeded Based On Priority (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -348,7 +350,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count Exceeded 50k Shot Count Based On Priority`,
+						text: `Applicator Count In 50k Shot Count Exceeded Based On Priority (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -378,7 +380,8 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+				// const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+				const bootstrapColors = ['#ffc107', '#dc3545'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -415,7 +418,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count Exceeded 100k Shot Count Based On Applicator List Status`,
+						text: `Applicator Count In 100k Shot Count Exceeded Based On Applicator List Status (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -445,7 +448,8 @@
 				console.log(response.data);
 
 				// Define Bootstrap 4 colors
-				const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+				// const bootstrapColors = ['#28a745', '#ffc107', '#dc3545'];
+				const bootstrapColors = ['#ffc107', '#dc3545'];
 
 				// Convert the data object to an array
 				const seriesData = response.data.map(item => {
@@ -482,7 +486,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count Exceeded 50k Shot Count Based On Applicator List Status`,
+						text: `Applicator Count In 50k Shot Count Exceeded Based On Applicator List Status (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -543,7 +547,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count With Wire Crimper Shot Count Accumulated`,
+						text: `Applicator Count With Wire Crimper Shot Count Accumulated`,
 						align: 'left'
 					},
 					plotOptions: {
@@ -610,7 +614,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count With Wire Anvil Shot Count Accumulated`,
+						text: `Applicator Count With Wire Anvil Shot Count Accumulated`,
 						align: 'left'
 					},
 					plotOptions: {
@@ -677,7 +681,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count With Insulation Crimper Shot Count Accumulated`,
+						text: `Applicator Count With Insulation Crimper Shot Count Accumulated`,
 						align: 'left'
 					},
 					plotOptions: {
@@ -744,7 +748,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count With Insulation Anvil Shot Count Accumulated`,
+						text: `Applicator Count With Insulation Anvil Shot Count Accumulated`,
 						align: 'left'
 					},
 					plotOptions: {
@@ -811,7 +815,7 @@
 						}
 					},
 					title: {
-						text: `Current Applicator Count With Slide Cutter Shot Count Accumulated`,
+						text: `Applicator Count With Slide Cutter Shot Count Accumulated`,
 						align: 'left'
 					},
 					plotOptions: {

@@ -41,7 +41,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                 <!-- /.card-header -->
                                 <div class="card-body">
                                     <div class="row mb-2">
-                                        <h5>Current Overall Applicator Count Based On Applicator Shot Count Limit</h5>
+                                        <h5>Current Overall Applicator Count Based On Applicator Shot Count Limit (Wire Crimper or Wire Anvil Only)</h5>
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-6 col-sm-12">
@@ -49,40 +49,40 @@ include 'plugins/navbar/viewer_navbar.php';
                                                 <thead>
                                                     <tr>
                                                         <th>Shot Count Limit Status</th>
-                                                        <th>Normal</th>
+                                                        <th class="d-none">Normal</th>
                                                         <th>Priority</th>
                                                         <th>Prod Priority</th>
-                                                        <th>Total Applicators</th>
+                                                        <th class="d-none">Total Applicators</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
                                                         <td>Not Exceeded 50k Shots</td>
-                                                        <td id="total_appshot_good_normal_qa">0</td>
+                                                        <td class="d-none" id="total_appshot_good_normal_qa">0</td>
                                                         <td id="total_appshot_good_prio_qa">0</td>
                                                         <td id="total_appshot_good_prod_prio_qa">0</td>
-                                                        <td id="total_appshot_good_qa">0</td>
+                                                        <td class="d-none" id="total_appshot_good_qa">0</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Not Exceeded 100k Shots</td>
-                                                        <td id="total_appshot_good_normal_ee">0</td>
+                                                        <td class="d-none" id="total_appshot_good_normal_ee">0</td>
                                                         <td id="total_appshot_good_prio_ee">0</td>
                                                         <td id="total_appshot_good_prod_prio_ee">0</td>
-                                                        <td id="total_appshot_good_ee">0</td>
+                                                        <td class="d-none" id="total_appshot_good_ee">0</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Exceeded 50k Shots</td>
-                                                        <td id="total_appshot_exceeded_normal_qa">0</td>
+                                                        <td class="d-none" id="total_appshot_exceeded_normal_qa">0</td>
                                                         <td id="total_appshot_exceeded_prio_qa">0</td>
                                                         <td id="total_appshot_exceeded_prod_prio_qa">0</td>
-                                                        <td id="total_appshot_exceeded_qa">0</td>
+                                                        <td class="d-none" id="total_appshot_exceeded_qa">0</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Exceeded 100k Shots</td>
-                                                        <td id="total_appshot_exceeded_normal_ee">0</td>
+                                                        <td class="d-none" id="total_appshot_exceeded_normal_ee">0</td>
                                                         <td id="total_appshot_exceeded_prio_ee">0</td>
                                                         <td id="total_appshot_exceeded_prod_prio_ee">0</td>
-                                                        <td id="total_appshot_exceeded_ee">0</td>
+                                                        <td class="d-none" id="total_appshot_exceeded_ee">0</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -113,21 +113,21 @@ include 'plugins/navbar/viewer_navbar.php';
                                                         <td id="total_shotcnt_d_ee_good">0</td>
                                                         <td id="total_shotcnt_d_ee_exceeded">0</td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr class="d-none">
                                                         <td>Insulation Crimper</td>
                                                         <td id="total_shotcnt_i_u_qa_good">0</td>
                                                         <td id="total_shotcnt_i_u_qa_exceeded">0</td>
                                                         <td id="total_shotcnt_i_u_ee_good">0</td>
                                                         <td id="total_shotcnt_i_u_ee_exceeded">0</td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr class="d-none">
                                                         <td>Insulation Anvil</td>
                                                         <td id="total_shotcnt_i_d_qa_good">0</td>
                                                         <td id="total_shotcnt_i_d_qa_exceeded">0</td>
                                                         <td id="total_shotcnt_i_d_ee_good">0</td>
                                                         <td id="total_shotcnt_i_d_ee_exceeded">0</td>
                                                     </tr>
-                                                    <tr>
+                                                    <tr class="d-none">
                                                         <td>Slide Cutter</td>
                                                         <td id="total_shotcnt_c_qa_good">0</td>
                                                         <td id="total_shotcnt_c_qa_exceeded">0</td>
@@ -151,17 +151,17 @@ include 'plugins/navbar/viewer_navbar.php';
                                         <div class="col-lg-6 col-sm-12" id="shotcnt_exceeded_appstat_ee_chart"></div>
                                     </div>
                                     <div class="row mb-2">
-                                        <h5>Applicator Count Based On Actual Applicator Shot Counts Accumulated</h5>
+                                        <h5>Current Applicator Count Based On Actual Applicator Shot Counts Accumulated</h5>
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-6 col-sm-12" id="shotcnt_u_ranges_chart"></div>
                                         <div class="col-lg-6 col-sm-12" id="shotcnt_d_ranges_chart"></div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row d-none">
                                         <div class="col-lg-6 col-sm-12" id="shotcnt_i_u_ranges_chart"></div>
                                         <div class="col-lg-6 col-sm-12" id="shotcnt_i_d_ranges_chart"></div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row d-none">
                                         <div class="col-lg-6 col-sm-12" id="shotcnt_c_ranges_chart"></div>
                                     </div>
                                 </div>
