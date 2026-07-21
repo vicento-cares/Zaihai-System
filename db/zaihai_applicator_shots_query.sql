@@ -526,3 +526,248 @@ FROM
 GROUP BY 
 	car_maker, 
 	car_model;
+
+-- Trial Query. Daily Applicator Shot Exceeded Count per type
+
+SELECT 
+	CAST(exceeded_date_time AS date) AS Day,
+	car_maker,
+	car_model,
+	shotcnt_category,
+	shotcnt_type,
+	COUNT(DISTINCT applicator_no) AS total
+FROM 
+	t_applicator_shots_h
+GROUP BY
+	CAST(exceeded_date_time AS date),
+	car_maker,
+	car_model,
+	shotcnt_category,
+	shotcnt_type
+ORDER BY
+	CAST(exceeded_date_time AS date);
+
+-- Trial Query. Daily Applicator Shot Exceeded Count distinct applicator count
+
+SELECT 
+	CAST(exceeded_date_time AS date) AS Day,
+	car_maker,
+	car_model,
+	shotcnt_category,
+	COUNT(DISTINCT applicator_no) AS total
+FROM 
+	t_applicator_shots_h 
+GROUP BY
+	CAST(exceeded_date_time AS date),
+	car_maker,
+	car_model,
+	shotcnt_category
+ORDER BY
+	CAST(exceeded_date_time AS date);
+
+-- Hourly Applicator Shot Exceeded Count distinct applicator count specific day
+
+DECLARE @day DATE = '2026-07-20';
+
+WITH AllHours AS (
+	SELECT 
+		RIGHT('0' + CAST(n AS VARCHAR(2)), 2) AS hour_start,
+		CASE 
+			WHEN n >= 6 THEN n - 6  -- Hours 06-23 will retain their natural order
+			ELSE n + 18             -- Hours 00-05 will appear after hour 23
+		END AS sort_order
+	FROM 
+		(SELECT TOP 24 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1 AS n FROM master.dbo.spt_values) AS Numbers
+),
+Categories AS
+(
+    SELECT DISTINCT
+        car_maker,
+        car_model
+    FROM m_applicator
+),
+ShotCategories AS
+(
+    SELECT *
+    FROM (VALUES
+        ('100K Shots'),
+        ('50K Shots')
+    ) v(shotcnt_category)
+),
+Exceeded AS
+(
+    SELECT
+        FORMAT(exceeded_date_time, 'HH') AS hour_start, 
+		car_maker,
+		car_model,
+		shotcnt_category,
+        COUNT(DISTINCT applicator_no) AS Total
+    FROM t_applicator_shots_h
+    WHERE 
+		shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
+		exceeded_date_time >= DATEADD(HOUR, 6, CAST(@day AS DATETIME)) AND 
+		exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(@day AS DATETIME))) 
+    GROUP BY 
+		FORMAT(exceeded_date_time, 'HH'), 
+		car_maker,
+		car_model,
+		shotcnt_category
+)
+SELECT
+    h.hour_start, 
+	c.car_maker,
+    c.car_model,
+    s.shotcnt_category,
+    ISNULL(e.Total, 0) AS Total
+FROM AllHours h
+CROSS JOIN Categories c
+CROSS JOIN ShotCategories s
+LEFT JOIN Exceeded e
+    ON h.hour_start = e.hour_start
+	AND e.car_maker = c.car_maker
+	AND e.car_model = c.car_model
+	AND e.shotcnt_category = s.shotcnt_category
+ORDER BY 
+	CASE 
+		WHEN CAST(h.hour_start AS INT) >= 6 THEN CAST(h.hour_start AS INT)
+		ELSE CAST(h.hour_start AS INT) + 24
+	END,
+	c.car_maker,
+	c.car_model,
+	s.shotcnt_category;
+
+-- This Week Applicator Shot Exceeded Count distinct applicator count
+
+DECLARE @StartDate DATE = DATEADD(DAY, -(DATEPART(WEEKDAY, GETDATE()) - 1), CAST(GETDATE() AS DATE));
+DECLARE @EndDate DATE = DATEADD(DAY, 6, @StartDate);
+
+WITH DateRange AS
+(
+    SELECT @StartDate AS SampleDate
+    UNION ALL
+    SELECT DATEADD(DAY, 1, SampleDate)
+    FROM DateRange
+    WHERE SampleDate < @EndDate
+),
+Categories AS
+(
+    SELECT DISTINCT
+        car_maker,
+        car_model
+    FROM m_applicator
+),
+ShotCategories AS
+(
+    SELECT *
+    FROM (VALUES
+        ('100K Shots'),
+        ('50K Shots')
+    ) v(shotcnt_category)
+),
+Exceeded AS
+(
+    SELECT
+        CAST(exceeded_date_time AS DATE) AS [Day],
+		car_maker,
+		car_model,
+		shotcnt_category,
+        COUNT(DISTINCT applicator_no) AS Total
+    FROM t_applicator_shots_h
+    WHERE 
+		shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
+		exceeded_date_time >= DATEADD(HOUR, 6, CAST(@StartDate AS DATETIME)) AND 
+		exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(@EndDate AS DATETIME))) 
+    GROUP BY 
+		CAST(exceeded_date_time AS DATE), 
+		car_maker,
+		car_model,
+		shotcnt_category
+)
+SELECT
+    d.SampleDate,
+	c.car_maker,
+    c.car_model,
+    s.shotcnt_category,
+    ISNULL(e.Total, 0) AS Total
+FROM DateRange d
+CROSS JOIN Categories c
+CROSS JOIN ShotCategories s
+LEFT JOIN Exceeded e
+    ON d.SampleDate = e.Day
+	AND e.car_maker = c.car_maker
+	AND e.car_model = c.car_model
+	AND e.shotcnt_category = s.shotcnt_category
+ORDER BY 
+	d.SampleDate,
+	c.car_maker,
+	c.car_model,
+	s.shotcnt_category
+OPTION (MAXRECURSION 7);
+
+-- Monthly Applicator Shot Exceeded Count distinct applicator count
+
+DECLARE @Year INT = 2026;  -- Specify the year
+DECLARE @Month INT = 7;   -- Specify the month (July)
+
+WITH DateRange AS (
+    SELECT 
+        DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+    FROM 
+        master.dbo.spt_values
+    WHERE 
+        type = 'P' AND 
+        number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+),
+Categories AS
+(
+    SELECT DISTINCT
+        car_maker,
+        car_model
+    FROM m_applicator
+),
+ShotCategories AS
+(
+    SELECT *
+    FROM (VALUES
+        ('100K Shots'),
+        ('50K Shots')
+    ) v(shotcnt_category)
+),
+Exceeded AS
+(
+    SELECT
+        CAST(exceeded_date_time AS DATE) AS [Day],
+		car_maker,
+		car_model,
+		shotcnt_category,
+        COUNT(DISTINCT applicator_no) AS Total
+    FROM t_applicator_shots_h
+    WHERE 
+		shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
+		exceeded_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME)) AND 
+		exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) 
+    GROUP BY 
+		CAST(exceeded_date_time AS DATE), 
+		car_maker,
+		car_model,
+		shotcnt_category
+)
+SELECT
+    d.report_date,
+	c.car_maker,
+    c.car_model,
+    s.shotcnt_category,
+    ISNULL(e.Total, 0) AS Total
+FROM DateRange d
+CROSS JOIN Categories c
+CROSS JOIN ShotCategories s
+LEFT JOIN Exceeded e
+    ON d.report_date = e.Day
+	AND e.car_maker = c.car_maker
+	AND e.car_model = c.car_model
+	AND e.shotcnt_category = s.shotcnt_category
+ORDER BY 
+	d.report_date,
+	c.car_maker,
+	c.car_model,
+	s.shotcnt_category;
