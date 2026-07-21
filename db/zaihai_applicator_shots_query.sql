@@ -567,7 +567,7 @@ ORDER BY
 
 -- Hourly Applicator Shot Exceeded Count distinct applicator count specific day
 
-DECLARE @day DATE = '2026-07-20';
+DECLARE @day DATE = CAST(DATEADD(HOUR, -6, GETDATE()) AS DATE);
 
 WITH AllHours AS (
 	SELECT 
@@ -601,7 +601,7 @@ Exceeded AS
 		car_maker,
 		car_model,
 		shotcnt_category,
-        COUNT(DISTINCT applicator_no) AS Total
+        COUNT(DISTINCT applicator_no) AS total_count
     FROM t_applicator_shots_h
     WHERE 
 		shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
@@ -618,7 +618,7 @@ SELECT
 	c.car_maker,
     c.car_model,
     s.shotcnt_category,
-    ISNULL(e.Total, 0) AS Total
+    ISNULL(e.total_count, 0) AS total_count
 FROM AllHours h
 CROSS JOIN Categories c
 CROSS JOIN ShotCategories s
@@ -634,7 +634,7 @@ ORDER BY
 	END,
 	c.car_maker,
 	c.car_model,
-	s.shotcnt_category;
+	s.shotcnt_category DESC;
 
 -- This Week Applicator Shot Exceeded Count distinct applicator count
 
@@ -671,7 +671,7 @@ Exceeded AS
 		car_maker,
 		car_model,
 		shotcnt_category,
-        COUNT(DISTINCT applicator_no) AS Total
+        COUNT(DISTINCT applicator_no) AS total_count
     FROM t_applicator_shots_h
     WHERE 
 		shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
@@ -688,7 +688,7 @@ SELECT
 	c.car_maker,
     c.car_model,
     s.shotcnt_category,
-    ISNULL(e.Total, 0) AS Total
+    ISNULL(e.total_count, 0) AS total_count
 FROM DateRange d
 CROSS JOIN Categories c
 CROSS JOIN ShotCategories s
@@ -701,13 +701,13 @@ ORDER BY
 	d.SampleDate,
 	c.car_maker,
 	c.car_model,
-	s.shotcnt_category
+	s.shotcnt_category DESC 
 OPTION (MAXRECURSION 7);
 
 -- Monthly Applicator Shot Exceeded Count distinct applicator count
 
-DECLARE @Year INT = 2026;  -- Specify the year
-DECLARE @Month INT = 7;   -- Specify the month (July)
+DECLARE @Year INT = YEAR(GETDATE());  -- Specify the year
+DECLARE @Month INT = MONTH(GETDATE());   -- Specify the month (July)
 
 WITH DateRange AS (
     SELECT 
@@ -740,7 +740,7 @@ Exceeded AS
 		car_maker,
 		car_model,
 		shotcnt_category,
-        COUNT(DISTINCT applicator_no) AS Total
+        COUNT(DISTINCT applicator_no) AS total_count
     FROM t_applicator_shots_h
     WHERE 
 		shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
@@ -757,7 +757,7 @@ SELECT
 	c.car_maker,
     c.car_model,
     s.shotcnt_category,
-    ISNULL(e.Total, 0) AS Total
+    ISNULL(e.total_count, 0) AS total_count
 FROM DateRange d
 CROSS JOIN Categories c
 CROSS JOIN ShotCategories s
@@ -770,4 +770,4 @@ ORDER BY
 	d.report_date,
 	c.car_maker,
 	c.car_model,
-	s.shotcnt_category;
+	s.shotcnt_category DESC;

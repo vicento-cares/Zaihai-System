@@ -1597,4 +1597,361 @@ if ($method == 'get_shotcnt_exceeded_appstat_qa_chart') {
     echo json_encode($finalData);
 }
 
+if ($method == 'get_current_hourly_exceeded_chart') {
+    $data = [];
+    $categories = [];
+
+    $sql = "DECLARE @day DATE = CAST(DATEADD(HOUR, -6, GETDATE()) AS DATE);
+
+            WITH AllHours AS (
+                SELECT 
+                    RIGHT('0' + CAST(n AS VARCHAR(2)), 2) AS hour_start,
+                    CASE 
+                        WHEN n >= 6 THEN n - 6  -- Hours 06-23 will retain their natural order
+                        ELSE n + 18             -- Hours 00-05 will appear after hour 23
+                    END AS sort_order
+                FROM 
+                    (SELECT TOP 24 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1 AS n FROM master.dbo.spt_values) AS Numbers
+            ),
+            Categories AS
+            (
+                SELECT DISTINCT
+                    car_maker,
+                    car_model
+                FROM m_applicator
+            ),
+            ShotCategories AS
+            (
+                SELECT *
+                FROM (VALUES
+                    ('100K Shots'),
+                    ('50K Shots')
+                ) v(shotcnt_category)
+            ),
+            Exceeded AS
+            (
+                SELECT
+                    FORMAT(exceeded_date_time, 'HH') AS hour_start, 
+                    car_maker,
+                    car_model,
+                    shotcnt_category,
+                    COUNT(DISTINCT applicator_no) AS total_count
+                FROM t_applicator_shots_h
+                WHERE 
+                    shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
+                    exceeded_date_time >= DATEADD(HOUR, 6, CAST(@day AS DATETIME)) AND 
+                    exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(@day AS DATETIME))) 
+                GROUP BY 
+                    FORMAT(exceeded_date_time, 'HH'), 
+                    car_maker,
+                    car_model,
+                    shotcnt_category
+            )
+            SELECT
+                h.hour_start, 
+                c.car_maker,
+                c.car_model,
+                s.shotcnt_category,
+                ISNULL(e.total_count, 0) AS total_count
+            FROM AllHours h
+            CROSS JOIN Categories c
+            CROSS JOIN ShotCategories s
+            LEFT JOIN Exceeded e
+                ON h.hour_start = e.hour_start
+                AND e.car_maker = c.car_maker
+                AND e.car_model = c.car_model
+                AND e.shotcnt_category = s.shotcnt_category
+            ORDER BY 
+                CASE 
+                    WHEN CAST(h.hour_start AS INT) >= 6 THEN CAST(h.hour_start AS INT)
+                    ELSE CAST(h.hour_start AS INT) + 24
+                END,
+                c.car_maker,
+                c.car_model,
+                s.shotcnt_category DESC;";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'] . " " . $row['shotcnt_category'];
+        } else {
+            $maker_model_label = $row['car_maker'] . " " . $row['shotcnt_category'];
+        }
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        $hour = $row['hour_start'];   // Extract the hour from the row
+        $value = (int)$row['total_count']; // Extract the value and cast it to an integer
+
+        // Check if the route key already exists in the data array
+        if (!isset($data[$maker_model_label])) {
+            // Initialize labels and values arrays for the route if it doesn't exist
+            $data[$maker_model_label] = [
+                "categories" => [],
+                "data" => []
+            ];
+        }
+
+        // Add hour and value to the respective arrays
+        $data[$maker_model_label]['categories'][] = $hour;
+        $data[$maker_model_label]['data'][] = $value;
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode($data, JSON_PRETTY_PRINT);
+}
+
+if ($method == 'get_current_week_exceeded_chart') {
+    $data = [];
+    $categories = [];
+
+    $sql = "DECLARE @StartDate DATE = DATEADD(DAY, -(DATEPART(WEEKDAY, GETDATE()) - 1), CAST(GETDATE() AS DATE));
+            DECLARE @EndDate DATE = DATEADD(DAY, 6, @StartDate);
+
+            WITH DateRange AS
+            (
+                SELECT @StartDate AS SampleDate
+                UNION ALL
+                SELECT DATEADD(DAY, 1, SampleDate)
+                FROM DateRange
+                WHERE SampleDate < @EndDate
+            ),
+            Categories AS
+            (
+                SELECT DISTINCT
+                    car_maker,
+                    car_model
+                FROM m_applicator
+            ),
+            ShotCategories AS
+            (
+                SELECT *
+                FROM (VALUES
+                    ('100K Shots'),
+                    ('50K Shots')
+                ) v(shotcnt_category)
+            ),
+            Exceeded AS
+            (
+                SELECT
+                    CAST(exceeded_date_time AS DATE) AS [Day],
+                    car_maker,
+                    car_model,
+                    shotcnt_category,
+                    COUNT(DISTINCT applicator_no) AS total_count
+                FROM t_applicator_shots_h
+                WHERE 
+                    shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
+                    exceeded_date_time >= DATEADD(HOUR, 6, CAST(@StartDate AS DATETIME)) AND 
+                    exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(@EndDate AS DATETIME))) 
+                GROUP BY 
+                    CAST(exceeded_date_time AS DATE), 
+                    car_maker,
+                    car_model,
+                    shotcnt_category
+            )
+            SELECT
+                d.SampleDate,
+                c.car_maker,
+                c.car_model,
+                s.shotcnt_category,
+                ISNULL(e.total_count, 0) AS total_count
+            FROM DateRange d
+            CROSS JOIN Categories c
+            CROSS JOIN ShotCategories s
+            LEFT JOIN Exceeded e
+                ON d.SampleDate = e.Day
+                AND e.car_maker = c.car_maker
+                AND e.car_model = c.car_model
+                AND e.shotcnt_category = s.shotcnt_category
+            ORDER BY 
+                d.SampleDate,
+                c.car_maker,
+                c.car_model,
+                s.shotcnt_category DESC 
+            OPTION (MAXRECURSION 7);";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $maker_model_label = '';
+
+        if ($row['car_maker'] != $row['car_model']) {
+            $maker_model_label = $row['car_maker'] . " " . $row['car_model'];
+        } else {
+            $maker_model_label = $row['car_maker'];
+        }
+
+        $color = $color_map[$maker_model_label] ?? '#6c757d'; // Default gray
+
+        $maker_model_label .= " " . $row['shotcnt_category'];
+
+        // Add unique report_date to categories
+        if (!in_array($maker_model_label, $categories)) {
+            $categories[] = $maker_model_label;
+        }
+
+        $SampleDate = $row['SampleDate']; 
+        $value = (int)$row['total_count']; // Extract the value and cast it to an integer
+
+        // Check if the route key already exists in the data array
+        if (!isset($data[$maker_model_label])) {
+            // Initialize labels and values arrays for the route if it doesn't exist
+            $data[$maker_model_label] = [
+                "categories" => [],
+                "data" => [],
+                "color" => $color
+            ];
+        }
+
+        // Add day and value to the respective arrays
+        $data[$maker_model_label]['categories'][] = $SampleDate;
+        $data[$maker_model_label]['data'][] = $value;
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode($data, JSON_PRETTY_PRINT);
+}
+
+if ($method == 'get_current_month_exceeded_chart') {
+    $categories = [];
+
+    $statusCounts = [];
+    $statusCounts2 = [];
+
+    $data = [];
+    $data2 = [];
+
+    $sql = "DECLARE @Year INT = YEAR(GETDATE());  -- Specify the year
+            DECLARE @Month INT = MONTH(GETDATE());   -- Specify the month (July)
+
+            WITH DateRange AS (
+                SELECT 
+                    DATEADD(DAY, number, DATEFROMPARTS(@Year, @Month, 1)) AS report_date
+                FROM 
+                    master.dbo.spt_values
+                WHERE 
+                    type = 'P' AND 
+                    number < DAY(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)))  -- Generate dates for the month
+            ),
+            Categories AS
+            (
+                SELECT DISTINCT
+                    car_maker,
+                    car_model
+                FROM m_applicator
+            ),
+            ShotCategories AS
+            (
+                SELECT *
+                FROM (VALUES
+                    ('100K Shots'),
+                    ('50K Shots')
+                ) v(shotcnt_category)
+            ),
+            Exceeded AS
+            (
+                SELECT
+                    CAST(exceeded_date_time AS DATE) AS [Day],
+                    car_maker,
+                    car_model,
+                    shotcnt_category,
+                    COUNT(DISTINCT applicator_no) AS total_count
+                FROM t_applicator_shots_h
+                WHERE 
+                    shotcnt_type IN ('Wire Crimper', 'Wire Anvil') AND 
+                    exceeded_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME)) AND 
+                    exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) 
+                GROUP BY 
+                    CAST(exceeded_date_time AS DATE), 
+                    car_maker,
+                    car_model,
+                    shotcnt_category
+            )
+            SELECT
+                d.report_date,
+                c.car_maker,
+                c.car_model,
+                s.shotcnt_category,
+                ISNULL(e.total_count, 0) AS total_count
+            FROM DateRange d
+            CROSS JOIN Categories c
+            CROSS JOIN ShotCategories s
+            LEFT JOIN Exceeded e
+                ON d.report_date = e.Day
+                AND e.car_maker = c.car_maker
+                AND e.car_model = c.car_model
+                AND e.shotcnt_category = s.shotcnt_category
+            ORDER BY 
+                d.report_date,
+                c.car_maker,
+                c.car_model,
+                s.shotcnt_category DESC";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->execute();
+
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($rows as $row) {
+        $date = $row['report_date'];
+
+        if (!in_array($date, $categories)) {
+            $categories[] = $date;
+        }
+    }
+
+    $dateMap = array_flip($categories);
+    $totalDays = count($categories);
+
+    foreach ($rows as $row) {
+        $shotCategory = $row['shotcnt_category'];
+
+        $carKey = ($row['car_maker'] == $row['car_model'])
+            ? $row['car_maker']
+            : $row['car_maker'] . ' ' . $row['car_model'];
+        
+        if (!isset($statusCounts[$shotCategory])) {
+            $statusCounts[$shotCategory] = [];
+        }
+
+        if (!isset($statusCounts[$shotCategory][$carKey])) {
+            $statusCounts[$shotCategory][$carKey] = [];
+        }
+
+        $seriesKey = $carKey . ' ' . $row['shotcnt_category'];
+
+        $statusCounts[$shotCategory][$carKey][$row['report_date']] = (int)$row['total_count'];
+    }
+
+    foreach ($statusCounts as $shotCategory => $cars) {
+        $data[$shotCategory] = [];
+
+        foreach ($cars as $carKey => $dates) {
+            $series = [];
+
+            foreach ($categories as $date) {
+                $series[] = $dates[$date] ?? 0;
+            }
+
+            $data[$shotCategory][] = [
+                'name' => $carKey,
+                'data' => $series
+            ];
+        }
+    }
+
+    // Encode the categories and data as JSON
+    echo json_encode(['categories' => $categories, 'data' => $data, 'colorMap' => $color_map]);
+}
+
 $conn = null;

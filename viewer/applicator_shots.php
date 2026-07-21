@@ -174,6 +174,88 @@ include 'plugins/navbar/viewer_navbar.php';
                     <!-- /.row -->
                     <div class="row">
                         <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline collapsed-card">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Hourly Applicator Count based on Exceeded Shot Count as of <?=date("F j, Y")?> (Wire Crimper or Wire Anvil Only)</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="row" id="current_hourly_exceeded_chart"></div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline collapsed-card">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Week Applicator Count based on Exceeded Shot Count as of <?=date("F j, Y")?> (Wire Crimper or Wire Anvil Only)</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="row" id="current_week_exceeded_chart"></div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                     <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card card-gray-dark card-outline collapsed-card">
+                                <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Current Month Applicator Count based on Exceeded Shot Count as of <?=date("F j, Y")?> (Wire Crimper or Wire Anvil Only)</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                    <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="row" id="current_month_exceeded_chart">
+                                        <div class="col-lg-6 col-sm-12">
+                                            <div class="row" id="current_month_exceeded_chart1"></div>
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12">
+                                            <div class="row" id="current_month_exceeded_chart2"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                    <div class="row">
+                        <div class="col-sm-12">
                             <div class="card card-gray-dark card-outline">
                                 <div class="card-header">
                                 <h3 class="card-title"><i class="fas fa-list"></i> Applicator Shots Table</h3>

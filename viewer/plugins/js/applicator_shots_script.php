@@ -10,6 +10,9 @@
 	let shotcnt_i_u_ranges_chart;
 	let shotcnt_i_d_ranges_chart;
 	let shotcnt_c_ranges_chart;
+	let current_hourly_exceeded_chart;
+	let current_week_exceeded_chart;
+	let current_month_exceeded_chart;
 
     // Global Variables for Realtime
 	var realtime_get_recent_applicator_shots;
@@ -28,6 +31,9 @@
 		// get_shotcnt_i_u_ranges_chart();
 		// get_shotcnt_i_d_ranges_chart();
 		// get_shotcnt_c_ranges_chart();
+		get_current_hourly_exceeded_chart();
+		get_current_week_exceeded_chart();
+		get_current_month_exceeded_chart();
 		
 		get_car_maker_dropdown_search();
 		get_car_model_dropdown_search();
@@ -833,6 +839,257 @@
 
 				shotcnt_c_ranges_chart = new ApexCharts(ctx, options);
 				shotcnt_c_ranges_chart.render();
+			}
+		});
+	}
+
+	let current_hourly_exceeded_charts = [];
+
+	const get_current_hourly_exceeded_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_hourly_exceeded_chart'
+			},  
+			success: response => {
+				// Clear previous charts
+                $('#current_hourly_exceeded_chart').empty();
+                current_hourly_exceeded_charts = []; // Reset the arrays of charts
+
+				// Loop through response to generate charts for each maker_model_label
+                for (const maker_model_label in response) {
+                    // Define Bootstrap 4 colors
+				    const bootstrapColors = ['#dc3545'];
+
+                    const maker_model_data = response[maker_model_label];
+                    
+                    // Create a unique container for each maker_model_label chart
+                    const chartId = `chexchart_${maker_model_label.replace(/\s/g, '_')}`; // Create an ID, replace spaces with underscores
+                    $('#current_hourly_exceeded_chart').append(`<div class="col-lg-6 col-sm-12" id="${chartId}"></div>`); // Append a new div for the chart
+
+                    // Define options for the chart
+                    var options = {
+                        chart: {
+                            type: 'bar',
+                            height: 250
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                columnWidth: '50%',
+                                endingShape: 'flat',
+                            },
+                        },
+                        dataLabels: {
+                            enabled: true
+                        },
+                        series: [{
+                            name: maker_model_label, // Use the route name as the series name
+                            data: maker_model_data.data
+                        }],
+                        colors: bootstrapColors,
+						yaxis: {
+							title: {
+								text: 'Applicator Count'
+							}
+						},
+                        xaxis: {
+                            categories: maker_model_data.categories
+                        },
+                        title: {
+                            text: `${maker_model_label} Exceeded Count`, // Add specific day context
+                            align: 'left'
+                        }
+                    };
+
+                    // Create and render the chart
+                    const ctx = document.querySelector(`#${chartId}`);
+                    const chart = new ApexCharts(ctx, options);
+                    chart.render();
+                    current_hourly_exceeded_charts.push(chart); // Store the chart instance
+				}
+			}
+		});
+	}
+
+	let current_week_exceeded_charts = [];
+
+	const get_current_week_exceeded_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_week_exceeded_chart'
+			},  
+			success: response => {
+				// Clear previous charts
+                $('#current_week_exceeded_chart').empty();
+                current_week_exceeded_charts = []; // Reset the arrays of charts
+
+				// Loop through response to generate charts for each maker_model_label
+                for (const maker_model_label in response) {
+					const maker_model_data = response[maker_model_label];
+
+                    // Define Bootstrap 4 colors
+				    const bootstrapColors = [maker_model_data.color];
+
+                    // Create a unique container for each maker_model_label chart
+                    const chartId = `cwchart_${maker_model_label.replace(/\s/g, '_')}`; // Create an ID, replace spaces with underscores
+                    $('#current_week_exceeded_chart').append(`<div class="col-lg-6 col-sm-12" id="${chartId}"></div>`); // Append a new div for the chart
+
+                    // Define options for the chart
+                    var options = {
+                        chart: {
+                            type: 'line',
+                            height: 250,
+                            toolbar: {
+                                show: true
+                            }
+                        },
+                        series: [{
+                            name: maker_model_label, // Use the route name as the series name
+                            data: maker_model_data.data
+                        }],
+                        stroke: {
+                            width: [5, 5]
+                        },
+						markers: {
+                            size: 4,
+                            colors: ['#fff'],
+                            strokeColors: '#333',
+                            strokeWidth: 2
+                        },
+						dataLabels: {
+                            enabled: true,
+                            style: {
+                                colors: ['#fff'],
+                                fontSize: '13px',
+                                fontWeight: 'bold'
+                            },
+                            background: {
+                                enabled: true,
+                                foreColor: '#000',
+                                borderRadius: 3,
+                                padding: 2
+                            }
+                        },
+						xaxis: {
+                            categories: maker_model_data.categories
+                        },
+						yaxis: {
+							title: {
+								text: 'Applicator Count'
+							}
+						},
+						colors: bootstrapColors,
+						legend: {
+                            position: 'top',
+                            labels: {
+                                colors: '#000',
+                                fontSize: '14px',
+                                fontWeight: 'bold'
+                            }
+                        },
+						tooltip: {
+                            shared: true,
+                            intersect: false,
+                            theme: "light"
+                        },
+                        title: {
+                            text: `${maker_model_label} Exceeded Count`, // Add specific day context
+                            align: 'left'
+                        }
+                    };
+
+                    // Create and render the chart
+                    const ctx = document.querySelector(`#${chartId}`);
+                    const chart = new ApexCharts(ctx, options);
+                    chart.render();
+                    current_week_exceeded_charts.push(chart); // Store the chart instance
+				}
+			}
+		});
+	}
+	
+	let current_month_exceeded_charts = [];
+
+	const get_current_month_exceeded_chart = () => {
+		$.ajax({
+			url: '../process/applicator_shots/as_dash_g_p.php',
+			type: 'GET',
+			cache: false,
+			dataType: 'json',
+			data: {
+				method: 'get_current_month_exceeded_chart'
+			},  
+			success: response => {
+				current_month_exceeded_charts.forEach(chart => chart.destroy());
+				current_month_exceeded_charts = [];
+
+				$("#current_month_exceeded_chart").empty();
+
+				Object.entries(response.data).forEach(([shotCategory, series], index) => {
+					const chartId = `current_month_exceeded_chart_${index}`;
+
+					$("#current_month_exceeded_chart").append(`
+						<div class="col-lg-6 col-sm-12 mb-3">
+							<div class="row">
+								<div class="col-12">
+									<div id="${chartId}"></div>
+								</div>
+							</div>
+						</div>
+					`);
+
+					const colors = series.map(item =>
+						response.colorMap[item.name] || "#343a40"
+					);
+
+					const options = {
+						chart: {
+							type: "line",
+							height: 300
+						},
+						series: series,
+						colors: colors,
+						yaxis: {
+							title: {
+								text: 'Applicator Count'
+							}
+						},
+						xaxis: {
+							categories: response.categories
+						},
+						title: {
+							text: shotCategory,
+							align: "left"
+						},
+						stroke: {
+							curve: "straight"
+						},
+						markers: {
+							size: 5
+						},
+						tooltip: {
+							shared: true,
+							intersect: false
+						}
+					};
+
+					const chart = new ApexCharts(
+						document.querySelector(`#${chartId}`),
+						options
+					);
+
+					chart.render();
+
+					current_month_exceeded_charts.push(chart);
+				});
 			}
 		});
 	}
