@@ -238,14 +238,7 @@ include 'plugins/navbar/viewer_navbar.php';
                                 </div>
                                 <!-- /.card-header -->
                                 <div class="card-body">
-                                    <div class="row" id="current_month_exceeded_chart">
-                                        <div class="col-lg-6 col-sm-12">
-                                            <div class="row" id="current_month_exceeded_chart1"></div>
-                                        </div>
-                                        <div class="col-lg-6 col-sm-12">
-                                            <div class="row" id="current_month_exceeded_chart2"></div>
-                                        </div>
-                                    </div>
+                                    <div class="row" id="current_month_exceeded_chart"></div>
                                 </div>
                                 <!-- /.card-body -->
                             </div>

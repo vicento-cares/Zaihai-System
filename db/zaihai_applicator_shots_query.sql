@@ -667,7 +667,7 @@ ShotCategories AS
 Exceeded AS
 (
     SELECT
-        CAST(exceeded_date_time AS DATE) AS [Day],
+        CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE) AS [Day],
 		car_maker,
 		car_model,
 		shotcnt_category,
@@ -678,7 +678,7 @@ Exceeded AS
 		exceeded_date_time >= DATEADD(HOUR, 6, CAST(@StartDate AS DATETIME)) AND 
 		exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(@EndDate AS DATETIME))) 
     GROUP BY 
-		CAST(exceeded_date_time AS DATE), 
+		CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE), 
 		car_maker,
 		car_model,
 		shotcnt_category
@@ -736,7 +736,7 @@ ShotCategories AS
 Exceeded AS
 (
     SELECT
-        CAST(exceeded_date_time AS DATE) AS [Day],
+        CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE) AS [Day],
 		car_maker,
 		car_model,
 		shotcnt_category,
@@ -747,7 +747,7 @@ Exceeded AS
 		exceeded_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME)) AND 
 		exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) 
     GROUP BY 
-		CAST(exceeded_date_time AS DATE), 
+		CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE), 
 		car_maker,
 		car_model,
 		shotcnt_category

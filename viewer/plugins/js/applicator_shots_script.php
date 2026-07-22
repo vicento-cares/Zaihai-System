@@ -40,7 +40,7 @@
 		get_applicator_no_datalist_search();
 		get_location_datalist_search();
 		get_recent_applicator_shots();
-		realtime_get_recent_applicator_shots = setInterval(get_recent_applicator_shots, 10000);
+		realtime_get_recent_applicator_shots = setInterval(get_recent_applicator_shots, 30000);
 	});
 
 	const get_current_overall_shotcnt = () => {
@@ -1033,11 +1033,71 @@
 
 				$("#current_month_exceeded_chart").empty();
 
+				// Line Chart
+				// Object.entries(response.data).forEach(([shotCategory, series], index) => {
+				// 	const chartId = `current_month_exceeded_chart_${index}`;
+
+				// 	$("#current_month_exceeded_chart").append(`
+				// 		<div class="col-sm-12 mb-3">
+				// 			<div class="row">
+				// 				<div class="col-12">
+				// 					<div id="${chartId}"></div>
+				// 				</div>
+				// 			</div>
+				// 		</div>
+				// 	`);
+
+				// 	const colors = series.map(item =>
+				// 		response.colorMap[item.name] || "#343a40"
+				// 	);
+
+				// 	const options = {
+				// 		chart: {
+				// 			type: "line",
+				// 			height: 300
+				// 		},
+				// 		series: series,
+				// 		colors: colors,
+				// 		yaxis: {
+				// 			title: {
+				// 				text: 'Applicator Count'
+				// 			}
+				// 		},
+				// 		xaxis: {
+				// 			categories: response.categories
+				// 		},
+				// 		title: {
+				// 			text: shotCategory,
+				// 			align: "left"
+				// 		},
+				// 		stroke: {
+				// 			curve: "straight"
+				// 		},
+				// 		markers: {
+				// 			size: 5
+				// 		},
+				// 		tooltip: {
+				// 			shared: true,
+				// 			intersect: false
+				// 		}
+				// 	};
+
+				// 	const chart = new ApexCharts(
+				// 		document.querySelector(`#${chartId}`),
+				// 		options
+				// 	);
+
+				// 	chart.render();
+
+				// 	current_month_exceeded_charts.push(chart);
+				// });
+
+				// Stacked Column Chart
 				Object.entries(response.data).forEach(([shotCategory, series], index) => {
 					const chartId = `current_month_exceeded_chart_${index}`;
 
 					$("#current_month_exceeded_chart").append(`
-						<div class="col-lg-6 col-sm-12 mb-3">
+						<div class="col-sm-12 mb-3">
 							<div class="row">
 								<div class="col-12">
 									<div id="${chartId}"></div>
@@ -1050,34 +1110,64 @@
 						response.colorMap[item.name] || "#343a40"
 					);
 
+					// const options = {
+					// 	chart: {
+					// 		type: "line",
+					// 		height: 300
+					// 	},
+					// 	series: series,
+					// 	colors: colors,
+					// 	yaxis: {
+					// 		title: {
+					// 			text: 'Applicator Count'
+					// 		}
+					// 	},
+					// 	xaxis: {
+					// 		categories: response.categories
+					// 	},
+					// 	title: {
+					// 		text: shotCategory,
+					// 		align: "left"
+					// 	},
+					// 	stroke: {
+					// 		curve: "straight"
+					// 	},
+					// 	markers: {
+					// 		size: 5
+					// 	},
+					// 	tooltip: {
+					// 		shared: true,
+					// 		intersect: false
+					// 	}
+					// };
+
 					const options = {
 						chart: {
-							type: "line",
-							height: 300
+							type: 'bar',
+							stacked: true,
+							toolbar: {
+								show: true
+							}
 						},
 						series: series,
 						colors: colors,
+						xaxis: {
+							categories: response.categories
+						},
 						yaxis: {
 							title: {
 								text: 'Applicator Count'
 							}
 						},
-						xaxis: {
-							categories: response.categories
-						},
 						title: {
 							text: shotCategory,
-							align: "left"
+							align: 'left'
 						},
-						stroke: {
-							curve: "straight"
-						},
-						markers: {
-							size: 5
-						},
-						tooltip: {
-							shared: true,
-							intersect: false
+						plotOptions: {
+							bar: {
+								horizontal: false,
+								columnWidth: '55%'
+							},
 						}
 					};
 

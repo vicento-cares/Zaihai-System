@@ -1660,7 +1660,9 @@ if ($method == 'get_current_hourly_exceeded_chart') {
                 ON h.hour_start = e.hour_start
                 AND e.car_maker = c.car_maker
                 AND e.car_model = c.car_model
-                AND e.shotcnt_category = s.shotcnt_category
+                AND e.shotcnt_category = s.shotcnt_category 
+            WHERE 
+                s.shotcnt_category = '100K Shots' 
             ORDER BY 
                 CASE 
                     WHEN CAST(h.hour_start AS INT) >= 6 THEN CAST(h.hour_start AS INT)
@@ -1741,7 +1743,7 @@ if ($method == 'get_current_week_exceeded_chart') {
             Exceeded AS
             (
                 SELECT
-                    CAST(exceeded_date_time AS DATE) AS [Day],
+                    CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE) AS [Day],
                     car_maker,
                     car_model,
                     shotcnt_category,
@@ -1752,7 +1754,7 @@ if ($method == 'get_current_week_exceeded_chart') {
                     exceeded_date_time >= DATEADD(HOUR, 6, CAST(@StartDate AS DATETIME)) AND 
                     exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(@EndDate AS DATETIME))) 
                 GROUP BY 
-                    CAST(exceeded_date_time AS DATE), 
+                    CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE), 
                     car_maker,
                     car_model,
                     shotcnt_category
@@ -1770,7 +1772,9 @@ if ($method == 'get_current_week_exceeded_chart') {
                 ON d.SampleDate = e.Day
                 AND e.car_maker = c.car_maker
                 AND e.car_model = c.car_model
-                AND e.shotcnt_category = s.shotcnt_category
+                AND e.shotcnt_category = s.shotcnt_category 
+            WHERE 
+                s.shotcnt_category = '100K Shots' 
             ORDER BY 
                 d.SampleDate,
                 c.car_maker,
@@ -1860,7 +1864,7 @@ if ($method == 'get_current_month_exceeded_chart') {
             Exceeded AS
             (
                 SELECT
-                    CAST(exceeded_date_time AS DATE) AS [Day],
+                    CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE) AS [Day],
                     car_maker,
                     car_model,
                     shotcnt_category,
@@ -1871,7 +1875,7 @@ if ($method == 'get_current_month_exceeded_chart') {
                     exceeded_date_time >= DATEADD(HOUR, 6, CAST(DATEFROMPARTS(@Year, @Month, 1) AS DATETIME)) AND 
                     exceeded_date_time < DATEADD(HOUR, 6, DATEADD(DAY, 1, CAST(EOMONTH(DATEFROMPARTS(@Year, @Month, 1)) AS DATETIME2))) 
                 GROUP BY 
-                    CAST(exceeded_date_time AS DATE), 
+                    CAST(DATEADD(HOUR, -6, exceeded_date_time) AS DATE), 
                     car_maker,
                     car_model,
                     shotcnt_category
@@ -1889,7 +1893,9 @@ if ($method == 'get_current_month_exceeded_chart') {
                 ON d.report_date = e.Day
                 AND e.car_maker = c.car_maker
                 AND e.car_model = c.car_model
-                AND e.shotcnt_category = s.shotcnt_category
+                AND e.shotcnt_category = s.shotcnt_category 
+            WHERE 
+                s.shotcnt_category = '100K Shots' 
             ORDER BY 
                 d.report_date,
                 c.car_maker,
