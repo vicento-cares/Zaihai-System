@@ -154,7 +154,7 @@
 						}
 					},
 					title: {
-						text: `Applicator Count In 50k Shot Count Exceeded Condition (Wire Crimper or Wire Anvil Only)`,
+						text: `50k Shot Count Exceeded (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -222,7 +222,7 @@
 						}
 					},
 					title: {
-						text: `Applicator Count In 100k Shot Count Exceeded Condition (Wire Crimper or Wire Anvil Only)`,
+						text: `100k Shot Count Exceeded (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -289,7 +289,7 @@
 						}
 					},
 					title: {
-						text: `Applicator Count In 100k Shot Count Exceeded Based On Priority (Wire Crimper or Wire Anvil Only)`,
+						text: `100k Shot Count Exceeded Based On Priority (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -356,7 +356,7 @@
 						}
 					},
 					title: {
-						text: `Applicator Count In 50k Shot Count Exceeded Based On Priority (Wire Crimper or Wire Anvil Only)`,
+						text: `50k Shot Count Exceeded Based On Priority (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -424,7 +424,7 @@
 						}
 					},
 					title: {
-						text: `Applicator Count In 100k Shot Count Exceeded Based On Applicator List Status (Wire Crimper or Wire Anvil Only)`,
+						text: `100k Shot Count Exceeded Based On Applicator List Status (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -492,7 +492,7 @@
 						}
 					},
 					title: {
-						text: `Applicator Count In 50k Shot Count Exceeded Based On Applicator List Status (Wire Crimper or Wire Anvil Only)`,
+						text: `50k Shot Count Exceeded Based On Applicator List Status (Wire Crimper or Wire Anvil Only)`,
 						align: 'left'
 					}
 				};
@@ -1141,9 +1141,38 @@
 					// 	}
 					// };
 
+					// Calculate totals
+					const totals = response.categories.map((_, i) =>
+						series.reduce((sum, s) => sum + (s.data[i] || 0), 0)
+					);
+
+					const maxTotal = Math.max(...totals);
+
+					const annotations = {
+						points: totals.map((total, i) => ({
+							x: response.categories[i],
+							y: total,
+							marker: {
+								size: 0
+							},
+							label: {
+								text: total.toString(),
+								offsetY: -10,
+								borderColor: 'transparent',
+								style: {
+									background: 'transparent',
+									color: '#000',
+									fontSize: '14px',
+									fontWeight: 600
+								}
+							}
+						}))
+					};
+
 					const options = {
 						chart: {
 							type: 'bar',
+							height: 575,
 							stacked: true,
 							toolbar: {
 								show: true
@@ -1155,6 +1184,9 @@
 							categories: response.categories
 						},
 						yaxis: {
+							min: 0,
+							max: maxTotal,
+							tickAmount: Math.min(maxTotal, 10),
 							title: {
 								text: 'Applicator Count'
 							}
@@ -1166,9 +1198,23 @@
 						plotOptions: {
 							bar: {
 								horizontal: false,
-								columnWidth: '55%'
+								columnWidth: '55%',
+								dataLabels: {
+									total: {
+										enabled: true,
+										offsetY: -10,
+										style: {
+											fontSize: '14px',
+											fontWeight: 'bold'
+										},
+										formatter: function (val) {
+											return val;
+										}
+									}
+								}
 							},
-						}
+						},
+						annotations: annotations
 					};
 
 					const chart = new ApexCharts(
