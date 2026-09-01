@@ -158,8 +158,12 @@ if ($method == 'get_recent_applicator_list') {
 				END AS elapsed_time,
 				date_updated,
 				-- Downtime column
+				-- CASE 
+				--	WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) > 1440 THEN 1 
+				--	ELSE 0 
+				-- END AS downtime
 				CASE 
-					WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) > 1440 THEN 1 
+					WHEN DATEDIFF(MINUTE, date_updated, GETDATE()) > 720 THEN 1 
 					ELSE 0 
 				END AS downtime
 			FROM t_applicator_list
